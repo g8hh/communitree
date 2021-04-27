@@ -1195,10 +1195,16 @@
     }
     var op0=this.operator(0);
     var op1=this.operator(1);
-    if (!op1) s+=String(op0);
-    else if (op1<3) s+="e".repeat(op1-1)+Math.pow(10,op0-Math.floor(op0))+"e"+Math.floor(op0);
-    else if (op1<8) s+="e".repeat(op1)+op0;
-    else s+="(10^)^"+op1+" "+op0;
+    if (!op1){ 
+      if(op0 < 1000) s+=Math.round(op0*100)/100
+      else if(op0 < 1000000000) s+=Math.round(op0)
+      else s+=Math.round((op0/Math.pow(10, Math.floor(Math.log10(op0))))*100)/100+"e"+Math.floor(Math.log10(op0))}
+    else if (op1<8) {
+      if(op0 < 1000) s+="e".repeat(op1-1)+Math.round(Math.pow(10,op0-Math.floor(op0))*100)/100+"e"+Math.floor(op0)
+      else if(op0 < 100000) s+="e".repeat(op1-1)+Math.round(Math.pow(10,op0-Math.floor(op0)))+"e"+Math.floor(op0)
+      else if(op0 < 1000000000) s+="e".repeat(op1-1)+"e"+Math.floor(op0)
+      else s+="e".repeat(op1)+Math.round(Math.pow(10,Math.log10(op0)-Math.floor(Math.log10(op0)))*100)/100+"e"+Math.floor(Math.log10(op0))}
+    else s+= new ExpantaNum(10).pow(new ExpantaNum(op0).slog().minus(new ExpantaNum(op0).slog().floor()))+"F"+(op1+new ExpantaNum(op0).slog().floor().toNumber());
     return s;
   };
   //from break_eternity.js

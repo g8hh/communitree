@@ -1,6 +1,7 @@
 // ************ Save stuff ************
 function save() {
 	localStorage.setItem(modInfo.id, btoa(unescape(encodeURIComponent(JSON.stringify(player)))));
+  //ok it saved fine so the problem must be when loading
 }
 function startPlayerBase() {
 	return {
@@ -144,11 +145,16 @@ function fixData(defaultData, newData) {
 				fixData(defaultData[item], newData[item]);
 		}
 		else if (defaultData[item] instanceof ExpantaNum) { // Convert to ExpantaNum
-			if (newData[item] === undefined||typeof newData[item]=="object")
+			if (newData[item] === undefined)
 				newData[item] = defaultData[item];
 
-			else
-				newData[item] = new ExpantaNum(newData[item]);
+			else{
+                let newItemThing=new ExpantaNum(0)
+				newItemThing.array = newData[item].array
+				newItemThing.sign = newData[item].sign
+				newItemThing.layer = newData[item].layer
+                newData[item] = newItemThing
+            } 
 		}
 		else if ((!!defaultData[item]) && (typeof defaultData[item] === "object")) {
 			if (newData[item] === undefined || (typeof defaultData[item] !== "object"))

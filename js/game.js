@@ -8,7 +8,11 @@ const TMT_VERSION = {
 	tmtNum: "2.π.1",
 	tmtName: "Incrementally Updated"
 }
-
+const EN_VERSION = {
+  enNum: "1.0",
+  enName: "ExpantaNum"
+  
+}
 function getResetGain(layer, useType = null) {
 	let type = useType
 	if (!useType){ 
