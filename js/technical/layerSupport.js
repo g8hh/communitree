@@ -1,3 +1,4 @@
+const EN = ExpantaNum
 var layers = {}
 
 const decimalZero = new ExpantaNum(0)
