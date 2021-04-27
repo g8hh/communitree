@@ -17,7 +17,7 @@ challenges: {
     11: {
         name: "Ouch",
         challengeDescription: "description of ouchie",
-        goal: new Decimal(100),
+        goal: new ExpantaNum(100),
         etc
     },
     etc
