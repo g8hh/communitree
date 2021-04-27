@@ -118,6 +118,8 @@ var systemComponents = {
             Made by {{modInfo.author}}	
         </span>
         <br>
+        The ExpantaNum Tree <a v-bind:href="'https://github.com/unsoftcapped3/The-Modding-Tree-Expantanum/blob/main/changelog.md'" target="_blank" class="link" v-bind:style = "{'font-size': '14px', 'display': 'inline'}" >{{EN_VERSION.enNum}}</a> by upvote and \sum_{n=1}^{+\infty}n = -1/12
+        <br>
         The Modding Tree <a v-bind:href="'https://github.com/Acamaeda/The-Modding-Tree/blob/master/changelog.md'" target="_blank" class="link" v-bind:style = "{'font-size': '14px', 'display': 'inline'}" >{{TMT_VERSION.tmtNum}}</a> by Acamaeda
         <br>
         The Prestige Tree made by Jacorb and Aarex

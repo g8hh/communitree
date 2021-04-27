@@ -1,7 +1,7 @@
 let modInfo = {
-	name: "The ??? Tree",
+	name: "The Modding Tree",
 	id: "mymod",
-	author: "nobody",
+	author: "",
 	pointsName: "points",
 	discordName: "",
 	discordLink: "",
@@ -13,7 +13,7 @@ let modInfo = {
 // Set your version in num and name
 let VERSION = {
 	num: "0.0",
-	name: "Literally nothing",
+	name: "",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
@@ -55,7 +55,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new ExpantaNum("e280000000"))
+	return false
 }
 
 

@@ -1,15 +1,6 @@
 
 function exponentialFormat(num, precision, mantissa = true) {
-    let e = num.log10().floor()
-    let m = num.div(ExpantaNum.pow(10, e))
-    if (m.toStringWithDecimalPlaces(precision) == 10) {
-        m = new ExpantaNum(1)
-        e = e.add(1)
-    }
-    e = (e.gte(1e9) ? format(e, 1) : (e.gte(10000) ? commaFormat(e, 0) : e.toStringWithDecimalPlaces(0)))
-    if (mantissa)
-        return m.toStringWithDecimalPlaces(precision) + "e" + e
-    else return "e" + e
+    return num.toString(precision)
 }
 
 function commaFormat(num, precision) {
@@ -22,7 +13,7 @@ function commaFormat(num, precision) {
 function regularFormat(num, precision) {
     if (isNaN(num)) return "NaN"
     if (num.array[0][1] < 0.001) return (0).toFixed(precision)
-    return num.toStringWithDecimalPlaces(Math.max(precision,2))
+    return num.toString(Math.max(precision,2))
 }
 
 function fixValue(x, y = 0) {
@@ -35,31 +26,19 @@ function sumValues(x) {
     return x.reduce((a, b) => ExpantaNum.add(a, b))
 }
 
-function format(decimal, precision = 2,) {
+function format(decimal, precision = 2) {
     decimal = new ExpantaNum(decimal)
-    if (isNaN(decimal)) {
-        player.hasNaN = true;
-        return "NaN"
+    let fmt = decimal.toString(precision)
+    if(decimal.gte(1000)){return fmt}
+    else if(precision>0){
+      if(fmt.split(".").length==1){fmt=fmt+".00"}
+      else if(fmt.split(".")[1].length==1){fmt=fmt+"0"}
     }
-    if (decimal.sign < 0) return "-" + format(decimal.neg(), precision)
-    if (!isFinite(decimal)) return "Infinity"
-    if (decimal.gte("eeee1000")) {
-        var slog = decimal.slog()
-        if (slog.gte(1e6)) return "F" + format(slog.floor())
-        else return ExpantaNum.pow(10, slog.sub(slog.floor())).toStringWithDecimalPlaces(3) + "F" + commaFormat(slog.floor(), 0)
-    }
-    else if (decimal.gte("1e100000")) return exponentialFormat(decimal, 0, false)
-    else if (decimal.gte("1e1000")) return exponentialFormat(decimal, 0)
-    else if (decimal.gte(1e9)) return exponentialFormat(decimal, precision)
-    else if (decimal.gte(1e3)) return commaFormat(decimal, 0)
-    else return regularFormat(decimal, precision)
+  return fmt
 }
 
 function formatWhole(decimal) {
-    decimal = new ExpantaNum(decimal)
-    if (decimal.gte(1e9)) return format(decimal, 2)
-    if (decimal.lte(0.98) && !decimal.eq(0)) return format(decimal, 2)
-    return format(decimal, 0)
+    return format(decimal,0)
 }
 
 function formatTime(s) {
@@ -72,9 +51,9 @@ function formatTime(s) {
 
 function toPlaces(x, precision, maxAccepted) {
     x = new ExpantaNum(x)
-    let result = x.toStringWithDecimalPlaces(precision)
+    let result = x.toString(precision)
     if (new ExpantaNum(result).gte(maxAccepted)) {
-        result = new ExpantaNum(maxAccepted - Math.pow(0.1, precision)).toStringWithDecimalPlaces(precision)
+        result = new ExpantaNum(maxAccepted - Math.pow(0.1, precision)).toString(precision)
     }
     return result
 }
