@@ -29,7 +29,25 @@ function sumValues(x) {
 function format(decimal, precision = 2) {
     decimal = new ExpantaNum(decimal)
     let fmt = decimal.toString(precision)
-    if(decimal.gte(1000)){return fmt}
+    if(decimal.gte(1000)&&decimal.lt("10^^5")){
+      let powers = fmt.split("e")
+      for (let i in powers){
+        let x=Number(powers[i])
+        if(Number.isNaN(x)||x==Infinity){}
+        else if(Number(powers[i])>(1000)){
+          let st = powers[i]
+          let s=st.length
+          if(s==4){st=st[0]+","+st.substr(1,3)}
+          if(s==5){st=st.substr(0,2)+","+st.substr(2,3)}
+          if(s==6){st=st.substr(0,3)+","+st.substr(3,3)}
+          if(s==7){st=st.substr(0,1)+","+st.substr(1,3)+","+st.substr(4,3)}
+          if(s==8){st=st.substr(0,2)+","+st.substr(2,3)+","+st.substr(5,3)}
+          if(s==9){st=st.substr(0,3)+","+st.substr(3,3)+","+st.substr(6,3)}
+          powers[i]=st
+        }
+      }
+      fmt=powers.join("e")
+      return fmt}
     else if(precision>0){
       if(fmt.split(".").length==1){fmt=fmt+".00"}
       else if(fmt.split(".")[1].length==1){fmt=fmt+"0"}

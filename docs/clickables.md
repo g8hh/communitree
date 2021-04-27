@@ -20,6 +20,8 @@ clickables: {
     cols: # of columns,
     11: {
         display() {return "Blah"},
+        onClick() {},
+        canClick(){return true},
         etc
     }
     etc

@@ -17,12 +17,12 @@ buyables: {
     rows: # of rows,
     cols: # of columns,
     11: {
-        cost(x) { return new Decimal(1).mul(x || getBuyableAmt(this.layer, this.id)) },
-        display() { return "Blah" },
+        cost() { return new ExpantaNum(1).mul(getBuyableAmount(this.layer, this.id)) },
+        display() { return "Buyable" },
         canAfford() { return player[this.layer].points.gte(this.cost()) },
         buy() {
             player[this.layer].points = player[this.layer].points.sub(this.cost())
-            setBuyableAmount(this.layer, this.id, getBuyableAmt(this.layer, this.id).add(1))
+            setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
         },
         etc
     },
