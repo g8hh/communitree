@@ -1,11 +1,11 @@
 let modInfo = {
-	name: "The Modding Tree",
-	id: "mymod",
-	author: "",
+	name: "The Communitree!",
+	id: "all",
+	author: "ducdat0507",
 	pointsName: "points",
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new ExpantaNum (10), // Used for hard resets and new players
+	initialStartPoints: EN (10), // Used for hard resets and new players
 	
 	offlineLimit: 1,  // In hours
 }
@@ -28,20 +28,27 @@ let winText = `Congratulations! You have reached the end and beaten this game, b
 var doNotCallTheseFunctionsEveryTick = ["blowUpEverything"]
 
 function getStartPoints(){
-    return new ExpantaNum(modInfo.initialStartPoints)
+    return EN(modInfo.initialStartPoints)
 }
 
 // Determines if it should show points/sec
 function canGenPoints(){
-	return true
+	return hasUpgrade("jac", 101)
 }
 
 // Calculate points/sec!
 function getPointGen() {
 	if(!canGenPoints())
-		return new ExpantaNum(0)
+		return EN(0)
 
-	let gain = new ExpantaNum(1)
+	let gain = EN(1)
+	if (hasUpgrade("jac", 102)) gain = gain.mul(upgradeEffect("jac", 102))
+	if (hasUpgrade("jac", 103)) gain = gain.mul(upgradeEffect("jac", 103))
+	if (hasUpgrade("jac", 223)) gain = gain.mul(buyableEffect("jac", 111)).mul(buyableEffect("jac", 112))
+	gain = gain.mul(buyableEffect("jac", 101))
+	gain = gain.mul(buyableEffect("jac", 121))
+	gain = gain.mul(buyableEffect("jac", 123).ppp)
+
 	return gain
 }
 

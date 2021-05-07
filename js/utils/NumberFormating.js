@@ -17,17 +17,17 @@ function regularFormat(num, precision) {
 }
 
 function fixValue(x, y = 0) {
-    return x || new ExpantaNum(y)
+    return x || EN(y)
 }
 
 function sumValues(x) {
     x = Object.values(x)
-    if (!x[0]) return new ExpantaNum(0)
+    if (!x[0]) return EN(0)
     return x.reduce((a, b) => ExpantaNum.add(a, b))
 }
 
 function format(decimal, precision = 2) {
-    decimal = new ExpantaNum(decimal)
+    decimal = EN(decimal)
     let fmt = decimal.toString(precision)
     if(decimal.gte(1000)&&decimal.lt("10^^5")){
       let powers = fmt.split("e")
@@ -68,10 +68,10 @@ function formatTime(s) {
 }
 
 function toPlaces(x, precision, maxAccepted) {
-    x = new ExpantaNum(x)
+    x = EN(x)
     let result = x.toString(precision)
-    if (new ExpantaNum(result).gte(maxAccepted)) {
-        result = new ExpantaNum(maxAccepted - Math.pow(0.1, precision)).toString(precision)
+    if (EN(result).gte(maxAccepted)) {
+        result = EN(maxAccepted - Math.pow(0.1, precision)).toString(precision)
     }
     return result
 }

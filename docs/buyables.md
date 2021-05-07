@@ -17,7 +17,7 @@ buyables: {
     rows: # of rows,
     cols: # of columns,
     11: {
-        cost() { return new ExpantaNum(1).mul(getBuyableAmount(this.layer, this.id)) },
+        cost() { return EN(1).mul(getBuyableAmount(this.layer, this.id)) },
         display() { return "Buyable" },
         canAfford() { return player[this.layer].points.gte(this.cost()) },
         buy() {

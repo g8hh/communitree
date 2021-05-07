@@ -26,7 +26,7 @@ let winText = `Congratulations! You have reached the end and beaten this game, b
 var doNotCallTheseFunctionsEveryTick = ["doReset", "buy", "onPurchase", "blowUpEverything"]
 
 function getStartPoints(){
-    return new ExpantaNum(modInfo.initialStartPoints)
+    return EN(modInfo.initialStartPoints)
 }
 
 // Determines if it should show points/sec
@@ -37,9 +37,9 @@ function canGenPoints(){
 // Calculate points/sec!
 function getPointGen() {
 	if(!canGenPoints())
-		return new ExpantaNum(0)
+		return EN(0)
 
-	let gain = new ExpantaNum(1)
+	let gain = EN(1)
 	if (hasUpgrade("c", 12)) gain = gain.times(upgradeEffect("c", 12))
 	return gain
 }
@@ -47,7 +47,7 @@ function getPointGen() {
 // You can add non-layer related variables that should to into "player" and be saved here, along with default values
 function addedPlayerData() { return {
 	weather: "Yes",
-	happiness: new ExpantaNum(72),
+	happiness: EN(72),
 }}
 
 // Display extra things at the top of the page
@@ -59,7 +59,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new ExpantaNum("e280000000"))
+	return player.points.gte(EN("e280000000"))
 }
 
 

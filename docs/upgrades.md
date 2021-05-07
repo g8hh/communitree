@@ -16,7 +16,7 @@ upgrades: {
     cols: # of columns,
     11: {
         description: "Blah",
-        cost: new ExpantaNum(100),
+        cost: EN(100),
         etc
     },
     etc

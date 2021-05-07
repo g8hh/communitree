@@ -66,16 +66,16 @@ function getStartLayerData(layer) {
 	if (layerdata.unlocked === undefined)
 		layerdata.unlocked = true;
 	if (layerdata.total === undefined)
-		layerdata.total = new ExpantaNum(0);
+		layerdata.total = EN(0);
 	if (layerdata.best === undefined)
-		layerdata.best = new ExpantaNum(0);
+		layerdata.best = EN(0);
 	if (layerdata.resetTime === undefined)
 		layerdata.resetTime = 0;
 
 	layerdata.buyables = getStartBuyables(layer);
 	if (layerdata.clickables == undefined)
 		layerdata.clickables = getStartClickables(layer);
-	layerdata.spentOnBuyables = new ExpantaNum(0);
+	layerdata.spentOnBuyables = EN(0);
 	layerdata.upgrades = [];
 	layerdata.milestones = [];
 	layerdata.achievements = [];
@@ -87,7 +87,7 @@ function getStartBuyables(layer) {
 	if (layers[layer].buyables) {
 		for (id in layers[layer].buyables)
 			if (isPlainObject(layers[layer].buyables[id]))
-				data[id] = new ExpantaNum(0);
+				data[id] = EN(0);
 	}
 	return data;
 }
@@ -115,9 +115,9 @@ function fixSave() {
 
 	for (layer in layers) {
 		if (player[layer].best !== undefined)
-			player[layer].best = new ExpantaNum(player[layer].best);
+			player[layer].best = EN(player[layer].best);
 		if (player[layer].total !== undefined)
-			player[layer].total = new ExpantaNum(player[layer].total);
+			player[layer].total = EN(player[layer].total);
 
 		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
 
@@ -149,7 +149,7 @@ function fixData(defaultData, newData) {
 				newData[item] = defaultData[item];
 
 			else{
-                let newItemThing=new ExpantaNum(0)
+                let newItemThing=EN(0)
 				newItemThing.array = newData[item].array
 				newItemThing.sign = newData[item].sign
 				newItemThing.layer = newData[item].layer

@@ -8,14 +8,14 @@ addLayer("c", {
         position: 0, // Horizontal position within a row. By default it uses the layer id and sorts in alphabetical order
         startData() { return {
             unlocked: true,
-			points: new ExpantaNum(0),
-            best: new ExpantaNum(0),
-            total: new ExpantaNum(0),
+			points: EN(0),
+            best: EN(0),
+            total: EN(0),
             buyables: {}, // You don't actually have to initialize this one
             beep: false,
         }},
         color: "#4BDC13",
-        requires: new ExpantaNum(10), // Can be a function that takes requirement increases into account
+        requires: EN(10), // Can be a function that takes requirement increases into account
         resource: "lollipops", // Name of prestige currency
         baseResource: "points", // Name of resource prestige is based on
         baseAmount() {return player.points}, // Get the current amount of baseResource
@@ -25,17 +25,17 @@ addLayer("c", {
         roundUpCost: false, // True if the cost needs to be rounded up (use when baseResource is static?)
 
         // For normal layers, gain beyond [softcap] points is put to the [softcapPower]th power
-        softcap: new ExpantaNum(1e100), 
-        softcapPower: new ExpantaNum(0.5), 
+        softcap: EN(1e100), 
+        softcapPower: EN(0.5), 
         canBuyMax() {}, // Only needed for static layers with buy max
         gainMult() { // Calculate the multiplier for main currency from bonuses
-            mult = new ExpantaNum(1)
+            mult = EN(1)
             if (hasUpgrade(this.layer, 166)) mult = mult.times(2) // These upgrades don't exist
 			if (hasUpgrade(this.layer, 120)) mult = mult.times(upgradeEffect(this.layer, 120))
             return mult
         },
         gainExp() { // Calculate the exponent on main currency from bonuses
-            return new ExpantaNum(1)
+            return EN(1)
         },
         row: 0, // Row the layer is in on the tree (0 is the first row)
         effect() {
@@ -103,12 +103,12 @@ addLayer("c", {
             11: {
                 title: "Generator of Genericness",
                 description: "Gain 1 Point every second.",
-                cost: new ExpantaNum(1),
+                cost: EN(1),
                 unlocked() { return player[this.layer].unlocked }, // The upgrade is only visible when this is true
             },
             12: {
                 description: "Point generation is faster based on your unspent Lollipops.",
-                cost: new ExpantaNum(1),
+                cost: EN(1),
                 unlocked() { return (hasUpgrade(this.layer, 11))},
                 effect() { // Calculate bonuses from the upgrade. Can return a single value or an object with multiple values
                     let ret = player[this.layer].points.add(1).pow(player[this.layer].upgrades.includes(24)?1.1:(player[this.layer].upgrades.includes(14)?0.75:0.5)) 
@@ -143,7 +143,7 @@ addLayer("c", {
                 currencyDisplayName: "exhancers", // Use if using a nonstandard currency
                 currencyInternalName: 11, // Use if using a nonstandard currency
 
-                cost: new ExpantaNum(3),
+                cost: EN(3),
                 unlocked() { return player[this.layer].unlocked }, // The upgrade is only visible when this is true
             },
         },
@@ -372,12 +372,12 @@ addLayer("c", {
 addLayer("f", {
     startData() { return {
         unlocked: false,
-        points: new ExpantaNum(0),
+        points: EN(0),
         boop: false,
         clickables: {[11]: "Start"} // Optional default Clickable state
     }},
     color: "#FE0102",
-    requires() {return new ExpantaNum(10)}, 
+    requires() {return EN(10)}, 
     resource: "farm points", 
     baseResource: "points", 
     baseAmount() {return player.points},
@@ -478,7 +478,7 @@ addLayer("f", {
 addLayer("a", {
         startData() { return {
             unlocked: true,
-			points: new ExpantaNum(0),
+			points: EN(0),
         }},
         color: "yellow",
         resource: "achievement power", 

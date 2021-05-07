@@ -1,9 +1,9 @@
 const EN = ExpantaNum
 var layers = {}
 
-const decimalZero = new ExpantaNum(0)
-const decimalOne = new ExpantaNum(1)
-const decimalNaN = new ExpantaNum(NaN)
+const decimalZero = EN(0)
+const decimalOne = EN(1)
+const decimalNaN = EN(NaN)
 
 function layerShown(layer){
     return tmp[layer].layerShown;
@@ -159,12 +159,12 @@ function setupLayer(layer){
     if(!layers[layer].componentStyles) layers[layer].componentStyles = {}
     if(layers[layer].symbol === undefined) layers[layer].symbol = layer.charAt(0).toUpperCase() + layer.slice(1)
     if(layers[layer].unlockOrder === undefined) layers[layer].unlockOrder = []
-    if(layers[layer].gainMult === undefined) layers[layer].gainMult = new ExpantaNum(1)
-    if(layers[layer].gainExp === undefined) layers[layer].gainExp = new ExpantaNum(1)
+    if(layers[layer].gainMult === undefined) layers[layer].gainMult = EN(1)
+    if(layers[layer].gainExp === undefined) layers[layer].gainExp = EN(1)
     if(layers[layer].type === undefined) layers[layer].type = "none"
     if(layers[layer].base === undefined || layers[layer].base <= 1) layers[layer].base = 2
-    if(layers[layer].softcap === undefined) layers[layer].softcap = new ExpantaNum("e1e7")
-    if(layers[layer].softcapPower === undefined) layers[layer].softcapPower = new ExpantaNum("0.5")
+    if(layers[layer].softcap === undefined) layers[layer].softcap = EN("e1e7")
+    if(layers[layer].softcapPower === undefined) layers[layer].softcapPower = EN("0.5")
     if(layers[layer].displayRow === undefined) layers[layer].displayRow = layers[layer].row
     if(layers[layer].name === undefined) layers[layer].name = layer
     if(layers[layer].layerShown === undefined) layers[layer].layerShown = true
