@@ -16,12 +16,8 @@ Clickables should be formatted like this:
 
 ```js
 clickables: {
-    rows: # of rows,
-    cols: # of columns,
     11: {
         display() {return "Blah"},
-        onClick() {},
-        canClick(){return true},
         etc
     }
     etc
@@ -41,6 +37,8 @@ Features:
 - canClick(): A function returning a bool to determine if you can click the clickable.
 
 - onClick(): A function that implements clicking one of the clickable. 
+
+- onHold(): **optional** A function that is called 20x/sec when the button is held for at least 0.25 seconds.
 
 - style: **optional**. Applies CSS to this clickable, in the form of an object where the keys are CSS attributes, and the values are the values for those attributes (both as strings).
 

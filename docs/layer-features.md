@@ -46,7 +46,8 @@ You can make almost any value dynamic by using a function in its place, includin
         {
             key: "p", // What the hotkey button is. Use uppercase if it's combined with shift, or "ctrl+x" for holding down ctrl.
             description: "p: reset your points for prestige points", // The description of the hotkey that is displayed in the game's How To Play tab
-            onPress() { if (player.p.unlocked) doReset("p") }
+            onPress() { if (player.p.unlocked) doReset("p") },
+            unlocked() {return hasMilestone('p', 3)} // Determines if you can use the hotkey, optional
         }
     ]
     ```
@@ -153,6 +154,8 @@ You can make almost any value dynamic by using a function in its place, includin
 - increaseUnlockOrder: **optional**. An array of layer ids. When this layer is unlocked for the first time, the `unlockOrder` value for any not-yet-unlocked layers in this list increases. This can be used to make them harder to unlock.
 
 - shouldNotify: **optional**. A function to return true if this layer should be highlighted in the tree. The layer will automatically be highlighted if you can buy an upgrade whether you have this or not.
+
+- glowColor: **optional**. The color that this layer will be highlighted if it should notify. The default is red. You can use this if you want several different notification types!
 
 - componentStyles: **optional**. An object that contains a set of functions returning CSS objects. Each of these will be applied to any components on the layer with the type of its id. Example:
 

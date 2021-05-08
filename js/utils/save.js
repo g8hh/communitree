@@ -22,7 +22,7 @@ function startPlayerBase() {
 		showStory: true,
 		points: modInfo.initialStartPoints,
 		subtabs: {},
-		lastSafeTab: (layoutInfo.showTree ? "none" : layoutInfo.startTab)
+		lastSafeTab: (readData(layoutInfo.showTree) ? "none" : layoutInfo.startTab)
 	};
 }
 function getStartPlayer() {
@@ -78,6 +78,7 @@ function getStartLayerData(layer) {
 	layerdata.spentOnBuyables = new ExpantaNum(0);
 	layerdata.upgrades = [];
 	layerdata.milestones = [];
+	layerdata.lastMilestone = null;
 	layerdata.achievements = [];
 	layerdata.challenges = getStartChallenges(layer);
 	return layerdata;

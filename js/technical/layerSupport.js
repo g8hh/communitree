@@ -1,4 +1,3 @@
-const EN = ExpantaNum
 var layers = {}
 
 const decimalZero = new ExpantaNum(0)
@@ -65,6 +64,7 @@ function updateLayers(){
 function setupLayer(layer){
     layers[layer].layer = layer
     if (layers[layer].upgrades){
+        setRowCol(layers[layer].upgrades)
         for (thing in layers[layer].upgrades){
             if (!isNaN(thing)){
                 layers[layer].upgrades[thing].id = thing
@@ -85,6 +85,7 @@ function setupLayer(layer){
         }
     }
     if (layers[layer].achievements){
+        setRowCol(layers[layer].achievements)
         for (thing in layers[layer].achievements){
             if (!isNaN(thing)){
                 layers[layer].achievements[thing].id = thing
@@ -95,6 +96,7 @@ function setupLayer(layer){
         }
     }
     if (layers[layer].challenges){
+        setRowCol(layers[layer].challenges)
         for (thing in layers[layer].challenges){
             if (!isNaN(thing)){
                 layers[layer].challenges[thing].id = thing
@@ -109,18 +111,22 @@ function setupLayer(layer){
     }
     if (layers[layer].buyables){
         layers[layer].buyables.layer = layer
+        setRowCol(layers[layer].buyables)
         for (thing in layers[layer].buyables){
             if (!isNaN(thing)){
                 layers[layer].buyables[thing].id = thing
                 layers[layer].buyables[thing].layer = layer
                 if (layers[layer].buyables[thing].unlocked === undefined)
                     layers[layer].buyables[thing].unlocked = true
-            }
+                }
+                layers[layer].buyables[thing].canBuy = function() {return canBuyBuyable(this.layer, this.id)}
+                if (layers[layer].buyables[thing].purchaseLimit === undefined) layers[layer].buyables[thing].purchaseLimit = new ExpantaNum(Infinity)
         }  
     }
 
     if (layers[layer].clickables){
         layers[layer].clickables.layer = layer
+        setRowCol(layers[layer].clickables)
         for (thing in layers[layer].clickables){
             if (!isNaN(thing)){
                 layers[layer].clickables[thing].id = thing
@@ -168,6 +174,7 @@ function setupLayer(layer){
     if(layers[layer].displayRow === undefined) layers[layer].displayRow = layers[layer].row
     if(layers[layer].name === undefined) layers[layer].name = layer
     if(layers[layer].layerShown === undefined) layers[layer].layerShown = true
+    if(layers[layer].glowColor === undefined) layers[layer].glowColor = "#ff0000"
 
     let row = layers[layer].row
 
@@ -224,6 +231,20 @@ function readData(data, args=null){
 		return data(args);
 	else
 		return data;
+}
+
+function setRowCol(upgrades) {
+    if (upgrades.rows && upgrades.cols) return
+    let maxRow = 0
+    let maxCol = 0
+    for (up in upgrades) {
+        if (!isNaN(up)) {
+            if (Math.floor(up/10) > maxRow) maxRow = Math.floor(up/10)
+            if (up%10 > maxCol) maxCol = up%10
+        }
+    }
+    upgrades.rows = maxRow
+    upgrades.cols = maxCol
 }
 
 function someLayerUnlocked(row){
