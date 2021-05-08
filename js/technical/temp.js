@@ -217,6 +217,11 @@ function setupBuyables(layer) {
 				x = x ?? player[this.layer].buyables[this.id]
 				return layers[this.layer].buyables[this.id].actualEffectFunction(x)
 			}
+			b.actualBaseFunction = b.base
+			b.base = function(x) {
+				x = x ?? player[this.layer].buyables[this.id]
+				return layers[this.layer].buyables[this.id].actualBaseFunction(x)
+			}
 		}
 	}
 }
