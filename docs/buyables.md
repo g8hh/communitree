@@ -38,6 +38,8 @@ Features:
 - effect(): **optional**. A function that calculates and returns the current values of bonuses of this buyable.  Can have an optional argument "x" to calculate the effect of having x of the buyable.. 
     Can return a value or an object containing multiple values.
 
+- base(): **optional**. A function that calculates and returns the current base of the buyables effect. Can have an optional argument "x" to calculate the effect of having x of the buyable..
+    Can return whatever you would like and can be used with this.base() in the effect function
 - display(): A function returning everything that should be displayed on the buyable after the title, likely including the description, amount bought, cost, and current effect. Can use basic HTML.
 
 - unlocked(): **optional**. A function returning a bool to determine if the buyable is visible or not. Default is unlocked.
