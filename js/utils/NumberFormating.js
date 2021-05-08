@@ -9,6 +9,9 @@ function commaFormat(num, precision) {
     return num.toStringWithDecimalPlaces(Math.max(precision,2)).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
 }
 
+function formatSmall(x, precision=2) { 
+    return format(x, precision, true)    
+}
 
 function regularFormat(num, precision) {
     if (isNaN(num)) return "NaN"
@@ -26,7 +29,8 @@ function sumValues(x) {
     return x.reduce((a, b) => ExpantaNum.add(a, b))
 }
 
-function format(decimal, precision = 2) {
+function format(decimal, precision = 2, small=false) {
+    small = small || modInfo.allowSmall
     decimal = new ExpantaNum(decimal)
     let fmt = decimal.toString(precision)
     if(decimal.gte(1000)&&decimal.lt("10^^5")){
@@ -51,6 +55,16 @@ function format(decimal, precision = 2) {
     else if(precision>0){
       if(fmt.split(".").length==1){fmt=fmt+".00"}
       else if(fmt.split(".")[1].length==1){fmt=fmt+"0"}
+    }
+    else if(decimal.lte(0.001) &&small&&decimal.gt(0)){
+        decimal = decimal.pow(-1)
+        let val = ""
+    if (decimal.lt("1e1000")){
+        val = exponentialFormat(decimal, precision)
+        return val.replace(/([^(?:e|F)]*)$/, '-$1')
+    }
+    else   
+        return format(decimal, precision) + "⁻¹"
     }
   return fmt
 }
