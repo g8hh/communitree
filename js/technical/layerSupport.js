@@ -1,5 +1,5 @@
 var layers = {}
-
+const EN = ExpantaNum
 const ExpantaNumZero = new ExpantaNum(0)
 const ExpantaNumOne = new ExpantaNum(1)
 const ExpantaNumNaN = new ExpantaNum(NaN)
