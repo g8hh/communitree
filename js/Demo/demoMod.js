@@ -4,15 +4,15 @@ let modInfo = {
 	pointsName: "points",
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new Decimal (10), // Used for hard resets and new players
+	initialStartPoints: new ExpantaNum (10), // Used for hard resets and new players
 	
 	offlineLimit: 1,  // In hours
 }
 
 // Set your version in num and name
 let VERSION = {
-	num: "2.π.1",
-	name: "Incrementally Updated",
+	num: "2.5.8",
+	name: "Dreams Really Do Come True",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
