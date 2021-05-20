@@ -66,6 +66,9 @@ function format(decimal, precision = 2, small=false) {
     else   
         return format(decimal, precision) + "⁻¹"
     }
+    if(fmt.split(".").length>0&&precision==0){
+        fmt=fmt.split(".")[0]
+    }
   return fmt
 }
 
