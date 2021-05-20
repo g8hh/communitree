@@ -5,8 +5,8 @@ var scrolled = false;
 
 // Don't change this
 const EN_VERSION = {
-  enNum: "1.0",
-  enName: "ExpantaNum"
+  enNum: "1.1",
+  enName: "Format+"
   
 }
 const TMT_VERSION = {
