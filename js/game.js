@@ -10,7 +10,7 @@ const EN_VERSION = {
   
 }
 const TMT_VERSION = {
-	tmtNum: "2.5.8",
+	tmtNum: "2.5.9.2",
 	tmtName: "Dreams Really Do Come True"
 }
 
