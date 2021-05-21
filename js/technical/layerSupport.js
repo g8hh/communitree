@@ -1,4 +1,5 @@
 var layers = {}
+const ExpantaNum = OmegaNum
 const EN = ExpantaNum
 const ExpantaNumZero = new ExpantaNum(0)
 const ExpantaNumOne = new ExpantaNum(1)
