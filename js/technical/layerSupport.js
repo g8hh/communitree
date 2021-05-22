@@ -4,7 +4,9 @@ const EN = ExpantaNum
 const ExpantaNumZero = new ExpantaNum(0)
 const ExpantaNumOne = new ExpantaNum(1)
 const ExpantaNumNaN = new ExpantaNum(NaN)
-
+const decimalZero = ExpantaNumZero
+const decimalOne= ExpantaNumOne
+const decimalNaN = ExpantaNumNaN
 function layerShown(layer){
     return tmp[layer].layerShown;
 }
