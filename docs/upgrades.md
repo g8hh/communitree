@@ -12,8 +12,6 @@ Upgrades are stored in the following format:
 
 ```js
 upgrades: {
-    rows: # of rows,
-    cols: # of columns,
     11: {
         description: "Blah",
         cost: EN(100),
@@ -23,7 +21,7 @@ upgrades: {
 }
 ```
 
-Each upgrade should have an id where the first digit is the row and the second digit is the column.
+Usually, upgrades should have an id where the first digit is the row and the second digit is the column.
 
 Individual upgrades can have these features:
 
@@ -37,7 +35,7 @@ Individual upgrades can have these features:
 
 - fullDisplay(): **OVERRIDE**. Overrides the other displays and descriptions, and lets you set the full text for the upgrade. Can use basic HTML.
 
-- cost: A Decimal for the cost of the upgrade. By default, upgrades cost the main prestige currency for the layer.
+- cost: A ExpantaNum for the cost of the upgrade. By default, upgrades cost the main prestige currency for the layer.
 
 - unlocked(): **optional**. A function returning a bool to determine if the upgrade is visible or not. Default is unlocked.
 
@@ -49,7 +47,7 @@ Individual upgrades can have these features:
 
 - id: **assigned automagically**. It's the "key" which the upgrade was stored under, for convenient access. The upgrade in the example's id is 11.
 
-By default, upgrades use the main prestige currency for the layer. You can include these to change them (but it needs to be a Decimal):
+By default, upgrades use the main prestige currency for the layer. You can include these to change them (but it needs to be a ExpantaNum):
 
 - currencyDisplayName: **optional**. The name to display for the currency for the upgrade.
 
