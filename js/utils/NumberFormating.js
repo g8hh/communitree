@@ -1,12 +1,14 @@
 
 function exponentialFormat(num, precision, mantissa = true) {
-    return num.toString(precision)
+    var exp = num.log10().floor()
+    var man = num.div(EN.pow(10, exp))
+    return man.toFixed(precision) + "×10↑" + commaFormat(exp)
 }
 
 function commaFormat(num, precision) {
     if (num === null || num === undefined) return "NaN"
     if (num.array[0][1] < 0.001) return (0).toFixed(precision)
-    return num.toStringWithDecimalPlaces(Math.max(precision,2)).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
+    return num.toFixed(precision).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
 }
 
 function formatSmall(x, precision=2) { 
@@ -32,44 +34,42 @@ function sumValues(x) {
 function format(decimal, precision = 2, small=false) {
     small = small || modInfo.allowSmall
     decimal = new ExpantaNum(decimal)
-    let fmt = decimal.toString(precision)
-    if(decimal.gte(1000)&&decimal.lt("10^^5")){
-      let powers = fmt.split("e")
-      for (let i in powers){
-        let x=Number(powers[i])
-        if(Number.isNaN(x)||x==Infinity){}
-        else if(Number(powers[i])>(1000)){
-          let st = powers[i]
-          let s=st.length
-          if(s==4){st=st[0]+","+st.substr(1,3)}
-          if(s==5){st=st.substr(0,2)+","+st.substr(2,3)}
-          if(s==6){st=st.substr(0,3)+","+st.substr(3,3)}
-          if(s==7){st=st.substr(0,1)+","+st.substr(1,3)+","+st.substr(4,3)}
-          if(s==8){st=st.substr(0,2)+","+st.substr(2,3)+","+st.substr(5,3)}
-          if(s==9){st=st.substr(0,3)+","+st.substr(3,3)+","+st.substr(6,3)}
-          powers[i]=st
-        }
-      }
-      fmt=powers.join("e")
-      return fmt}
-    else if(precision>0){
-      if(fmt.split(".").length==1){fmt=fmt+".00"}
-      else if(fmt.split(".")[1].length==1){fmt=fmt+"0"}
-    }
-    else if(decimal.lte(0.001) &&small&&decimal.gt(0)){
+    if (decimal.array[0] === null || !decimal.isFinite()) return decimal.toString()
+
+    if (decimal.lte(0.001) && small && decimal.gt(0)) {
         decimal = decimal.pow(-1)
         let val = ""
-    if (decimal.lt("1e1000")){
-        val = exponentialFormat(decimal, precision)
-        return val.replace(/([^(?:e|F)]*)$/, '-$1')
+        if (decimal.lt("1e1000")){
+            val = exponentialFormat(decimal, precision)
+            return val.replace(/([^(?:e|F)]*)$/, '-$1')
+        }
+        else return format(decimal, precision) + "⁻¹"
+    } else if (decimal.lt(1000)) {
+        return commaFormat(decimal, precision)
+    } else if (decimal.lt(1e9)) {
+        return commaFormat(decimal, 0)
+    } else if (decimal.lt("e1000")) {
+        return exponentialFormat(decimal, 3)
+    } else if (decimal.lt("e1000000")) {
+        return exponentialFormat(decimal, 0)
+    } else if (decimal.lt("eee1000000")) {
+        var tower = ""
+        while (decimal.gte("e1000000")) {
+            tower += "10↑"
+            decimal = decimal.log10()
+        }
+        var frm = format(decimal, 0)
+        if (decimal.gte(1000000000)) frm = "(" + frm + ")"
+        return tower + frm
+    } else if (decimal.lt("10^^1000000000")) {
+        var tower = decimal.slog(10).sub(1)
+        var towerF = tower.floor()
+        var rem = EN.pow(10, tower.sub(towerF))
+        if (rem <= 9) rem = EN.pow(10, rem)
+        else towerF = towerF.add(1)
+        return "10↑↑" + commaFormat(towerF) + "↑" + format(rem, 3)
     }
-    else   
-        return format(decimal, precision) + "⁻¹"
-    }
-    if(fmt.split(".").length>0&&precision==0){
-        fmt=fmt.split(".")[0]
-    }
-  return fmt
+    return "too large to format"
 }
 
 function formatWhole(decimal) {

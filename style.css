@@ -208,20 +208,21 @@ h1, h2, h3, b, input {
 
 .tabButton {
 	background-color: transparent;
-	color: var(--color);
+	color: var(--background);
 	font-size: 20px;
 	cursor: pointer;
 	padding: 5px 20px;
 	margin: 5px;
 	border-radius: 10px;
 	border: 2px solid;
-	color: var(--color);
-
+	border-color: rgba(0, 0, 0, 0.125);
+	box-shadow: 0 0 5px 2px var(--background);
+	z-index: 100000;
 }
 
 .tabButton:hover {
 	transform: scale(1.1, 1.1);
-	text-shadow: 0 0 7px var(--color);
+	box-shadow: 0 0 7px var(--color);
 }
 
 .reset {

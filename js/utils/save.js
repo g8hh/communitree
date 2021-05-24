@@ -222,17 +222,18 @@ function setupModInfo() {
 function fixNaNs() {
 	NaNcheck(player);
 }
-function NaNcheck(data) {
+function NaNcheck(data, name = "player") {
 	for (item in data) {
 		if (data[item] == null) {
 		}
 		else if (Array.isArray(data[item])) {
 			NaNcheck(data[item]);
 		}
-		else if (data[item] !== data[item] || data[item] === decimalNaN) {
+		else if (data[item] !== data[item] || data[item] === ExpantaNumNaN) {
+			throw Error(data[item].toString() + " lol (at " + name + "." + item + ")");
 			if (NaNalert === true || confirm("Invalid value found in player, named '" + item + "'. Please let the creator of this mod know! Would you like to try to auto-fix the save and keep going?")) {
 				NaNalert = true;
-				data[item] = (data[item] !== data[item] ? 0 : decimalZero);
+				data[item] = (data[item] !== data[item] ? 0 : ExpantaNumZero);
 			}
 			else {
 				clearInterval(interval);
@@ -243,7 +244,7 @@ function NaNcheck(data) {
 		else if (data[item] instanceof ExpantaNum) { // Convert to ExpantaNum
 		}
 		else if ((!!data[item]) && (data[item].constructor === Object)) {
-			NaNcheck(data[item]);
+			NaNcheck(data[item], name + "." + item);
 		}
 	}
 }

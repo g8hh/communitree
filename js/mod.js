@@ -1,6 +1,6 @@
 let modInfo = {
 	name: "The Communitree!",
-	id: "all",
+	id: "allofem",
 	author: "ducdat0507",
 	pointsName: "points",
 	discordName: "",
@@ -12,14 +12,24 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.0",
-	name: "",
+	num: "0.1",
+	name: "Slow and Steady",
 }
 
-let changelog = `<h1>Changelog:</h1><br>
-	<h3>v0.0</h3><br>
-		- Added things.<br>
-		- Added stuff.`
+let changelog = `<h1>Changelog:</h1><br/>
+	<br/>
+	<h2>v0.1</h2><br/>
+	<h4><i>- Slow and Steady -</i></h4>
+		Added Aarex creator layer.<br/>
+		Added more layers in The Prestige Tree tab.<br/>
+		Migrated to The Modding Tree 2.5.9.2.<br/>
+		Changed from using ExpantaNum.js to OmegaNum.js (and therefore will wipe out everybody's saves, I'm sorry).<br/>
+		Modified number formatting. (look ma, I invented new up arrow notation!)<br/>
+		Bumped endgame to 10↑↑6↑68.475.<br/>
+	<br/>
+	<h2>v0.0</h2><br/>
+		Initial release.<br/>
+`
 
 let winText = `Congratulations! You have reached the end and beaten this game, but for now...`
 
@@ -33,12 +43,12 @@ function getStartPoints(){
 
 // Determines if it should show points/sec
 function canGenPoints(){
-	return hasUpgrade("jac", 101)
+	return hasUpgrade("jac", 101) && player.points.lt(EN.tetrate(10, "e1000000"))
 }
 
 // Calculate points/sec!
 function getPointGen() {
-	if(!canGenPoints())
+	if(!hasUpgrade("jac", 101) && !hasUpgrade("aar", 101))
 		return EN(0)
 
 	let gain = EN(1)
@@ -48,6 +58,13 @@ function getPointGen() {
 	gain = gain.mul(buyableEffect("jac", 101))
 	gain = gain.mul(buyableEffect("jac", 121))
 	gain = gain.mul(buyableEffect("jac", 123).ppp)
+	gain = gain.mul(buyableEffect("jac", 131))
+	gain = gain.mul(buyableEffect("jac", 132))
+	
+	if (hasUpgrade("aar", 101)) gain = gain.mul(10)
+	if (hasUpgrade("aar", 103)) gain = gain.mul(player.aar.bal.add(1))
+	
+	if (hasUpgrade("aar", 201)) gain = gain.mul(upgradeEffect("aar", 201))
 
 	return gain
 }
@@ -58,11 +75,12 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
+	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format("eeeeee68.475")} points)`
 ]
 
 // Determines when the game "ends"
 function isEndgame() {
-	return false
+	return player.points.gte("eeeeee68.475")
 }
 
 

@@ -243,7 +243,8 @@ function keepGoing() {
 }
 
 function toNumber(x) {
-	if (x.mag !== undefined) return x.toNumber()
+	if (!x && x !== "") return x
+	if (x.array !== undefined) return x.toNumber()
 	if (x + 0 !== x) return parseFloat(x)
 	return x
 }

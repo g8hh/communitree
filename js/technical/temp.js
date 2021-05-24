@@ -109,20 +109,20 @@ function updateTemp() {
 	}
 }
 
-function updateTempData(layerData, tmpData, funcsData) {
+function updateTempData(layerData, tmpData, funcsData, name = "tmp") {
 	
 	for (item in funcsData){
 		if (Array.isArray(layerData[item])) {
 			if (item !== "tabFormat" && item !== "content") // These are only updated when needed
-				updateTempData(layerData[item], tmpData[item], funcsData[item])
+				updateTempData(layerData[item], tmpData[item], funcsData[item], name + "." + item)
 		}
 		else if ((!!layerData[item]) && (layerData[item].constructor === Object) || (typeof layerData[item] === "object") && traversableClasses.includes(layerData[item].constructor.name)){
-			updateTempData(layerData[item], tmpData[item], funcsData[item])
+			updateTempData(layerData[item], tmpData[item], funcsData[item], name + "." + item)
 		}
 		else if (isFunction(layerData[item]) && !isFunction(tmpData[item])){
 			let value = layerData[item]()
 			if (value !== value || (value instanceof ExpantaNum && !ExpantaNum.isFinite(value))){
-				throw Error("NaN lol");
+				throw Error(value.toString() + " lol (at " + name + "." + item + ")");
 				if (NaNalert || confirm ("Invalid value found in tmp, named '" + item + "' (" + value + "). Please let the creator of this mod know! Would you like to try to auto-fix the save and keep going?")){
 					NaNalert = true
 					value = (value !== value ? 0 : ExpantaNumZero)
