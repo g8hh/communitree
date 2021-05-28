@@ -1,3 +1,4 @@
+
 function exponentialFormat(num, precision, mantissa = true) {
   
     return num.toStringWithDecimalPlaces(precision)
@@ -40,7 +41,11 @@ function format(decimal, precision = 2, small=false) {
     let fmt = decimal.toString()
     if(decimal.eq(0))return "0"
     if(decimal.lt("0.0001")){return format(decimal.rec(), precision) + "⁻¹"}
-  else if(decimal.lt(1)){return decimal.toStringWithDecimalPlaces(precision)}
+  else if(decimal.lt(1)){
+    if(small)precision+=2
+    if(fmt.length<precision+2){fmt+="0".repeat(precision-fmt.length+2)}
+    else{fmt = fmt.substring(0,precision+2)}
+    }
   else if(decimal.lt(1000)){
     let f=fmt.split(".")
     if(precision==0){
@@ -68,8 +73,6 @@ function format(decimal, precision = 2, small=false) {
     else if(precision==0){mantissa = m[0]+"."+m[1].substring(0,2)}
     else mantissa = m[0]+"."+m[1].substring(0,precision)
     return mantissa+"e"+exp.toString()
-  }else if(decimal.lt("ee9")){
-    return "e"+fmt.split("e")[1]
   }
   else if(decimal.lt("10^^5")){
     return "e"+format(decimal.log10())
@@ -77,27 +80,15 @@ function format(decimal, precision = 2, small=false) {
   else if(decimal.lt("10^^^5")){
     return "F"+format(decimal.slog())
   }
-
-    /*
-    if(decimal.gte(1000)&&decimal.lt("10^^5")){
-      return decimal.toString()}
-    else if(precision>0){
-      if(fmt.split(".").length==1){fmt=fmt+".00"}
-      else if(fmt.split(".")[1].length==1){fmt=fmt+"0"}
+  else {
+    if(decimal.lt("10^^^^5")){
+      //return "10{3}"+format(decimal.hyperlog(3))
     }
-    else if(decimal.lte(0.001) &&small&&decimal.gt(0)){
-        decimal = decimal.pow(-1)
-        let val = ""
-    if (decimal.lt("1e1000")){
-        val = exponentialFormat(decimal, precision)
-        return val.replace(/([^(?:e|F)]*)$/, '-$1')
-    }
-    else   
-        return format(decimal, precision) + "⁻¹"
-    }
-    if(fmt.split(".").length>0&&precision==0){
-        fmt=fmt.split(".")[0]
-    }*/
+    let e= decimal.toHyperE()
+    let sp = e.split("#")
+    sp[0]="E10"
+    return sp.join("#")
+       }
   return fmt
 }
 
