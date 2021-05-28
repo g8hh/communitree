@@ -137,8 +137,8 @@ function loadVue() {
 	Vue.component('challenge', {
 		props: ['layer', 'data'],
 		template: `
-		<div v-if="tmp[layer].challenges && tmp[layer].challenges[data]!== undefined && tmp[layer].challenges[data].unlocked && !(player.hideChallenges && maxedChallenge(layer, [data]))"
-			v-bind:class="['hChallenge', challengeStyle(layer, data)]" v-bind:style="tmp[layer].challenges[data].style">
+		<div v-if="tmp[layer].challenges && tmp[layer].challenges[data]!== undefined && tmp[layer].challenges[data].unlocked && !(player.hideChallenges && maxedChallenge(layer, [data]) && !inChallenge(layer, [data]))"
+			v-bind:class="['hChallenge', challengeStyle(layer, data), inChallenge(layer, data) ? 'resetNotify' : '']" v-bind:style="tmp[layer].challenges[data].style">
 			<br><h3 v-html="tmp[layer].challenges[data].name"></h3><br><br>
 			<button v-bind:class="{ longUpg: true, can: true, [layer]: true }" v-bind:style="{'background-color': tmp[layer].color}" v-on:click="startChallenge(layer, data)">{{challengeButtonText(layer, data)}}</button><br><br>
 			<span v-if="layers[layer].challenges[data].fullDisplay" v-html="run(layers[layer].challenges[data].fullDisplay, layers[layer].challenges[data])"></span>
@@ -149,7 +149,6 @@ function loadVue() {
 				<span v-if="layers[layer].challenges[data].rewardDisplay!==undefined">Currently: <span v-html="(tmp[layer].challenges[data].rewardDisplay) ? (run(layers[layer].challenges[data].rewardDisplay, layers[layer].challenges[data])) : format(tmp[layer].challenges[data].rewardEffect)"></span></span>
 			</span>
 			<node-mark :layer='layer' :data='tmp[layer].challenges[data].marked' :offset="10"></node-mark></span>
-
 		</div>
 		`
 	})
@@ -278,7 +277,6 @@ function loadVue() {
 				<span v-if= "tmp[layer].buyables[data].title"><h2 v-html="tmp[layer].buyables[data].title"></h2><br></span>
 				<span v-bind:style="{'white-space': 'pre-line'}" v-html="run(layers[layer].buyables[data].display, layers[layer].buyables[data])"></span>
 				<node-mark :layer='layer' :data='tmp[layer].buyables[data].marked'></node-mark>
-
 			</button>
 			<br v-if="(tmp[layer].buyables[data].sellOne !== undefined && !(tmp[layer].buyables[data].canSellOne !== undefined && tmp[layer].buyables[data].canSellOne == false)) || (tmp[layer].buyables[data].sellAll && !(tmp[layer].buyables[data].canSellAll !== undefined && tmp[layer].buyables[data].canSellAll == false))">
 			<sell-one :layer="layer" :data="data" v-bind:style="tmp[layer].componentStyles['sell-one']" v-if="(tmp[layer].buyables[data].sellOne)&& !(tmp[layer].buyables[data].canSellOne !== undefined && tmp[layer].buyables[data].canSellOne == false)"></sell-one>
@@ -434,7 +432,6 @@ function loadVue() {
 				<tab-buttons :layer="layer" :data="tmp[layer].microtabs[data]" :name="data" v-bind:style="tmp[layer].componentStyles['tab-buttons']"></tab-buttons>
 			</div>
 			<layer-tab v-if="tmp[layer].microtabs[data][player.subtabs[layer][data]].embedLayer" :layer="tmp[layer].microtabs[data][player.subtabs[layer][data]].embedLayer" :embedded="true"></layer-tab>
-
 			<column v-else v-bind:style="tmp[layer].microtabs[data][player.subtabs[layer][data]].style" :layer="layer" :data="tmp[layer].microtabs[data][player.subtabs[layer][data]].content"></column>
 		</div>
 		`
@@ -498,11 +495,10 @@ function loadVue() {
 		template: `<div>
 		<span class="upgRow" v-for="(row, r) in data"><table>
 			<span v-for="(node, id) in row" style = "{width: 0px}">
-				<tree-node :layer='node' :abb='tmp[node].symbol' :key="key + '-' + r + '-' + id"></tree-node>
+				<tree-node :layer='node' :prev='layer' :abb='tmp[node].symbol' :key="key + '-' + r + '-' + id"></tree-node>
 			</span>
 			<tr><table><button class="treeNode hidden"></button></table></tr>
 		</span></div>
-
 	`
 	})
 
@@ -567,6 +563,7 @@ function loadVue() {
 			layerunlocked,
 			doReset,
 			buyUpg,
+			buyUpgrade,
 			startChallenge,
 			milestoneShown,
 			keepGoing,
@@ -575,6 +572,8 @@ function loadVue() {
 			hasAchievement,
 			hasChallenge,
 			maxedChallenge,
+			getBuyableAmount,
+			getClickableState,
 			inChallenge,
 			canAffordUpgrade,
 			canBuyBuyable,
@@ -597,5 +596,3 @@ function loadVue() {
 		},
 	})
 }
-
- 

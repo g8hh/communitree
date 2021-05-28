@@ -10,15 +10,15 @@ You can make almost any value dynamic by using a function in its place, includin
 
 - name: **optional**. used in reset confirmations (and the default infobox title). If absent, it just uses the layer's id.
 
-- startData(): A function to return the default save data for this layer. Add any variables you have to it. Make sure to use `Decimal` values rather than normal numbers.
+- startData(): A function to return the default save data for this layer. Add any variables you have to it. Make sure to use `ExpantaNum` values rather than normal numbers.
 
     Standard values:
         - Required:
             - unlocked: a bool determining if this layer is unlocked or not
-            - points: a Decimal, the main currency for the layer
+            - points: a ExpantaNum, the main currency for the layer
         - Optional:
-            - total: A Decimal, tracks total amount of main prestige currency. Always tracked, but only shown if you add it here.
-            - best: A Decimal, tracks highest amount of main prestige currency. Always tracked, but only shown if you add it here.
+            - total: A ExpantaNum, tracks total amount of main prestige currency. Always tracked, but only shown if you add it here.
+            - best: A ExpantaNum, tracks highest amount of main prestige currency. Always tracked, but only shown if you add it here.
             - unlockOrder: used to keep track of relevant layers unlocked before this one.
             - resetTime: A number, time since this layer was last prestiged (or reset by another layer)
 
@@ -95,7 +95,7 @@ You can make almost any value dynamic by using a function in its place, includin
 
 - baseAmount(): A function that gets the current value of the base resource.
 
-- requires: A Decimal, the amount of the base needed to gain 1 of the prestige currency. Also the amount required to unlock the layer. You can instead make this a function, to make it harder if another layer was unlocked first (based on unlockOrder).
+- requires: A ExpantaNum, the amount of the base needed to gain 1 of the prestige currency. Also the amount required to unlock the layer. You can instead make this a function, to make it harder if another layer was unlocked first (based on unlockOrder).
 
 - exponent: Used as described above.
 
@@ -104,7 +104,7 @@ You can make almost any value dynamic by using a function in its place, includin
 - roundUpCost: **optional**. a bool, which is true if the resource cost needs to be rounded up. (use if the base resource is a "static" currency.)
 
 - gainMult(), gainExp(): **optional**. For normal layers, these functions calculate the multiplier and exponent on resource gain from upgrades and boosts and such. Plug in most bonuses here.
-    For static layers, they instead divide and root the cost of the resource.
+    For static layers, they instead multiply and roots the cost of the resource. (So to make a boost you want to make gainMult smaller and gainExp larger.)
 
 - directMult(): **optional**. Directly multiplies the resource gain, after exponents and softcaps. For static layers, actually multiplies resource gain instead of reducing the cost.
 
@@ -172,6 +172,10 @@ componentStyles: {
     "prestige-button"() { return {'color': '#AA66AA'} }
 }
 ```
+
+- leftTab: **optional**, if true, this layer will use the left tab instead of the right tab.
+
+- previousTab: **optional**, a layer's id. If a layer has a previousTab, the layer will always have a back arrow and pressing the back arrow on this layer will take you to the layer with this id. 
 
 - deactivated: **optional**, if this is true, hasUpgrade, hasChallenge, hasAchievement, and hasMilestone will return false for things in the layer, and you will be unable to buy or click things on the layer. You will have to disable effects of buyables, the innate layer effect, and possibly other things yourself.
 
