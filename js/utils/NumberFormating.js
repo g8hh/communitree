@@ -49,8 +49,8 @@ function format(decimal, precision = 2, small=false) {
   else if(decimal.lt(1000)){
     let f=fmt.split(".")
     if(precision==0){
-      return format(decimal.floor())}
-    if(f.length==1){
+      return format(decimal.floor(),0)}
+   else if(f.length==1){
       return fmt+".00"
     }
     else if(f[1].length<precision){
