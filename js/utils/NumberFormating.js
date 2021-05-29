@@ -34,7 +34,10 @@ function sumValues(x) {
     if (!x[0]) return new ExpantaNum(0)
     return x.reduce((a, b) => ExpantaNum.add(a, b))
 }
-
+function egg(n) {
+  if(n == undefined) return 0
+  return n
+}
 function format(decimal, precision = 2, small=false) {
     small = small || modInfo.allowSmall
     decimal = new ExpantaNum(decimal)
@@ -49,8 +52,8 @@ function format(decimal, precision = 2, small=false) {
   else if(decimal.lt(1000)){
     let f=fmt.split(".")
     if(precision==0){
-      return format(decimal.floor(),0)}
-   else if(f.length==1){
+      return format(decimal.floor())}
+    else if(f.length==1){
       return fmt+".00"
     }
     else if(f[1].length<precision){
@@ -74,22 +77,66 @@ function format(decimal, precision = 2, small=false) {
     return mantissa+"e"+exp.toString()
   }
   else if(decimal.lt("10^^5")){
+    let part1 = "e".repeat(egg(decimal.array[1])+1 - (decimal.gte(EN.E_MAX_SAFE_INTEGER)))
+    if(part1 != "e") {
+      decimal.array.pop()
+      return part1+format(decimal)
+    }
     return "e"+format(decimal.log10())
   }
   else if(decimal.lt("10^^^5")){
+    let part1 = "F".repeat(egg(decimal.array[2])+1 - (decimal.gte(EN.TETRATED_MAX_SAFE_INTEGER)))
+    if(part1 != "F") 
+    {
+      decimal.array.pop()
+      return part1+format(decimal)
+    }
     return "F"+format(decimal.slog())
   }
   else {
     if(decimal.lt("10^^^^5")){
-      //return "10{3}"+format(decimal.hyperlog(3))
+      //console.log(egg(decimal.array[3]))
+      // Hmmmmmm
+      let part1 = "G".repeat(egg(decimal.array[3])+ 1 - (decimal.gte("10^^^"+Number.MAX_SAFE_INTEGER)))
+      if(part1 != "G") {
+        decimal.array.pop()
+        return part1+format(decimal)
+      }
+      return "G" + format(decimal.hlog(3))
+    }
+    else if(decimal.lt("10{5}5")){
+      let part1 = "H".repeat(egg(decimal.array[4])+1 - (decimal.gte("10^^^^"+Number.MAX_SAFE_INTEGER)))
+      if(part1 != "H") {
+        decimal.array.pop()
+        return part1+format(decimal)
+      }
+      return "H" + format(decimal.hlog(4))
     }
     let e= decimal.toHyperE()
     let sp = e.split("#")
     sp[0]="E10"
-    return sp.join("#")
+    return sp.join("#")/*
+    else{
+      if(decimal.lt("10{998}5")){
+        let qp = EN(6)
+        let op=formatWhole(qp)
+        while(decimal.lt("10{"+op+"}5")){
+          qp=qp.add(1)
+          op=formatWhole(qp)
+        }
+        qp=qp.sub(1)
+        op=formatWhole(qp)
+        let part1 = ("10{"+op+"}").repeat(egg(decimal.array[4])+1 - (decimal.gte("10^^^^"+Number.MAX_SAFE_INTEGER)))
+      if(part1 != ("10{"+op+"}")) {
+        decimal.array.pop()
+        return part1+format(decimal)
+      }
+      return "10{"+op+"}" + format(decimal.hlog(op))
+      }
+    }*/
        }
   return fmt
-}
+} // w- what 
 
 function formatWhole(decimal) {
     return format(decimal,0)
