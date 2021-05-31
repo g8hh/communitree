@@ -80,7 +80,7 @@ addLayer("aar", {
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
-            unlocked() { return player.aca.best.lt(0) }
+            unlocked() { return player.aca.best.lte(0) }
         },
         103: {
             title: "Is this just a Timewall?",
@@ -89,7 +89,7 @@ addLayer("aar", {
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
-            unlocked() { return player.aca.best.lt(0) }
+            unlocked() { return player.aca.best.lte(0) }
         },
         104: {
             title: "Wow this isn't worth it",
@@ -98,7 +98,7 @@ addLayer("aar", {
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
-            unlocked() { return player.aca.best.lt(0) }
+            unlocked() { return player.aca.best.lte(0) }
         },
         111: {
             title: "Let's",
@@ -264,7 +264,7 @@ addLayer("aar", {
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
-            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lt(0) },
+            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lte(0) },
         },
         203: {
             title: "Apocalyptetra",
@@ -273,7 +273,7 @@ addLayer("aar", {
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
-            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lt(0) },
+            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lte(0) },
         },
         204: {
             title: "200-noogol",
@@ -282,7 +282,7 @@ addLayer("aar", {
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
-            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lt(0) },
+            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lte(0) },
         },
         205: {
             title: "Mlastomillion",
@@ -291,7 +291,7 @@ addLayer("aar", {
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
-            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lt(0) },
+            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lte(0) },
         },
         206: {
             title: "Binary-doocol",
@@ -320,7 +320,7 @@ addLayer("aar", {
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
-            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lt(0) },
+            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lte(0) },
         },
         212: {
             title: "Upgrade-Automator",
@@ -329,7 +329,7 @@ addLayer("aar", {
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
-            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lt(0) },
+            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lte(0) },
         },
         213: {
             title: "Soul-Automator",
@@ -338,7 +338,7 @@ addLayer("aar", {
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
-            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lt(0) },
+            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lte(0) },
         },
         214: {
             title: "Large Number Convention",
@@ -347,7 +347,7 @@ addLayer("aar", {
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
-            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lt(0) },
+            unlocked() { return hasUpgrade("aar", 201) && player.aca.best.lte(0) },
         },
         215: {
             title: "Aarex Point Generator",
@@ -641,7 +641,7 @@ addLayer("aar", {
         }
 
         // Aarex Dimensions
-        if (hasUpgrade("aar", 221) && player.aca.best.lt(0)) {
+        if (hasUpgrade("aar", 221) && player.aca.best.lte(0)) {
             player.aar.dimPoints = player.aar.dimPoints.add(buyableEffect("aar", 100).mul(player.aar.dims[0]).mul(delta))
             for (let a = 1; a < 10; a++) {
                 player.aar.dims[a-1] = player.aar.dims[a-1].add(buyableEffect("aar", 100 + a).mul(buyableEffect("aar", 113)).mul(player.aar.dims[a]).mul(delta))

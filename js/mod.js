@@ -12,13 +12,15 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.2.1",
+	num: "0.2.2",
 	name: "Layer Omega",
 }
 
 let changelog = `<h1>Changelog:</h1><br/>
 	<i>(Be warned: this may contain spoilers!)</i><br/>
 	<br/>
+	<h3>v0.2.2</h3><br/>
+		Fixed a game-breaking bug where Aarex layer is unintentionally locked.<br/>
 	<h3>v0.2.1</h3><br/>
 		Fixed a game-breaking bug where the game doesnt load or the game display numbers as NaN×10↑NaN and similar.<br/>
 	<br/>
