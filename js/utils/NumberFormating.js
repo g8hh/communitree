@@ -7,7 +7,7 @@ function exponentialFormat(num, precision, mantissa = true) {
 
 function commaFormat(num, precision) {
     if (num === null || num === undefined) return "NaN"
-    if (num instanceof ExpantaNum && num.array[0] < 0.001) return (0).toFixed(precision)
+    if (num.array && num.array[0] < 0.001) return (0).toFixed(precision)
     return num.toFixed(precision).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
 }
 
@@ -78,6 +78,10 @@ function format(decimal, precision = 2, small=false) {
         return tower + frm
     } else {
         var array = decimal.array
+        for (let a in array) if (array[a] >= 1e9) {
+            array[+a + 1] = (+array[+a + 1] || 0) + 1
+            array[a] = Math.log10(array[a])
+        }
         var str = ""
         while (str.length < 12 && array.length > 0) {
             str += (player.inlineExp && str != "" && !str.endsWith("↑") ? " " : "") + formatTower(array.length - 1, array[array.length - 1])
