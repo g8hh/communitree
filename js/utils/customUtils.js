@@ -16,3 +16,9 @@ function resetBuyableRow(layer, row) {
         if (player[layer].buyables[a]) player[layer].buyables[a] = ExpantaNumZero
     }
 }
+
+function logLerp(start, end, mul) {
+    var lStart = EN(start).log10()
+    var lEnd = EN(end).log10()
+    return EN.pow(10, lStart.add(lEnd.sub(lStart).mul(mul)))
+}

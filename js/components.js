@@ -519,8 +519,8 @@ function loadVue() {
 	Vue.component('slider', {
 		props: ['layer', 'data'],
 		template: `
-			<div class="tooltipBox">
-			<tooltip :text="player[layer][data[0]]"></tooltip><input type="range" v-model="player[layer][data[0]]" :min="data[1]" :max="data[2]"></div>
+			<div class="tooltipBox" v-if="data[4] === 'undefined' || run(data[4])">
+			<tooltip :text="data[5] === 'undefined' ? player[layer][data[0]] : run(data[5], player[layer], player[layer][data[0]])"></tooltip><input type="range" v-model="player[layer][data[0]]" :min="data[1]" :max="data[2]" :step="data[3]"></div>
 		`
 	})
 

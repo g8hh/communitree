@@ -7,8 +7,23 @@ function exponentialFormat(num, precision, mantissa = true) {
 
 function commaFormat(num, precision) {
     if (num === null || num === undefined) return "NaN"
-    if (num.array[0][1] < 0.001) return (0).toFixed(precision)
+    if (num instanceof ExpantaNum && num.array[0] < 0.001) return (0).toFixed(precision)
     return num.toFixed(precision).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
+}
+
+function formatTower(tower, times) {
+
+    if (tower == 0) return format(times)
+    if (times == 0) return ""
+
+    var str = ""
+    if (tower <= 4) str = "10".padEnd(tower + 2, "↑")
+    else str = "10↑" + superscript(tower.toString())
+
+    if (times <= 3) str = str.repeat(times)
+    else str = "(" + str + ")" + superscript(commaFormat(times))
+
+    return str
 }
 
 function formatSmall(x, precision=2) { 
@@ -61,15 +76,27 @@ function format(decimal, precision = 2, small=false) {
         var frm = format(decimal, 0)
         if (decimal.gte(1000000000)) frm = "(" + frm + ")"
         return tower + frm
-    } else if (decimal.lt("10^^1000000000")) {
-        var tower = decimal.slog(10).sub(1)
-        var towerF = tower.floor()
-        var rem = EN.pow(10, tower.sub(towerF))
-        if (rem <= 9) rem = EN.pow(10, rem)
-        else towerF = towerF.add(1)
-        return "10↑↑" + commaFormat(towerF) + "↑" + format(rem, 3)
+    } else {
+        var array = decimal.array
+        var str = ""
+        while (str.length < 12 && array.length > 0) {
+            str += (player.inlineExp && str != "" && !str.endsWith("↑") ? " " : "") + formatTower(array.length - 1, array[array.length - 1])
+            array.pop()
+        }
+        return str + (array.length > 0 ? "…" : "")
     }
     return "too large to format"
+}
+
+function superscript(value) {
+    if (player.inlineExp) return "^" + value
+    return swapChars(value, "0123456789,", "⁰¹²³⁴⁵⁶⁷⁸⁹’")
+}
+
+function swapChars(value, start, end) {
+    for (var a = 0; a < start.length; a++)
+        value = value.replaceAll(start[a], end[a])
+    return value
 }
 
 function formatWhole(decimal) {
@@ -77,6 +104,7 @@ function formatWhole(decimal) {
 }
 
 function formatTime(s) {
+    if (s > 31536000000 || (s.gt && s.gt(31536000000))) return format(EN(s).div(31536000)) + " years"
     if (s < 60) return format(s) + "s"
     else if (s < 3600) return formatWhole(Math.floor(s / 60)) + "m " + format(s % 60) + "s"
     else if (s < 84600) return formatWhole(Math.floor(s / 3600)) + "h " + formatWhole(Math.floor(s / 60) % 60) + "m " + format(s % 60) + "s"

@@ -60,7 +60,7 @@ td {
 
 h1, h2, h3, b, input {
 	display: inline;
-	font-family: "Lucida Console", "Courier New", monospace
+	font-family: Consolas, "Lucida Console", "Courier New", monospace
 }
 
 
@@ -73,7 +73,7 @@ h1, h2, h3, b, input {
 	border-radius: 50%;
 	box-shadow: var(--hqProperty2a), var(--hqProperty2b);
 	font-size: 40px;
-	font-family: "Lucida Console", "Courier New", monospace;
+	font-family: Consolas, "Lucida Console", "Courier New", monospace;
 	color: rgba(0, 0, 0, 0.5);
 	text-shadow: var(--hqProperty3);
 	padding: 0;
@@ -89,7 +89,7 @@ h1, h2, h3, b, input {
 	border-radius: 33%;
 	box-shadow: var(--hqProperty2a), var(--hqProperty2b);
 	font-size: 40px;
-	font-family: "Lucida Console", "Courier New", monospace;
+	font-family: Consolas, "Lucida Console", "Courier New", monospace;
 	color: rgba(0, 0, 0, 0.5);
 	text-shadow: var(--hqProperty3);
 	padding: 0;
@@ -399,7 +399,7 @@ a {
 	font-size: 20px;
 	color: #41f5f5;
 	cursor: pointer;
-	font-family: "Lucida Console", "Courier New", monospace;
+	font-family: Consolas, "Lucida Console", "Courier New", monospace;
 	-webkit-text-stroke-width: 1px;
 	-webkit-text-stroke-color: #02f2f2;
 	text-decoration: none;
@@ -588,7 +588,7 @@ ul {
 	margin-bottom: 5px;
 	margin-left: -80px;
 	padding: 7px;
-	font-family: "Lucida Console", "Courier New", monospace;
+	font-family: Consolas, "Lucida Console", "Courier New", monospace;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
@@ -744,3 +744,4 @@ button > * {
 .star:after {
 	transform: rotate(35deg);
 }
+

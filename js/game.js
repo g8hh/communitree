@@ -405,7 +405,10 @@ function hardReset() {
 
 var ticking = false
 
+var frame = 0
+
 var interval = setInterval(function() {
+	frame += 1;
 	if (player===undefined||tmp===undefined) return;
 	if (ticking) return;
 	if (gameEnded&&!player.keepGoing) return;

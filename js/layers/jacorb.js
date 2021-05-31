@@ -1,3 +1,5 @@
+'use strict';
+
 addLayer("jac", {
     name: "Jacorb",
     symbol: "J",
@@ -18,7 +20,7 @@ addLayer("jac", {
     exponent: 0.5,
     canBuyMax: () => true,
     gainMult() {
-        mult = EN(1)
+        let mult = EN(1)
         if (hasUpgrade("jac", 104)) mult = mult.mul(upgradeEffect("jac", 104))
         if (hasUpgrade("aar", 104)) mult = mult.mul(player.aar.bal.add(1))
         return mult
@@ -27,11 +29,16 @@ addLayer("jac", {
         return EN(1)
     },
     hotkeys: [
-        {key: "j", description: "J: Reset for Jacorb points", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        {
+            key: "j", 
+            description: "J: Reset for Jacorb points", 
+            unlocked() {return tmp[this.layer].layerShown },
+            onPress(){ if (canReset(this.layer)) doReset(this.layer) }
+        },
     ],
 
     autoUpgrade() {
-        return hasUpgrade("aar", 212)
+        return hasUpgrade("aar", 212) || hasMilestone("aca", 1)
     },
 
     upgrades: {
@@ -166,19 +173,19 @@ addLayer("jac", {
             currencyDisplayName: "quirks",
             currencyInternalName: 131,
             effect() {
-                var eff = {
+                let eff = {
                     q: player[this.layer].buyables[132].add(1).log().add(1).pow(2.1),
                     h: player[this.layer].buyables[131].add(1).log().add(1).pow(2),
                 }
                 if (hasUpgrade("jac", 226)) {
-                    var p = upgradeEffect("jac", 216).m ? upgradeEffect("jac", 216).m.mul(upgradeEffect("jac", 216).ba).pow(5) : 1
+                    let p = upgradeEffect("jac", 216).m ? upgradeEffect("jac", 216).m.mul(upgradeEffect("jac", 216).ba).pow(5) : 1
                     eff.q = eff.q.mul(p)
                     eff.h = eff.h.mul(p)
                 }
                 return eff
             },
             effectDisplay() {
-                var eff = this.effect()
+                let eff = this.effect()
                 return "Q: ×" + format(eff.q) + ", H: ×" + format(eff.h)
             },
             unlocked() { return hasUpgrade("jac", 204) },
@@ -197,7 +204,7 @@ addLayer("jac", {
                 }
             },
             effectDisplay() {
-                var eff = this.effect()
+                let eff = this.effect()
                 return "M: ×" + format(eff.m) + ", BA: ×" + format(eff.ba)
             },
             unlocked() { return hasUpgrade("jac", 205) },
@@ -467,7 +474,7 @@ addLayer("jac", {
             unlocked() { return hasUpgrade("jac", 264) },
         },
         266: {
-            title: () => hasUpgrade("jac", 266) ? "████ ██ ████" : "It's at EE50",
+            title: () => hasUpgrade("jac", 266) ? "████ ██ ████████" : "It's at 10↑10↑50",
             description: () => hasUpgrade("jac", 266) ? "██████ ███████████ ███ ███ ██████ █ ████████" : "Resets EVERYTHING, but you unlock a new creator.",
             cost: EN(1),
             currencyLocation() {return player[this.layer].buyables}, 
@@ -507,7 +514,7 @@ addLayer("jac", {
                 return EN(20)
             },
             effect(x=player[this.layer].buyables[this.id]) {
-                let eff = x.add(1).pow(hasUpgrade("aar", 101) ? 1 : 0.75);
+                let eff = x.max(0).add(1).pow(hasUpgrade("aar", 102) ? 1 : 0.75);
                 return eff
             },
             display() {
@@ -550,7 +557,7 @@ addLayer("jac", {
                 return data.cost.mul(EN.pow(3, player[this.layer].buyables[this.id].pow(1.25)))
             },
             cost(x=player[this.layer].buyables[this.id]) {
-                var cost = EN(20)
+                let cost = EN(20)
                 if (hasUpgrade("jac", 232)) cost = cost.div(upgradeEffect("jac", 232))
                 return cost.max("1e-308")
             },
@@ -609,7 +616,7 @@ addLayer("jac", {
                 return data.cost.mul(EN.pow(3, player[this.layer].buyables[this.id].pow(1.25)))
             },
             cost(x=player[this.layer].buyables[this.id]) {
-                var cost = EN(20)
+                let cost = EN(20)
                 if (hasUpgrade("jac", 232)) cost = cost.div(upgradeEffect("jac", 232))
                 return cost.max("1e-308")
             },
@@ -780,7 +787,7 @@ addLayer("jac", {
             },
             effect(x=player[this.layer].buyables[this.id]) {
                 x = softcap(x, EN(200), .75)
-                var gf = buyableEffect("jac", 112)
+                let gf = buyableEffect("jac", 112)
                 let eff = {
                     ppp: EN.pow(gf.root(gf.add(1).log().div(20).add(0.2)), x)
                 }
@@ -835,7 +842,7 @@ addLayer("jac", {
             },
             effect(x=player[this.layer].buyables[this.id]) {
                 x = softcap(x, EN(100), 9)
-                var mul = EN(1.2)
+                let mul = EN(1.2)
                 mul = mul.mul(buyableEffect("jac", 135))
                 let eff = EN.pow(mul, x)
                 return eff;
@@ -1057,7 +1064,7 @@ addLayer("jac", {
                 return EN(75)
             },
             effect(x=player[this.layer].buyables[this.id]) {
-                var time = EN(player[this.layer].resetTime)
+                let time = EN(player[this.layer].resetTime)
                 if (hasUpgrade("jac", 264)) time = time.mul(100); if (hasUpgrade("jac", 265)) time = time.mul(100)
                 let eff = {
                     so: softcap(x.add(10).log10().pow(time.add(1).log().pow(1.5)), EN(1e15), .5),
@@ -1112,7 +1119,7 @@ addLayer("jac", {
             },
             effect(x=player[this.layer].buyables[this.id]) {
                 x = softcap(x.mul(buyableEffect("jac", 142).ng || 1), EN(50), .5)
-                var time = EN(player[this.layer].resetTime)
+                let time = EN(player[this.layer].resetTime)
                 if (hasUpgrade("jac", 264)) time = time.mul(100); if (hasUpgrade("jac", 265)) time = time.mul(100)
                 let eff = time.add(1).pow(10).pow(time.add(1).log().pow(1.5)).pow(x).mul(buyableEffect("jac", 141))
                 return eff;
@@ -1275,7 +1282,7 @@ addLayer("jac", {
             },
             effect(x=player[this.layer].buyables[this.id]) {
                 x = softcap(x, EN(100000), .2)
-                var time = EN(player[this.layer].resetTime)
+                let time = EN(player[this.layer].resetTime)
                 let eff = {
                     ps: x.add(1).pow(time.add(1).log().pow(2)).pow(100),
                     ng: x.add(1).log().mul(time.add(1).log().pow(2)).div(10).add(1).sqrt()
@@ -1332,7 +1339,7 @@ addLayer("jac", {
             },
             effect(x=player[this.layer].buyables[this.id]) {
                 x = softcap(x, EN(100000), .2)
-                var time = EN(player[this.layer].resetTime)
+                let time = EN(player[this.layer].resetTime)
                 let eff = {
                     ps: x.add(1).pow(time.add(1).log().pow(2)).pow(100),
                     ng: x.add(1).log().mul(time.add(1).log().pow(2)).div(10).add(1).sqrt()

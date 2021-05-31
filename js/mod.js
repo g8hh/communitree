@@ -12,11 +12,21 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1",
-	name: "Slow and Steady",
+	num: "0.2",
+	name: "Layer Omega",
 }
 
 let changelog = `<h1>Changelog:</h1><br/>
+	<i>(Be warned: this may contain spoilers!)</i><br/>
+	<br/>
+	<h2>v0.2</h2><br/>
+	<h4><i>- Layer Omega -</i></h4>
+		Added Acamaeda creator layer (note, the layer may contain flashing colors).<br/>
+		You are now no longer able to do a sacrifice reset without an Aarex Dimension 10.<br/>
+		Modified number formatting to use a more accurate one.<br/>
+		Added epilepsy warning and epilepsy toggle.<br/>
+		Changed the main font to Consolas from Lucida Console.<br/>
+		Bumped endgame to 10↑↑10↑↑10↑10↑10↑9.<br/>
 	<br/>
 	<h2>v0.1</h2><br/>
 	<h4><i>- Slow and Steady -</i></h4>
@@ -66,6 +76,8 @@ function getPointGen() {
 	
 	if (hasUpgrade("aar", 201)) gain = gain.mul(upgradeEffect("aar", 201))
 
+	if (hasUpgrade("aca", 101)) gain = gain.pow(upgradeEffect("aca", 101))
+
 	return gain
 }
 
@@ -75,12 +87,19 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format("eeeeee68.475")} points)`
+	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format("(10^^)^2 (10^)^3 9")} points)`,
+	() => !player.isWarned ? `
+		<div style="border:2px solid var(--color);margin-top:10px;padding:5px;display:inline-block">
+		Important notice: Some parts of the game may contain flashing lights.<br/>
+		To prevent this, turn on "Anti-Epilepsy Mode" in the settings tab.<br/>
+		(the gear icon in the top-left corner)<br/>
+		<button style="margin-top:10px;" onclick="player.isWarned = true">Got it!</button>
+	` : ""
 ]
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte("eeeeee68.475")
+	return player.points.gte("(10^^)^2 (10^)^3 9")
 }
 
 
