@@ -15,7 +15,7 @@ addLayer("aca", {
     displayRow: 1,
     position: 0,
     branches: ["jac", "aar"],
-    layerShown() { return player.aar.best.gte("eeeeee100000000") || player.aca.best.gte(1) },
+    layerShown() { return player.aar.points.gte("eeeeee1000") || player.aca.best.gte(1) },
 
     startData() { return {
         points: EN(0),

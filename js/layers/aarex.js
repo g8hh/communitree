@@ -138,7 +138,7 @@ addLayer("aar", {
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
             effect() {
-                let eff = player.jac.points.add(1).log10().mul(2).add(1).log10().add(1)
+                let eff = player.jac.points.max(0).add(1).log10().mul(2).add(1).log10().add(1)
                 return eff
             },
             effectDisplay() { return "×" + format(this.effect()) },
@@ -691,7 +691,8 @@ addLayer("aar", {
                     },
                     buy() {
                         let i = this.id - 100
-                        player.aar.dimPoints = player.aar.dimPoints.sub(this.cost()).max(0)
+                        let cost = this.cost()
+                        if (cost.gte("ee15")) player.aar.dimPoints = player.aar.dimPoints.sub().max(0)
                         player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(1)
                         player.aar.dims[i] = player.aar.dims[i].add(1)
                     },
@@ -869,7 +870,7 @@ addLayer("aar", {
                         let max = this.max()
                         let cost = this.maxcost()
 
-                        player.aar.dimPoints = player.aar.dimPoints.sub(cost).max(0)
+                        if (cost.gte("ee15")) player.aar.dimPoints = player.aar.dimPoints.sub(cost).max(0)
                         player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(max)
                         player.aar.dims[i] = player.aar.dims[i].add(max)
                     },

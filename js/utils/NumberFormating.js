@@ -20,7 +20,7 @@ function formatTower(tower, times) {
     if (tower <= 4) str = "10".padEnd(tower + 2, "↑")
     else str = "10↑" + superscript(tower.toString())
 
-    if (times <= 3) str = str.repeat(times)
+    if (times <= 1) str = str.repeat(times)
     else str = "(" + str + ")" + superscript(commaFormat(times))
 
     return str
@@ -83,7 +83,7 @@ function format(decimal, precision = 2, small=false) {
             array[a] = Math.log10(array[a])
         }
         var str = ""
-        while (str.length < 12 && array.length > 0) {
+        while (array.length > 0) {
             str += (player.inlineExp && str != "" && !str.endsWith("↑") ? " " : "") + formatTower(array.length - 1, array[array.length - 1])
             array.pop()
         }

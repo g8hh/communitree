@@ -504,7 +504,7 @@ addLayer("jac", {
             },
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                return player[this.layer].points.div(data.cost).pow(0.5).mul(data.prestigeMul).floor()
+                return player[this.layer].points.max(0).div(data.cost).pow(0.5).mul(data.prestigeMul).floor()
             },
             prestigeNext () {
                 let data = tmp[this.layer].buyables[this.id]
@@ -548,7 +548,7 @@ addLayer("jac", {
             title() { return format(player[this.layer].buyables[this.id], 0)},
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                if (hasUpgrade("jac", 213)) return player[this.layer].buyables[101].div(data.cost).log().div(Math.log(3)).root(1.25).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
+                if (hasUpgrade("jac", 213)) return player[this.layer].buyables[101].max(0).div(data.cost).log().div(Math.log(3)).root(1.25).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
                 return EN(data.prestigeNext.lte(player[this.layer].buyables[101]) ? 1 : 0)
             },
             prestigeNext () {
@@ -607,7 +607,7 @@ addLayer("jac", {
             title() { return format(player[this.layer].buyables[this.id], 0)},
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                if (hasUpgrade("jac", 213)) return player[this.layer].buyables[101].div(data.cost).log().div(Math.log(3)).root(1.25).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
+                if (hasUpgrade("jac", 213)) return player[this.layer].buyables[101].max(0).div(data.cost).log().div(Math.log(3)).root(1.25).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
                 return EN(data.prestigeNext.lte(player[this.layer].buyables[101]) ? 1 : 0)
             },
             prestigeNext () {
@@ -669,7 +669,7 @@ addLayer("jac", {
             title() { return format(player[this.layer].buyables[this.id], 0)},
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                if (hasUpgrade("jac", 241)) return player[this.layer].buyables[101].div(data.cost).log().div(Math.log(1e25)).root(1.35).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
+                if (hasUpgrade("jac", 241)) return player[this.layer].buyables[101].max(0).div(data.cost).log().div(Math.log(1e25)).root(1.35).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
                 return EN(data.prestigeNext.lte(player.jac.points) ? 1 : 0)
             },
             prestigeNext () {
@@ -725,7 +725,7 @@ addLayer("jac", {
             },
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                return player[this.layer].points.div(data.cost).pow(0.12).mul(data.prestigeMul).floor()
+                return player[this.layer].points.max(0).div(data.cost).pow(0.12).mul(data.prestigeMul).floor()
             },
             prestigeNext () {
                 let data = tmp[this.layer].buyables[this.id]
@@ -774,7 +774,7 @@ addLayer("jac", {
             title() { return format(player[this.layer].buyables[this.id], 0)},
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                if (hasUpgrade("jac", 241)) return player[this.layer].buyables[101].div(data.cost).log().div(Math.log(1e25)).root(1.35).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
+                if (hasUpgrade("jac", 241)) return player[this.layer].buyables[101].max(0).div(data.cost).log().div(Math.log(1e25)).root(1.35).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
                 return EN(data.prestigeNext.lte(player.jac.points) ? 1 : 0)
             },
             prestigeNext () {
@@ -829,7 +829,7 @@ addLayer("jac", {
             title() { return format(player[this.layer].buyables[this.id], 0)},
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                if (hasUpgrade("jac", 244)) return player[this.layer].buyables[111].div(data.cost).log().div(Math.log(1.05)).root(1.05).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
+                if (hasUpgrade("jac", 244)) return player[this.layer].buyables[111].max(0).div(data.cost).log().div(Math.log(1.05)).root(1.05).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
                 return EN(data.prestigeNext.lte(player.jac.buyables[111]) ? 1 : 0)
             },
             prestigeNext () {
@@ -882,7 +882,7 @@ addLayer("jac", {
             title() { return format(player[this.layer].buyables[this.id], 0)},
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                if (hasUpgrade("jac", 225)) return player[this.layer].buyables[111].div(data.cost).log().div(Math.log(1.05)).root(1.05).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
+                if (hasUpgrade("jac", 225)) return player[this.layer].buyables[111].max(0).div(data.cost).log().div(Math.log(1.05)).root(1.05).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
                 return EN(data.prestigeNext.lte(player.jac.buyables[112]) ? 1 : 0)
             },
             prestigeNext () {
@@ -941,7 +941,7 @@ addLayer("jac", {
             },
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                return buyableEffect("jac", 112).div(data.cost).pow(0.01).pow(0.02).mul(data.prestigeMul).floor()
+                return buyableEffect("jac", 112).max(0).div(data.cost).pow(0.01).pow(0.02).mul(data.prestigeMul).floor()
             },
             prestigeNext () {
                 let data = tmp[this.layer].buyables[this.id]
@@ -999,7 +999,7 @@ addLayer("jac", {
             },
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                return buyableEffect("jac", 121).div(data.cost).pow(0.01).pow(0.03).mul(data.prestigeMul).floor()
+                return buyableEffect("jac", 121).max(0).div(data.cost).pow(0.01).pow(0.03).mul(data.prestigeMul).floor()
             },
             prestigeNext () {
                 let data = tmp[this.layer].buyables[this.id]
@@ -1012,7 +1012,7 @@ addLayer("jac", {
             effect(x=player[this.layer].buyables[this.id]) {
                 let time = EN(player[this.layer].resetTime)
                 if (hasUpgrade("jac", 264)) time = time.mul(100); if (hasUpgrade("jac", 265)) time = time.mul(100)
-                let eff = x.add(1).pow(20).pow(player.jac.points.add(1).log().add(1).log())
+                let eff = x.add(1).pow(20).pow(player.jac.points.max(0).add(1).log().add(1).log())
                 return eff;
             },
             display() {
@@ -1054,7 +1054,7 @@ addLayer("jac", {
             },
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                return player[this.layer].buyables[124].div(data.cost).pow(1.5).mul(data.prestigeMul).floor()
+                return player[this.layer].buyables[124].max(0).div(data.cost).pow(1.5).mul(data.prestigeMul).floor()
             },
             prestigeNext () {
                 let data = tmp[this.layer].buyables[this.id]
@@ -1106,7 +1106,7 @@ addLayer("jac", {
             title() { return format(player[this.layer].buyables[this.id], 0)},
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                if (hasUpgrade("jac", 206)) return player[this.layer].buyables[123].div(data.cost).log().div(Math.log(1.2)).root(1.05).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
+                if (hasUpgrade("jac", 206)) return player[this.layer].buyables[123].max(0).div(data.cost).log().div(Math.log(1.2)).root(1.05).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
                 return EN(data.prestigeNext.lte(player.jac.buyables[123]) ? 1 : 0)
             },
             prestigeNext () {
@@ -1160,7 +1160,7 @@ addLayer("jac", {
             title() { return format(player[this.layer].buyables[this.id], 0)},
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                if (hasUpgrade("jac", 246)) return player[this.layer].buyables[124].div(data.cost).log().div(Math.log(1.05)).root(1.05).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
+                if (hasUpgrade("jac", 246)) return player[this.layer].buyables[124].max(0).div(data.cost).log().div(Math.log(1.05)).root(1.05).sub(player[this.layer].buyables[this.id]).add(1).max(0).floor()
                 return EN(data.prestigeNext.lte(player.jac.buyables[124]) ? 1 : 0)
             },
             prestigeNext () {
@@ -1217,7 +1217,7 @@ addLayer("jac", {
             },
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                return player[this.layer].buyables[132].div(data.cost).pow(.008).mul(data.prestigeMul).floor()
+                return player[this.layer].buyables[132].max(0).div(data.cost).pow(.008).mul(data.prestigeMul).floor()
             },
             prestigeNext () {
                 let data = tmp[this.layer].buyables[this.id]
@@ -1271,7 +1271,7 @@ addLayer("jac", {
             },
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                return player[this.layer].buyables[131].div(data.cost).pow(.003).mul(data.prestigeMul).floor()
+                return player[this.layer].buyables[131].max(0).div(data.cost).pow(.003).mul(data.prestigeMul).floor()
             },
             prestigeNext () {
                 let data = tmp[this.layer].buyables[this.id]
@@ -1328,7 +1328,7 @@ addLayer("jac", {
             },
             prestigeGain () {
                 let data = tmp[this.layer].buyables[this.id]
-                return (hasUpgrade("aar", 201) ? player.jac.buyables[101] : buyableEffect("jac", 131)).add(1).log10().div(data.cost).pow(.01).mul(data.prestigeMul).sub(player[this.layer].buyables[this.id]).max(0).floor()
+                return (hasUpgrade("aar", 201) ? player.jac.buyables[101] : buyableEffect("jac", 131)).add(1).log10().max(0).div(data.cost).pow(.01).mul(data.prestigeMul).sub(player[this.layer].buyables[this.id]).max(0).floor()
             },
             prestigeNext () {
                 let data = tmp[this.layer].buyables[this.id]
