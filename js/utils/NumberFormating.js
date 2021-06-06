@@ -32,7 +32,7 @@ function formatSmall(x, precision=2) {
 
 function regularFormat(num, precision) {
     if (isNaN(num)) return "NaN"
-    if (num.array[0][1] < 0.001) return (0).toFixed(precision)
+    if (num.array[0] < 0.001) return (0).toFixed(precision)
     return num.toString(Math.max(precision,2))
 }
 
@@ -45,7 +45,10 @@ function sumValues(x) {
     if (!x[0]) return EN(0)
     return x.reduce((a, b) => ExpantaNum.add(a, b))
 }
-
+function egg(n) {
+  if(n == undefined) return 0
+  return n
+}
 function format(decimal, precision = 2, small=false) {
     small = small || modInfo.allowSmall
     decimal = new ExpantaNum(decimal)
@@ -111,9 +114,9 @@ function formatTime(s) {
     if (s > 31536000000 || (s.gt && s.gt(31536000000))) return format(EN(s).div(31536000)) + " years"
     if (s < 60) return format(s) + "s"
     else if (s < 3600) return formatWhole(Math.floor(s / 60)) + "m " + format(s % 60) + "s"
-    else if (s < 84600) return formatWhole(Math.floor(s / 3600)) + "h " + formatWhole(Math.floor(s / 60) % 60) + "m " + format(s % 60) + "s"
-    else if (s < 31536000) return formatWhole(Math.floor(s / 84600) % 365) + "d " + formatWhole(Math.floor(s / 3600) % 24) + "h " + formatWhole(Math.floor(s / 60) % 60) + "m " + format(s % 60) + "s"
-    else return formatWhole(Math.floor(s / 31536000)) + "y " + formatWhole(Math.floor(s / 84600) % 365) + "d " + formatWhole(Math.floor(s / 3600) % 24) + "h " + formatWhole(Math.floor(s / 60) % 60) + "m " + format(s % 60) + "s"
+    else if (s < 86400) return formatWhole(Math.floor(s / 3600)) + "h " + formatWhole(Math.floor(s / 60) % 60) + "m " + format(s % 60) + "s"
+    else if (s < 31536000) return formatWhole(Math.floor(s / 86400) % 365) + "d " + formatWhole(Math.floor(s / 3600) % 24) + "h " + formatWhole(Math.floor(s / 60) % 60) + "m " + format(s % 60) + "s"
+    else return formatWhole(Math.floor(s / 31536000)) + "y " + formatWhole(Math.floor(s / 86400) % 365) + "d " + formatWhole(Math.floor(s / 3600) % 24) + "h " + formatWhole(Math.floor(s / 60) % 60) + "m " + format(s % 60) + "s"
 }
 
 function toPlaces(x, precision, maxAccepted) {
