@@ -10,7 +10,7 @@ var activeFunctions = [
 	"sellOne", "sellAll", "pay", "actualCostFunction", "actualEffectFunction",
 	"effectDescription", "display", "fullDisplay", "effectDisplay", "rewardDisplay",
 	"tabFormat", "content",
-	"onComplete", "onPurchase", "onEnter", "onExit",
+	"onComplete", "onPurchase", "onEnter", "onExit", "done",
 	"getUnlocked", "getStyle", "getCanClick", "getTitle", "getDisplay"
 ]
 
@@ -43,8 +43,8 @@ function setupTemp() {
 	}
 
 	tmp.other = {
-		lastPoints: player.points || ExpantaNumZero,
-		oomps: ExpantaNumZero,
+		lastPoints: player.points || OmegaNumZero,
+		oomps: OmegaNumZero,
 		screenWidth: 0,
 		screenHeight: 0,
     }
@@ -59,7 +59,7 @@ function setupTempData(layerData, tmpData, funcsData) {
 		if (layerData[item] == null) {
 			tmpData[item] = null
 		}
-		else if (layerData[item] instanceof ExpantaNum)
+		else if (layerData[item] instanceof OmegaNum)
 			tmpData[item] = layerData[item]
 		else if (Array.isArray(layerData[item])) {
 			tmpData[item] = []
@@ -77,7 +77,7 @@ function setupTempData(layerData, tmpData, funcsData) {
 		}
 		else if (isFunction(layerData[item]) && !activeFunctions.includes(item)){
 			funcsData[item] = layerData[item]
-			tmpData[item] = ExpantaNumOne // The safest thing to put probably?
+			tmpData[item] = OmegaNumOne // The safest thing to put probably?
 		} else {
 			tmpData[item] = layerData[item]
 		}
@@ -109,30 +109,19 @@ function updateTemp() {
 	}
 }
 
-function updateTempData(layerData, tmpData, funcsData, name = "tmp") {
-	
+function updateTempData(layerData, tmpData, funcsData, useThis) {
 	for (item in funcsData){
 		if (Array.isArray(layerData[item])) {
 			if (item !== "tabFormat" && item !== "content") // These are only updated when needed
-				updateTempData(layerData[item], tmpData[item], funcsData[item], name + "." + item)
+				updateTempData(layerData[item], tmpData[item], funcsData[item], useThis)
 		}
 		else if ((!!layerData[item]) && (layerData[item].constructor === Object) || (typeof layerData[item] === "object") && traversableClasses.includes(layerData[item].constructor.name)){
-			updateTempData(layerData[item], tmpData[item], funcsData[item], name + "." + item)
+			updateTempData(layerData[item], tmpData[item], funcsData[item], useThis)
 		}
 		else if (isFunction(layerData[item]) && !isFunction(tmpData[item])){
-			let value = layerData[item]()
-			if (value !== value || (value instanceof ExpantaNum && !ExpantaNum.isFinite(value))){
-				throw Error(value.toString() + " lol (at " + name + "." + item + ")");
-				if (NaNalert || confirm ("Invalid value found in tmp, named '" + item + "' (" + value + "). Please let the creator of this mod know! Would you like to try to auto-fix the save and keep going?")){
-					NaNalert = true
-					value = (value !== value ? 0 : ExpantaNumZero)
-				}
-				else {
-					clearInterval(interval);
-					player.autosave = false;
-					NaNalert = true;
-				}
-			}
+			let value
+			if (useThis !== undefined) value = layerData[item].bind(useThis)()
+			else value = layerData[item]()
 			Vue.set(tmpData, item, value)
 		}
 	}	
@@ -170,4 +159,8 @@ function setupBuyables(layer) {
 			}
 		}
 	}
+}
+
+function checkOmegaNumNaN(x) {
+	return (x instanceof OmegaNum) && !x.eq(x)
 }

@@ -1,29 +1,18 @@
 
 function exponentialFormat(num, precision, mantissa = true) {
-    var exp = num.log10().floor()
-    var man = num.div(EN.pow(10, exp))
-    return man.toFixed(precision) + "×10↑" + commaFormat(exp)
+  
+    return num.toStringWithDecimalPlaces(precision)
 }
 
 function commaFormat(num, precision) {
     if (num === null || num === undefined) return "NaN"
-    if (num.array && num.array[0] < 0.001) return (0).toFixed(precision)
-    return num.toFixed(precision).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
-}
+    if (num.array[0] < 0.001) return (0).toFixed(precision)
+    let init = num.toString()
+    let portions = init.split(".")
+    portions[0] = portions[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
+    return portions[0]
 
-function formatTower(tower, times) {
-
-    if (tower == 0) return format(times)
-    if (times == 0) return ""
-
-    var str = ""
-    if (tower <= 4) str = "10".padEnd(tower + 2, "↑")
-    else str = "10↑" + superscript(tower.toString())
-
-    if (times <= 1) str = str.repeat(times)
-    else str = "(" + str + ")" + superscript(commaFormat(times))
-
-    return str
+    
 }
 
 function formatSmall(x, precision=2) { 
@@ -37,12 +26,12 @@ function regularFormat(num, precision) {
 }
 
 function fixValue(x, y = 0) {
-    return x || EN(y)
+    return x || new ExpantaNum(y)
 }
 
 function sumValues(x) {
     x = Object.values(x)
-    if (!x[0]) return EN(0)
+    if (!x[0]) return new ExpantaNum(0)
     return x.reduce((a, b) => ExpantaNum.add(a, b))
 }
 function egg(n) {
@@ -52,59 +41,102 @@ function egg(n) {
 function format(decimal, precision = 2, small=false) {
     small = small || modInfo.allowSmall
     decimal = new ExpantaNum(decimal)
-    if (decimal.array[0] === null || !decimal.isFinite()) return decimal.toString()
-
-    if (decimal.lte(0.001) && small && decimal.gt(0)) {
-        decimal = decimal.pow(-1)
-        let val = ""
-        if (decimal.lt("1e1000")){
-            val = exponentialFormat(decimal, precision)
-            return val.replace(/([^(?:e|F)]*)$/, '-$1')
-        }
-        else return format(decimal, precision) + "⁻¹"
-    } else if (decimal.lt(1000)) {
-        return commaFormat(decimal, precision)
-    } else if (decimal.lt(1e9)) {
-        return commaFormat(decimal, 0)
-    } else if (decimal.lt("e1000")) {
-        return exponentialFormat(decimal, 3)
-    } else if (decimal.lt("e1000000")) {
-        return exponentialFormat(decimal, 0)
-    } else if (decimal.lt("eee1000000")) {
-        var tower = ""
-        while (decimal.gte("e1000000")) {
-            tower += "10↑"
-            decimal = decimal.log10()
-        }
-        var frm = format(decimal, 0)
-        if (decimal.gte(1000000000)) frm = "(" + frm + ")"
-        return tower + frm
-    } else {
-        var array = decimal.array
-        for (let a in array) if (array[a] >= 1e9) {
-            array[+a + 1] = (+array[+a + 1] || 0) + 1
-            array[a] = Math.log10(array[a])
-        }
-        var str = ""
-        while (array.length > 0) {
-            str += (player.inlineExp && str != "" && !str.endsWith("↑") ? " " : "") + formatTower(array.length - 1, array[array.length - 1])
-            array.pop()
-        }
-        return str + (array.length > 0 ? "…" : "")
+    let fmt = decimal.toString()
+    if(decimal.eq(0))return "0"
+    if(decimal.lt("0.0001")){return format(decimal.rec(), precision) + "⁻¹"}
+  else if(decimal.lt(1)){
+    if(small)precision+=2
+    if(fmt.length<precision+2){fmt+="0".repeat(precision-fmt.length+2)}
+    else{fmt = fmt.substring(0,precision+2)}
     }
-    return "too large to format"
-}
-
-function superscript(value) {
-    if (player.inlineExp) return "^" + value
-    return swapChars(value, "0123456789,", "⁰¹²³⁴⁵⁶⁷⁸⁹’")
-}
-
-function swapChars(value, start, end) {
-    for (var a = 0; a < start.length; a++)
-        value = value.replaceAll(start[a], end[a])
-    return value
-}
+  else if(decimal.lt(1000)){
+    let f=fmt.split(".")
+    if(precision==0){
+      return format(decimal.floor())}
+    else if(f.length==1){
+      return fmt+".00"
+    }
+    else if(f[1].length<precision){
+      return fmt+"0".repeat(precision-f[1].length)
+    }
+    else{
+      return f[0]+"."+f[1].substring(0,precision)
+    }
+  }else if(decimal.lt(1e9)){
+    return commaFormat(decimal,precision)
+  }else if(decimal.lt("e10000")){
+    let mantissa = EN(10).pow(decimal.log10().sub(decimal.log10().floor()))
+    let exp = decimal.log10().floor()
+    let m = mantissa.toString().split(".")
+    if(m.length==1)mantissa = m[0]+".00"
+    else if(m[1].length<precision){
+      mantissa = m[0]+"."+m[1]+"0".repeat(precision-m[1].length)
+    }
+    else if(precision==0){mantissa = m[0]+"."+m[1].substring(0,2)}
+    else mantissa = m[0]+"."+m[1].substring(0,precision)
+    return mantissa+"e"+exp.toString()
+  }
+  else if(decimal.lt("10^^5")){
+    let part1 = "e".repeat(egg(decimal.array[1])+1 - (decimal.gte(EN.E_MAX_SAFE_INTEGER)))
+    if(part1 != "e") {
+      decimal.array.pop()
+      return part1+format(decimal)
+    }
+    return "e"+format(decimal.log10())
+  }
+  else if(decimal.lt("10^^^5")){
+    let part1 = "F".repeat(egg(decimal.array[2])+1 - (decimal.gte(EN.TETRATED_MAX_SAFE_INTEGER)))
+    if(part1 != "F") 
+    {
+      decimal.array.pop()
+      return part1+format(decimal)
+    }
+    return "F"+format(decimal.slog())
+  }
+  else {
+    if(decimal.lt("10^^^^5")){
+      //console.log(egg(decimal.array[3]))
+      // Hmmmmmm
+      let part1 = "G".repeat(egg(decimal.array[3])+ 1 - (decimal.gte("10^^^"+Number.MAX_SAFE_INTEGER)))
+      if(part1 != "G") {
+        decimal.array.pop()
+        return part1+format(decimal)
+      }
+      return "G" + format(decimal.hlog(3))
+    }
+    else if(decimal.lt("10{5}5")){
+      let part1 = "H".repeat(egg(decimal.array[4])+1 - (decimal.gte("10^^^^"+Number.MAX_SAFE_INTEGER)))
+      if(part1 != "H") {
+        decimal.array.pop()
+        return part1+format(decimal)
+      }
+      return "H" + format(decimal.hlog(4))
+    }
+    let e= decimal.toHyperE()
+    let sp = e.split("#")
+    sp[0]="E10"
+    return sp.join("#")/*
+    else{
+      if(decimal.lt("10{998}5")){
+        let qp = EN(6)
+        let op=formatWhole(qp)
+        while(decimal.lt("10{"+op+"}5")){
+          qp=qp.add(1)
+          op=formatWhole(qp)
+        }
+        qp=qp.sub(1)
+        op=formatWhole(qp)
+        let part1 = ("10{"+op+"}").repeat(egg(decimal.array[4])+1 - (decimal.gte("10^^^^"+Number.MAX_SAFE_INTEGER)))
+      if(part1 != ("10{"+op+"}")) {
+        decimal.array.pop()
+        return part1+format(decimal)
+      }
+      return "10{"+op+"}" + format(decimal.hlog(op))
+      }
+    }*/
+       }
+  return fmt
+} // w- what 
 
 function formatWhole(decimal) {
     return format(decimal,0)
@@ -120,10 +152,10 @@ function formatTime(s) {
 }
 
 function toPlaces(x, precision, maxAccepted) {
-    x = EN(x)
+    x = new ExpantaNum(x)
     let result = x.toString(precision)
-    if (EN(result).gte(maxAccepted)) {
-        result = EN(maxAccepted - Math.pow(0.1, precision)).toString(precision)
+    if (new ExpantaNum(result).gte(maxAccepted)) {
+        result = new ExpantaNum(maxAccepted - Math.pow(0.1, precision)).toString(precision)
     }
     return result
 }

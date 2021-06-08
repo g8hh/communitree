@@ -15,12 +15,12 @@
 }
 
 body {
-	background-color: var(--background);
 	color: var(--color);
 	overflow: hidden;
 	--background: #0f0f0f;
 	--color: #dfdfdf;
 	--points: #ffffff;
+	background: var(--background)
 }
 
 html, body {
@@ -93,9 +93,12 @@ h1, h2, h3, b, input {
 	color: rgba(0, 0, 0, 0.5);
 	text-shadow: var(--hqProperty3);
 	padding: 0;
-	margin: 0 10px 0 10px;
 }
 
+.treeThing {
+	margin: 0 10px 0 10px;
+	vertical-align: middle;
+}
 
 .smallNode {
 	height: 60px;
@@ -215,21 +218,20 @@ h1, h2, h3, b, input {
 
 .tabButton {
 	background-color: transparent;
-	color: var(--background);
+	color: var(--color);
 	font-size: 20px;
 	cursor: pointer;
 	padding: 5px 20px;
 	margin: 5px;
 	border-radius: 10px;
 	border: 2px solid;
-	border-color: rgba(0, 0, 0, 0.125);
-	box-shadow: 0 0 5px 2px var(--background);
-	z-index: 100000;
+	color: var(--color);
+
 }
 
 .tabButton:hover {
 	transform: scale(1.1, 1.1);
-	box-shadow: 0 0 7px var(--color);
+	text-shadow: 0 0 7px var(--color);
 }
 
 .reset {
@@ -644,7 +646,6 @@ ul {
 .overlayThing {
 	z-index: 10000;
 	pointer-events:auto;
-	background-color: var(--background);
 }
 
 .sideLayers {
@@ -653,6 +654,8 @@ ul {
 	position: absolute;
 	right: 55px;
 	top: 65px;
+	background-color: transparent;
+
 }
 
 button > * {
@@ -756,3 +759,17 @@ button > * {
 	transform: rotate(35deg);
 }
 
+.bg {
+	z-index: -9000;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	background-color: var(--background);
+	top: 0
+}
+
+.noBackground {
+	background: transparent !important;
+	background-image: none !important;
+	--background: transparent !important;
+}

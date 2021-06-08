@@ -10,8 +10,8 @@ const EN_VERSION = {
   
 }
 const TMT_VERSION = {
-	tmtNum: "2.5.11.1",
-	tmtName: "Dreams Really Do Come True"
+	tmtNum: "2.6.0.1",
+	tmtName: "Fixed Reality"
 }
 
 function getResetGain(layer, useType = null) {
@@ -22,23 +22,23 @@ function getResetGain(layer, useType = null) {
 			return layers[layer].getResetGain()
 	} 
 	if(tmp[layer].type == "none")
-		return new ExpantaNum (0)
-	if (tmp[layer].gainExp.eq(0)) return ExpantaNumZero
+		return new OmegaNum (0)
+	if (tmp[layer].gainExp.eq(0)) return OmegaNumZero
 	if (type=="static") {
-		if ((!tmp[layer].canBuyMax) || tmp[layer].baseAmount.lt(tmp[layer].requires)) return ExpantaNumOne
-		let gain = tmp[layer].baseAmount.div(tmp[layer].requires).div(tmp[layer].gainMult).max(1).log(tmp[layer].base).times(tmp[layer].gainExp).pow(ExpantaNum.pow(tmp[layer].exponent, -1))
+		if ((!tmp[layer].canBuyMax) || tmp[layer].baseAmount.lt(tmp[layer].requires)) return OmegaNumOne
+		let gain = tmp[layer].baseAmount.div(tmp[layer].requires).div(tmp[layer].gainMult).max(1).log(tmp[layer].base).times(tmp[layer].gainExp).pow(OmegaNum.pow(tmp[layer].exponent, -1))
 		gain = gain.times(tmp[layer].directMult)
 		return gain.floor().sub(player[layer].points).add(1).max(1);
 	} else if (type=="normal"){
-		if (tmp[layer].baseAmount.lt(tmp[layer].requires)) return ExpantaNumZero
+		if (tmp[layer].baseAmount.lt(tmp[layer].requires)) return OmegaNumZero
 		let gain = tmp[layer].baseAmount.div(tmp[layer].requires).pow(tmp[layer].exponent).times(tmp[layer].gainMult).pow(tmp[layer].gainExp)
-		if (gain.gte(tmp[layer].softcap)) gain = gain.pow(tmp[layer].softcapPower).times(tmp[layer].softcap.pow(ExpantaNumOne.sub(tmp[layer].softcapPower)))
+		if (gain.gte(tmp[layer].softcap)) gain = gain.pow(tmp[layer].softcapPower).times(tmp[layer].softcap.pow(OmegaNumOne.sub(tmp[layer].softcapPower)))
 		gain = gain.times(tmp[layer].directMult)
 		return gain.floor().max(0);
 	} else if (type=="custom"){
 		return layers[layer].getResetGain()
 	} else {
-		return ExpantaNumZero
+		return OmegaNumZero
 	}
 }
 
@@ -51,35 +51,35 @@ function getNextAt(layer, canMax=false, useType = null) {
 
 		}
 	if(tmp[layer].type == "none")
-		return EN (Infinity)
+		return new OmegaNum (Infinity)
 
-	if (tmp[layer].gainMult.lte(0)) return EN(Infinity)
-	if (tmp[layer].gainExp.lte(0)) return EN(Infinity)
+	if (tmp[layer].gainMult.lte(0)) return new OmegaNum(Infinity)
+	if (tmp[layer].gainExp.lte(0)) return new OmegaNum(Infinity)
 
 	if (type=="static") 
 	{
 		if (!tmp[layer].canBuyMax) canMax = false
 		let amt = player[layer].points.plus((canMax&&tmp[layer].baseAmount.gte(tmp[layer].nextAt))?tmp[layer].resetGain:0).div(tmp[layer].directMult)
-		let extraCost = ExpantaNum.pow(tmp[layer].base, amt.pow(tmp[layer].exponent).div(tmp[layer].gainExp)).times(tmp[layer].gainMult)
+		let extraCost = OmegaNum.pow(tmp[layer].base, amt.pow(tmp[layer].exponent).div(tmp[layer].gainExp)).times(tmp[layer].gainMult)
 		let cost = extraCost.times(tmp[layer].requires).max(tmp[layer].requires)
 		if (tmp[layer].roundUpCost) cost = cost.ceil()
 		return cost;
 	} else if (type=="normal"){
 		let next = tmp[layer].resetGain.add(1).div(tmp[layer].directMult)
-		if (next.gte(tmp[layer].softcap)) next = next.div(tmp[layer].softcap.pow(ExpantaNumOne.sub(tmp[layer].softcapPower))).pow(ExpantaNumOne.div(tmp[layer].softcapPower))
+		if (next.gte(tmp[layer].softcap)) next = next.div(tmp[layer].softcap.pow(OmegaNumOne.sub(tmp[layer].softcapPower))).pow(OmegaNumOne.div(tmp[layer].softcapPower))
 		next = next.root(tmp[layer].gainExp).div(tmp[layer].gainMult).root(tmp[layer].exponent).times(tmp[layer].requires).max(tmp[layer].requires)
 		if (tmp[layer].roundUpCost) next = next.ceil()
 		return next;
 	} else if (type=="custom"){
 		return layers[layer].getNextAt(canMax)
 	} else {
-		return ExpantaNumZero
+		return OmegaNumZero
 	}}
 
 function softcap(value, cap, power = 0.5) {
 	if (value.lte(cap)) return value
 	else
-		return value.pow(power).times(cap.pow(ExpantaNumOne.sub(power)))
+		return value.pow(power).times(cap.pow(OmegaNumOne.sub(power)))
 }
 
 // Return true if the layer should be highlighted. By default checks for upgrades only.
@@ -172,7 +172,7 @@ function layerDataReset(layer, keep = []) {
 function resetBuyables(layer){
 	if (layers[layer].buyables) 
 		player[layer].buyables = getStartBuyables(layer)
-	player[layer].spentOnBuyables = ExpantaNumZero
+	player[layer].spentOnBuyables = OmegaNumZero
 }
 
 
@@ -220,18 +220,18 @@ function doReset(layer, force=false) {
 			}
 		}
 	
-		tmp[layer].baseAmount = ExpantaNumZero // quick fix
+		tmp[layer].baseAmount = OmegaNumZero // quick fix
 	}
 
-	if (tmp[layer].resetsNothing) return
+	if (run(layers[layer].resetsNothing, layers[layer])) return
 
 
 	for (layerResetting in layers) {
 		if (row >= layers[layerResetting].row && (!force || layerResetting != layer)) completeChallenge(layerResetting)
 	}
 
-	prevOnReset = {...player} //Deep Copy
-	player.points = (row == 0 ? ExpantaNumZero : getStartPoints())
+	prevOnReset = {...player} 
+	player.points = (row == 0 ? OmegaNumZero : getStartPoints())
 
 	for (let x = row; x >= 0; x--) rowReset(x, layer)
 	rowReset("side", layer)
@@ -334,12 +334,15 @@ function autobuyUpgrades(layer){
 }
 
 function gameLoop(diff) {
-	if (isEndgame() || gameEnded) gameEnded = 1
+	if (isEndgame() || gameEnded){
+		gameEnded = 1
+		clearParticles()
+	}
 
-	if (isNaN(diff)) diff = 0
+	if (isNaN(diff) || diff < 0) diff = 0
 	if (gameEnded && !player.keepGoing) {
 		diff = 0
-		player.tab = "gameEnded"
+		//player.tab = "gameEnded"
 		clearParticles()
 	}
 
@@ -403,11 +406,9 @@ function hardReset() {
 }
 
 var ticking = false
-
 var frame = 0
 
 var interval = setInterval(function() {
-	frame += 1;
 	if (player===undefined||tmp===undefined) return;
 	if (ticking) return;
 	if (gameEnded&&!player.keepGoing) return;
@@ -439,6 +440,7 @@ var interval = setInterval(function() {
 	adjustPopupTime(trueDiff)
 	updateParticles(trueDiff)
 	ticking = false
+	frame += 1;
 }, 50)
 
 setInterval(function() {needCanvasUpdate = true}, 500)
