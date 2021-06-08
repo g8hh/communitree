@@ -14,6 +14,8 @@ const TMT_VERSION = {
 	tmtName: "Fixed Reality"
 }
 
+document.title = modInfo.name
+
 function getResetGain(layer, useType = null) {
 	let type = useType
 	if (!useType){ 

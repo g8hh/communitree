@@ -7,15 +7,24 @@ let smallClickable = {
     'border-radius': '5px',
 }
 
+let tmtBuyable = {
+    width: '120px',
+    height: '120px',
+    'min-height': '120px',
+    'font-size': '10px',
+    'margin': '10px',
+    'border-radius': '0px'
+}
+
 addLayer("aca", {
     name: "Acamaeda",
     symbol: "AC",
 
     row: 4,
-    displayRow: 1,
+    displayRow: 2,
     position: 0,
     branches: ["jac", "aar"],
-    layerShown() { return player.aar.points.gte("eeeeee1000") || player.aca.best.gte(1) },
+    layerShown() { return player.aar.points.gte([250, 6]) || player.aca.best.gte(1) },
 
     startData() { return {
         points: EN(0),
@@ -43,14 +52,18 @@ addLayer("aca", {
 
         ach43Time: 0,
         upg256Time: 0,
+        
+        compPoints: EN(0),
+        devTarget: "",
+        devProgress: EN(0),
     }},
     color: () => "#8fa140",
     nodeStyle: () => { return {
-        background: player.antiEpilepsy ? 
+        background: options.antiEpilepsy ? 
             "linear-gradient(75deg, #ff6f34, #1ed34c)" : 
             (frame % 2 == 1 ? "#ff6f34" : "#1ed34c"),
         transition: ".5s, background 0s",
-        "background-origin": "border-box",
+        "background-origin": "border-box !important",
     }},
     resource: "Acamaeda points",
     baseResource: "points",
@@ -85,8 +98,10 @@ addLayer("aca", {
         let eff = {
             candyGain: EN(1),
             genMult: EN.pow(2, player.aca.candies.mul(player.aca.candiesEaten).pow(0.8)),
+            pointMult: EN.pent(10, player.aca.compPoints.add(1).log(10).pow(.25)),
             maxHealth: player.aca.candiesEaten.div(10).pow(0.5).add(100).floor(),
             atkPow: player.aca.wpnLevel.add(player.aca.wpnTier.mul(5)).pow(1.5).mul(EN.pow(1.1, player.aca.wpnLevel.add(player.aca.wpnTier.mul(80)))).floor(),
+            devSpeed: player.aca.compPoints.add(10).log10().pow(2).mul(buyableEffect("aca", 202)),
         }
 
         if (hasUpgrade("aca", 123)) eff.genMult = EN.tetr(10, player.aca.farmCandies.div(2500).max(0).mul(hasUpgrade("aca", 124) ? player.aca.dropCandies.add(10).log10() : 1), eff.genMult)
@@ -280,10 +295,16 @@ addLayer("aca", {
             unlocked() { return hasUpgrade("aca", 115) && player.aca.best.gte("ee180") },
         },
         124: {
-            title: "No longer Useless",
+            title: "No Longer Useless",
             description: "Drop candies boosts <b>Automagically</b>'s power.",
             cost: EN("10^^10000001"),
             unlocked() { return hasUpgrade("aca", 115) && player.aca.best.gte("10^^8000001") },
+        },
+        125: {
+            title: "The Modding Tree",
+            description: "Unlocks the “The Modding Tree” tab.",
+            cost: EN([12, 3, 1]),
+            unlocked() { return false && hasUpgrade("aca", 115) && player.aca.best.gte([9, 3, 1]) },
         },
         200: {
             title: "The Most Ambitious Cross-over in the History of Incremental Games,<br/>forever and ever and Ever and <i><b>EVER<b></i>.",
@@ -691,7 +712,7 @@ addLayer("aca", {
             currencyDisplayName: "candies",
             currencyInternalName: "candies",
             effect() {
-                let eff = EN.pow(10, (player.aca.upg256Time / 15) ** .9)
+                let eff = EN.pow(10, (player.aca.upg256Time / 15) ** .75)
                 return eff
             },
             effectDisplay() { return "^" + format(this.effect()) },
@@ -1111,6 +1132,99 @@ addLayer("aca", {
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].max(30)
             }
         },
+        201: {
+            title() {
+                return ""
+            }, 
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>Upgrades</h3>\n(${formatWhole(x)} / ${formatWhole(data.max)})
+                    Generates ${format(data.effect)} component points per second.
+                ` + (player.aca.devTarget != this.id ? `
+                    Diff: ${format(data.cost)}
+                ` : `
+                    Developing...\n${format(player.aca.devProgress)} / ${format(data.cost)}
+                `)
+            },
+            unlocked() {
+                return hasUpgrade("aca", 125)
+            },
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                let eff = EN.pow(2, x.pow(1.2)).sub(1)
+                return eff
+            },
+            max: EN(80),
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(10, x.div(8).add(1).pow(2))
+            },
+            canAfford() {
+                return ["", this.id].includes(player.aca.devTarget)
+            },
+            buy() { 
+                player.aca.devProgress = ExpantaNumZero
+                player.aca.devTarget = player.aca.devTarget == this.id ? "" : this.id
+            },
+            style() { 
+                let active = player.aca.devTarget == this.id
+                if (active) {
+                    let data = tmp[this.layer].buyables[this.id]
+                    let prog = player.aca.devProgress.div(data.cost)
+                    return { ...tmtBuyable, 
+                        "background": tmp.aca.color,
+                        "box-shadow": `inset 0 -${prog.mul(120).toString()}px #ffffff3f, 0 0 10px var(--points)`,
+                    }
+                } else return { ...tmtBuyable,  background: player.aca.devTarget ? "#3f3f3f" : tmp.aca.color}
+            }
+        },
+        202: {
+            title() {
+                return ""
+            }, 
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>Milestones</h3>\n(${formatWhole(x)} / ${formatWhole(data.max)})
+                    Makes dev speed ${format(data.effect)}× faster.
+                ` + (player.aca.devTarget != this.id ? `
+                    Diff: ${format(data.cost)}
+                ` : `
+                    Developing...\n${format(player.aca.devProgress)} / ${format(data.cost)}
+                `)
+            },
+            unlocked() {
+                return hasUpgrade("aca", 125)
+            },
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                let eff = EN.pow(3, x.pow(0.75))
+                return eff
+            },
+            max: EN(25),
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(100, x.div(8).add(1).pow(2))
+            },
+            canAfford() {
+                return ["", this.id].includes(player.aca.devTarget)
+            },
+            buy() { 
+                player.aca.devProgress = ExpantaNumZero
+                player.aca.devTarget = player.aca.devTarget == this.id ? "" : this.id
+            },
+            style() { 
+                let data = tmp[this.layer].buyables[this.id]
+                let active = player.aca.devTarget == this.id
+                return { ...tmtBuyable, 
+                    ...active ? {
+                        "background": tmp.aca.color,
+                        "box-shadow": `inset 0 -${player.aca.devProgress.div(data.cost).mul(120).toString()}px #ffffff3f`,
+                    } : {background: player.aca.devTarget ? "#3f3f3f" : tmp.aca.color}
+                }
+            }
+        },
     },
 
     clickables: {
@@ -1291,7 +1405,7 @@ addLayer("aca", {
             }
         }
 
-        if (hasUpgrade("aca", 212)) {
+        if (hasUpgrade("aca", 212) && !hasUpgrade("aca", 125)) {
             if (!player.aca.inQuest || hasUpgrade("aca", 225)) {
                 let maxhp = tmp.aca.effect.maxHealth
                 player.aca.health = player.aca.health.add(maxhp.div(getBuyableAmount("aca", 114).gt(0) ? 20 : maxhp.add(100).log10().mul(10).min(100)).mul(delta)).min(maxhp)
@@ -1340,12 +1454,12 @@ addLayer("aca", {
             player.aca.best = player.aca.best.max(player.aca.points)
         }
 
-        if (hasUpgrade("aca", 200)) {
+        if (hasUpgrade("aca", 200) && !hasUpgrade("aca", 125)) {
             player.aca.candies = player.aca.candies.add(tmp.aca.effect.candyGain.mul(delta))
             player.aca.candiesTotal = player.aca.candiesTotal.add(tmp.aca.effect.candyGain.mul(delta))
         }
 
-        if (hasUpgrade("aca", 215)) {
+        if (hasUpgrade("aca", 215) && !hasUpgrade("aca", 125)) {
             let fcph = player.aca.buyables[101].mul(10).add(player.aca.buyables[102].mul(35))
             if (hasUpgrade("aca", 231) && getBuyableAmount("aca", 113).gt(0)) fcph = fcph.mul(10)
             if (hasUpgrade("aca", 243)) fcph = fcph.mul(upgradeEffect("aca", 243))
@@ -1357,7 +1471,7 @@ addLayer("aca", {
             player.aca.lollipops = player.aca.lollipops.add(tmp.aca.clickables[103].prestigeGain.mul(player.aca.buyables[101]).div(100).mul(delta))
         }
 
-        if (hasUpgrade("aca", 224)) {
+        if (hasUpgrade("aca", 224) && !hasUpgrade("aca", 125)) {
             for (let a = 111; a <= 115; a++) {
                 if (player.aca.buyables[116].gt(0) && player.aca.clickables[130] === "drank" && player.aca.buyables[a].gt(0))
                     player.aca.buyables[a] = player.aca.buyables[a].mul(EN.pow(buyableEffect("aca", 116), delta * 0.26303))
@@ -1373,6 +1487,16 @@ addLayer("aca", {
 
         if (hasAchievement("aca", 43)) player.aca.ach43Time += delta
         if (hasUpgrade("aca", 256)) player.aca.upg256Time += delta
+        
+        if (hasUpgrade("aca", 125)) player.aca.compPoints = player.aca.compPoints.add(buyableEffect("aca", 201).mul(delta))
+
+        if (player.aca.devTarget) {
+            player.aca.devProgress = player.aca.devProgress.add(tmp.aca.effect.devSpeed.mul(delta))
+            if (player.aca.devProgress.gte(tmp.aca.buyables[player.aca.devTarget].cost)) {
+                player.aca.devProgress = player.aca.devProgress.sub(tmp.aca.buyables[player.aca.devTarget].cost)
+                player.aca.buyables[player.aca.devTarget] = player.aca.buyables[player.aca.devTarget].add(1)
+            }
+        }
     },
 
     achievements: {
@@ -1558,10 +1682,21 @@ addLayer("aca", {
             },
             "candy": {
                 title: "The Candy Tab",
-                unlocked: () => hasUpgrade("aca", 200),
+                unlocked: () => hasUpgrade("aca", 200) && !hasUpgrade("aca", 125),
                 content: [
                     ["blank", "10px"],
                     ["microtabs", "candy"],
+                ],
+            },
+            "tmt": {
+                title: "The Modding Tree",
+                unlocked: () => hasUpgrade("aca", 125),
+                content: [
+                    ["blank", "10px"],
+                    ["raw-html", () => `You have <h2 style"color:8fa140">${formatWhole(player.aca.compPoints)}</h2> component points, which are multipling point gain by ${formatWhole(tmp.aca.effect.pointMult)}`],
+                    ["raw-html", () => `(Your development speed is <h3>${format(tmp.aca.effect.devSpeed)}</h3>/s)`],
+                    ["blank", "10px"],
+                    ["row", [["buyable", 201], ["buyable", 202]]],
                 ],
             },
         },

@@ -244,6 +244,7 @@ function layerunlocked(layer) {
 
 function keepGoing() {
 	player.keepGoing = true;
+	player.tab = "none";
 	needCanvasUpdate = true;
 }
 
@@ -335,8 +336,6 @@ function isFunction(obj) {
 function isPlainObject(obj) {
 	return (!!obj) && (obj.constructor === Object)
 }
-
-document.title = modInfo.name
 
 // Converts a string value to whatever it's supposed to be
 function toValue(value, oldValue) {
