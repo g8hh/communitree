@@ -20,14 +20,14 @@ function constructNodeStyle(layer){
 		style.push({'background-image': 'url("' + tmp[layer].image + '")'})
 	if(tmp[layer].notify && player[layer].unlocked)
 		style.push({'box-shadow': 'var(--hqProperty2a), 0 0 20px ' + tmp[layer].trueGlowColor})
-	style.push(run(tmp[layer].nodeStyle))
+	style.push(tmp[layer].nodeStyle)
     return style
 }
 
 
 function challengeStyle(layer, id) {
 	if (player[layer].activeChallenge == id && canCompleteChallenge(layer, id)) return "canComplete"
-	else if (maxedChallenge(layer, id)) return "done"
+	else if (hasChallenge(layer, id)) return "done"
     return "locked"
 }
 
@@ -49,12 +49,11 @@ function achievementStyle(layer, id){
 
 
 
-
 function updateWidth() {
-	var screenWidth = window.innerWidth
-
-	var splitScreen = screenWidth >= 1024
-	if (player.forceOneTab) splitScreen = false
+	let screenWidth = window.innerWidth
+	let splitScreen = screenWidth >= 1024
+	if (options.forceOneTab) splitScreen = false
+	if (player.navTab == "none") splitScreen = true
 	tmp.other.screenWidth = screenWidth
 	tmp.other.screenHeight = window.innerHeight
 
@@ -65,10 +64,10 @@ function updateWidth() {
 function updateOomps(diff)
 {
 	tmp.other.oompsMag = 0
-	if (player.points.lte(new ExpantaNum(1e100))) return
+	if (player.points.lte(new OmegaNum(1e100))) return
 
-	var pp = new ExpantaNum(player.points);
-	var lp = tmp.other.lastPoints || new ExpantaNum(0);
+	var pp = new OmegaNum(player.points);
+	var lp = tmp.other.lastPoints || new OmegaNum(0);
 	if (pp.gt(lp)) {
 		if (pp.gte("10^^8")) {
 			pp = pp.slog(1e10)
@@ -90,7 +89,7 @@ function updateOomps(diff)
 function constructBarStyle(layer, id) {
 	let bar = tmp[layer].bars[id]
 	let style = {}
-	if (bar.progress instanceof ExpantaNum)
+	if (bar.progress instanceof OmegaNum)
 		bar.progress = bar.progress.toNumber()
 	bar.progress = (1 -Math.min(Math.max(bar.progress, 0), 1)) * 100
 
@@ -146,9 +145,9 @@ function constructTabFormat(layer, id, family){
 
 	}
 	if (isFunction(tabLayer)) {
-		return tabLayer()
+		return tabLayer.bind(location)()
 	}
-	updateTempData(tabLayer, tabTemp, tabFunc)
+	updateTempData(tabLayer, tabTemp, tabFunc, {layer, id, family})
 	return tabTemp
 }
 

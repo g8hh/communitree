@@ -1,29 +1,25 @@
 // ************ Save stuff ************
 function save() {
+	NaNcheck(player)
+	if (NaNalert) return
 	localStorage.setItem(modInfo.id, btoa(unescape(encodeURIComponent(JSON.stringify(player)))));
+	localStorage.setItem(modInfo.id+"_options", btoa(unescape(encodeURIComponent(JSON.stringify(options)))));
   //ok it saved fine so the problem must be when loading
 }
 function startPlayerBase() {
 	return {
 		tab: layoutInfo.startTab,
-		navTab: (layoutInfo.showTree ? "tree-tab" : "none"),
+		navTab: (layoutInfo.showTree ? layoutInfo.startNavTab : "none"),
 		time: Date.now(),
-		autosave: true,
 		notify: {},
-		msDisplay: "always",
-		offlineProd: true,
 		versionType: modInfo.id,
 		version: VERSION.num,
 		beta: VERSION.beta,
 		timePlayed: 0,
 		keepGoing: false,
 		hasNaN: false,
-		hideChallenges: false,
-		showStory: true,
-		forceOneTab: false,
+
 		points: modInfo.initialStartPoints,
-		inlineExp: false,
-		antiEpilepsy: false,
 		isWarned: false,
 		subtabs: {},
 		lastSafeTab: (readData(layoutInfo.showTree) ? "none" : layoutInfo.startTab)
@@ -70,9 +66,9 @@ function getStartLayerData(layer) {
 	if (layerdata.unlocked === undefined)
 		layerdata.unlocked = true;
 	if (layerdata.total === undefined)
-		layerdata.total = EN(0);
+		layerdata.total = new OmegaNum(0);
 	if (layerdata.best === undefined)
-		layerdata.best = EN(0);
+		layerdata.best = new OmegaNum(0);
 	if (layerdata.resetTime === undefined)
 		layerdata.resetTime = 0;
         if (layerdata.forceTooltip === undefined)
@@ -82,13 +78,14 @@ function getStartLayerData(layer) {
         if (layerdata.noRespecConfirm === undefined) layerdata.noRespecConfirm = false
 	if (layerdata.clickables == undefined)
 		layerdata.clickables = getStartClickables(layer);
-	layerdata.spentOnBuyables = EN(0);
+	layerdata.spentOnBuyables = new ExpantaNum(0);
 	layerdata.upgrades = [];
 	layerdata.milestones = [];
 	layerdata.lastMilestone = null;
 	layerdata.achievements = [];
 	layerdata.challenges = getStartChallenges(layer);
 	layerdata.grid = getStartGrid(layer);
+	layerdata.prevTab = ""
 	return layerdata;
 }
 function getStartBuyables(layer) {
@@ -96,7 +93,7 @@ function getStartBuyables(layer) {
 	if (layers[layer].buyables) {
 		for (id in layers[layer].buyables)
 			if (isPlainObject(layers[layer].buyables[id]))
-				data[id] = EN(0);
+				data[id] = new ExpantaNum(0);
 	}
 	return data;
 }
@@ -124,9 +121,9 @@ function fixSave() {
 
 	for (layer in layers) {
 		if (player[layer].best !== undefined)
-			player[layer].best = EN(player[layer].best);
+			player[layer].best = new ExpantaNum(player[layer].best);
 		if (player[layer].total !== undefined)
-			player[layer].total = EN(player[layer].total);
+			player[layer].total = new ExpantaNum(player[layer].total);
 
 		if (layers[layer].tabFormat && !Array.isArray(layers[layer].tabFormat)) {
 
@@ -171,7 +168,7 @@ function fixData(defaultData, newData) {
 				newData[item] = defaultData[item];
 
 			else{
-                let newItemThing=EN(0)
+                let newItemThing=new ExpantaNum(0)
 				newItemThing.array = newData[item].array
 				newItemThing.sign = newData[item].sign
 				newItemThing.layer = newData[item].layer
@@ -193,12 +190,15 @@ function fixData(defaultData, newData) {
 }
 function load() {
 	let get = localStorage.getItem(modInfo.id);
-	if (get === null || get === undefined)
+	if (get === null || get === undefined) {
 		player = getStartPlayer();
-	else
+		options = getStartOptions();
+	}
+	else {
 		player = Object.assign(getStartPlayer(), JSON.parse(atob(get)));
-	fixSave();
-
+		fixSave();
+		loadOptions();
+	}
 	if (player.offlineProd) {
 		if (player.offTime === undefined)
 			player.offTime = { remain: 0 };
@@ -217,6 +217,15 @@ function load() {
 	updateTabFormats();
 	loadVue();
 }
+function loadOptions() {
+	let get2 = localStorage.getItem(modInfo.id+"_options");
+	if (get2) 
+		options = Object.assign(getStartOptions(), JSON.parse(decodeURIComponent(escape(atob(get2)))));
+	else 
+		options = getStartOptions()
+
+
+}
 function setupModInfo() {
 	modInfo.changelog = changelog;
 	modInfo.winText = winText ? winText : `Congratulations! You have reached the end and beaten this game, but for now...`;
@@ -230,18 +239,15 @@ function NaNcheck(data, name = "player") {
 		if (data[item] == null) {
 		}
 		else if (Array.isArray(data[item])) {
-			NaNcheck(data[item]);
+			NaNcheck(data[item], name + "." + item);
 		}
-		else if (data[item] !== data[item] || data[item] === ExpantaNumNaN) {
-			throw Error(data[item].toString() + " lol (at " + name + "." + item + ")");
-			if (NaNalert === true || confirm("Invalid value found in player, named '" + item + "'. Please let the creator of this mod know! Would you like to try to auto-fix the save and keep going?")) {
-				NaNalert = true;
-				data[item] = (data[item] !== data[item] ? 0 : ExpantaNumZero);
-			}
-			else {
+		
+		else if (data[item] !== data[item] || checkOmegaNumNaN(data[item])) {
+			if (!NaNalert && !name.endsWith("-tab") && !name.endsWith("blank")) {
+				alert(`NaN lol\nat ${name}.${item}`)
 				clearInterval(interval);
-				player.autosave = false;
 				NaNalert = true;
+				return
 			}
 		}
 		else if (data[item] instanceof ExpantaNum) { // Convert to ExpantaNum
@@ -303,6 +309,6 @@ var saveInterval = setInterval(function () {
 		return;
 	if (gameEnded && !player.keepGoing)
 		return;
-	if (player.autosave)
+	if (options.autosave)
 		save();
 }, 5000);
