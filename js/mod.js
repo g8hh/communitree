@@ -12,12 +12,19 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.2.4",
-	name: "Layer Omega",
+	num: "0.3",
+	name: "Alphablade",
 }
 
 let changelog = `<h1>Changelog:</h1><br/>
 	<i>(Be warned: this may contain spoilers!)</i><br/>
+	<br/>
+	<h2>v0.3</h2><br/>
+	<h4><i>- Alphablade -</i></h4>
+		Added thefinaluptake creator layer.<br/>
+		Added The Modding Tree... wait<br/>
+		Fixed sliders not behaving as intended.<br/>
+		Bumped endgame to ${format([2000, 1, 0, 1])}.<br/>
 	<br/>
 	<h3>v0.2.4</h3><br/>
 		Modified number formatting, we now just use Hyper-E.<br/>
@@ -105,7 +112,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format([9, 3, 2])} points)`,
+	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format([2000, 1, 0, 1])} points)`,
 	() => !player.isWarned ? `
 		<div style="border:2px solid var(--color);margin-top:10px;padding:5px;display:inline-block">
 		Important notice: Some parts of the game may contain flashing lights.<br/>
@@ -117,7 +124,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte([9, 3, 2])
+	return player.points.gte([2000, 1, 0, 1])
 }
 
 
