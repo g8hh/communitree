@@ -42,7 +42,8 @@ function format(decimal, precision = 2, small = false) {
     let precision2 = Math.max(3, precision)
     decimal = new ExpantaNum(decimal)
     let fmt = decimal.toString()
-    if (decimal.eq(0)) return "0"
+    if (decimal.eq(0)) return (0).toFixed(precision)
+    if (decimal.sign < 0) return "-" + format(decimal.neg(), precision)
     if (decimal.lt("0.0001")) { return format(decimal.rec(), precision) + "⁻¹" }
     else if (decimal.lt(1)) {
         if (small) precision += 2
@@ -95,7 +96,7 @@ function format(decimal, precision = 2, small = false) {
         return "F" + format(decimal.slog(), precision2)
     }
     else {
-        if (decimal.lt("10^^^^5")) {
+        /*if (decimal.lt("10^^^^5")) {
             //console.log(egg(decimal.array[3]))
             // Hmmmmmm
             let part1 = "G".repeat(egg(decimal.array[3]) + 1 - (decimal.gte("10^^^" + Number.MAX_SAFE_INTEGER)))
@@ -112,10 +113,10 @@ function format(decimal, precision = 2, small = false) {
                 return part1 + format(decimal, precision2)
             }
             return "H" + format(decimal.hlog(4), precision2)
-        }
+        }*/
         let e = decimal.toHyperE()
         let sp = e.split("#")
-        sp[0] = "E10"
+        sp[0] = "E" + format(sp[0].substring(1, 20), precision2)
         return sp.join("#")/*
     else{
       if(decimal.lt("10{998}5")){
