@@ -12,12 +12,17 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.3",
+	num: "0.3.1",
 	name: "Alphablade",
 }
 
 let changelog = `<h1>Changelog:</h1><br/>
 	<i>(Be warned: this may contain spoilers!)</i><br/>
+	<br/>
+	<h3>v0.3.1</h3><br/>
+		Fixed ashes and flames sometimes not working correctly with high numbers.<br/>
+		Fixed the game fails to reload upon completing the thefinaluptake layer.<br/>
+		Fixed the game freezes instead of showing the endgame screen.<br/>
 	<br/>
 	<h2>v0.3</h2><br/>
 	<h4><i>- Alphablade -</i></h4>

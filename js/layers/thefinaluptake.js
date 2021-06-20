@@ -791,10 +791,10 @@ addLayer("tfu", {
     update(delta) {
         if (tmp[this.layer].layerShown) {
             let data = calculateDerivative([0, player.tfu.flames, EN.neg(tmp.tfu.effect.decaySpeed)], 
-                player.tfu.flames.div(tmp.tfu.effect.decaySpeed).min(buyableEffect("tfu", 103).mul(delta))
+                player.tfu.flames.div(tmp.tfu.effect.decaySpeed).max(Number.MIN_VALUE).min(buyableEffect("tfu", 103).mul(delta))
             );
-            player.tfu.ashes = player.tfu.ashes.add(data[0])
-            player.tfu.flames = data[1]
+            player.tfu.ashes = player.tfu.ashes.add(data[0]).abs()
+            player.tfu.flames = data[1].max(0)
             addPoints("tfu", player.tfu.ashes.mul(delta).mul(buyableEffect("tfu", 104)))
 
             if (hasMilestone("tfu", 0) && player.tfu.autoUpgrades) for (let a = 101; a <= 105; a++) buyBuyable("tfu", a)

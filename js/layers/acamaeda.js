@@ -136,7 +136,7 @@ addLayer("aca", {
         
         if (player.aca.modTimes.length) {
             let formulae = [
-                (x) => EN.pow(10, EN.pow(10, x.add(1).log().mul(200).add(x.mul(25))))
+                (x) => EN.pow(10, EN.pow(10, EN.add(x, 1).log().mul(200).add(EN.mul(x, 25))))
             ]
             for (let i = player.aca.modTimes.length - 1; i >= 0; i--) eff.modMultis.unshift(formulae[i](player.aca.modTimes[i]))
             eff.devSpeed = eff.devSpeed.mul(eff.modMultis[0])
@@ -2231,7 +2231,7 @@ addLayer("aca", {
         }
         if (player.aca.modTimes.length) {
             for (let i = player.aca.modTimes.length - 1; i >= 0; i--) {
-                player.aca.modTimes[i] = player.aca.modTimes[i].add(EN.add(player.aca.modTimes[i+1] || 0, 1).mul(delta))
+                player.aca.modTimes[i] = EN.add(player.aca.modTimes[i], EN.add(player.aca.modTimes[i+1] || 0, 1).mul(delta))
             }
         }
     },

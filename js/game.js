@@ -337,7 +337,7 @@ function autobuyUpgrades(layer){
 
 function gameLoop(diff) {
 	if (isEndgame() || gameEnded){
-		gameEnded = 1
+		app.gameEnded = gameEnded = true
 		clearParticles()
 	}
 

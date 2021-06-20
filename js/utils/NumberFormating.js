@@ -42,7 +42,7 @@ function format(decimal, precision = 2, small = false) {
     let precision2 = Math.max(3, precision)
     decimal = new ExpantaNum(decimal)
     let fmt = decimal.toString()
-    if (decimal.eq(0)) return (0).toFixed(precision)
+    if (decimal.abs().lt(1e-308)) return (0).toFixed(precision)
     if (decimal.sign < 0) return "-" + format(decimal.neg(), precision)
     if (decimal.lt("0.0001")) { return format(decimal.rec(), precision) + "⁻¹" }
     else if (decimal.lt(1)) {
