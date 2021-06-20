@@ -38,6 +38,7 @@ function egg(n) {
   return n
 }
 function format(decimal, precision = 2, small = false) {
+    if (EN.isNaN(decimal)) return "NaN"
     small = small || modInfo.allowSmall
     let precision2 = Math.max(3, precision)
     decimal = new ExpantaNum(decimal)
@@ -116,6 +117,7 @@ function format(decimal, precision = 2, small = false) {
         }*/
         let e = decimal.toHyperE()
         let sp = e.split("#")
+        console.log(sp)
         sp[0] = "E" + format(sp[0].substring(1, 20), precision2)
         return sp.join("#")/*
     else{

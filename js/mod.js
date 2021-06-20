@@ -23,6 +23,8 @@ let changelog = `<h1>Changelog:</h1><br/>
 		Fixed ashes and flames sometimes not working correctly with high numbers.<br/>
 		Fixed the game fails to reload upon completing the thefinaluptake layer.<br/>
 		Fixed the game freezes instead of showing the endgame screen.<br/>
+		Bumped thefinaluptake completion requirement.<br/>
+		Bumped endgame to ${format([5000, 1, 0, 1])}.<br/>
 	<br/>
 	<h2>v0.3</h2><br/>
 	<h4><i>- Alphablade -</i></h4>
@@ -117,7 +119,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format([2000, 1, 0, 1])} points)`,
+	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format([5000, 1, 0, 1])} points)`,
 	() => !player.isWarned ? `
 		<div style="border:2px solid var(--color);margin-top:10px;padding:5px;display:inline-block">
 		Important notice: Some parts of the game may contain flashing lights.<br/>
@@ -129,7 +131,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte([2000, 1, 0, 1])
+	return player.points.gte([5000, 1, 0, 1])
 }
 
 

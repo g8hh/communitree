@@ -136,7 +136,7 @@ addLayer("aca", {
         
         if (player.aca.modTimes.length) {
             let formulae = [
-                (x) => EN.pow(10, EN.pow(10, EN.add(x, 1).log().mul(200).add(EN.mul(x, 25))))
+                (x) => EN.pow(10, EN.pow(10, EN.add(x, 1).log().mul(500).add(EN.mul(x, 25))))
             ]
             for (let i = player.aca.modTimes.length - 1; i >= 0; i--) eff.modMultis.unshift(formulae[i](player.aca.modTimes[i]))
             eff.devSpeed = eff.devSpeed.mul(eff.modMultis[0])
@@ -2087,7 +2087,7 @@ addLayer("aca", {
                 [1, 1, 1, 1, 1],
             ],
             endReqs: [
-                [() => player.tfu.points.gte("ee1250"), "ee1,250 thefinaluptake points"],
+                [() => player.tfu.points.gte("ee2000"), "ee2,000 thefinaluptake points"],
                 [() => false, ""],
             ],
             layers: ["tfu"],
