@@ -81,7 +81,7 @@ function format(decimal, precision = 2, small = false) {
         return mantissa + "e" + commaFormat(exp)
     }
     else if (decimal.lt("10^^5")) {
-        let part1 = "e".repeat(egg(decimal.array[1]) + 1 - (decimal.gte(EN.E_MAX_SAFE_INTEGER)))
+        let part1 = "e".repeat(egg(decimal.array[1]))
         if (part1 != "e") {
             decimal.array.pop()
             return part1 + format(decimal, precision2)
@@ -117,7 +117,6 @@ function format(decimal, precision = 2, small = false) {
         }*/
         let e = decimal.toHyperE()
         let sp = e.split("#")
-        console.log(sp)
         sp[0] = "E" + format(sp[0].substring(1, 20), precision2)
         return sp.join("#")/*
     else{
