@@ -624,7 +624,7 @@ var cnRegReplace = new Map([
 	[/^subspace energy\n(.+)Next at (.+)$/, '子空间能量\n$1下一个在$2'],
 	[/^space energy\n(.+)Next at (.+)$/, '空间能量\n$1下一个在$2'],
 	[/^balance energy\n\n(.+)which are giving a ×(.+) bonus to Quirk effect and are multipling Subspace Energy and Time Capsules in their effects by (.+)×, slowly increases over this Jacorb reset.\n\n(.+)Reset previous progress for \+$/, '平衡能量 \n\n 为 夸克 效果提供 ×$2 奖励，并将其效果中的子空间能量和时间胶囊乘以 $3×，在此 Jacorb 重置后缓慢增加。\n\n 重置之前的进度 \+'],
-	[/^magic\n\n(.+)which are giving a ×(.+) bonus to Hindrance Spirit gain, Quirk gain, Solarity\'s Time Capsule effect and Subspace Energy effect.\n\n(.+)Reset previous progress for \+$/, '魔法\n\n 给予了 ×$2 的障碍精神增益、怪癖增益、日光的时间胶囊效果和子空间能量效果。\n\n 重置之前的进度 \+'],
+	[/^magic\n\n(.+)which are giving a ×(.+) bonus to Hindrance Spirit gain, Quirk gain, Solarity\'s Time Capsule effect and Subspace Energy effect.\n\n(.+)Reset previous progress for \+$/, '魔法\n\n 给予了 ×$2 的障碍精神增益、夸克增益、日光的时间胶囊效果和子空间能量效果。\n\n 重置之前的进度 \+'],
 	[/^solarity\n\n(.+)which are giving a ×(.+) boost to Solarity gain and a ×(.+) bonus to Time Capsule effect, slowly increses over this Jacorb reset.\n\n(.+)Reset previous progress for \+$/, '日光度 \n\n 为日光度增益提供 ×$2 提升和时间胶囊效果的 ×$3 奖励，在此 Jacorb 重置后缓慢增加。\n\n 重置之前的进度 \+'],
 	[/^subspace energy\n\n(.+)which are giving a ×(.+) bonus to Space Energy effect, slowly increases over this Jacorb reset.\n\n(.+)Reset previous progress for \+$/, '子空间能量 \n\n 给予空间能量效果 × $2 加成，在Jacorb重置后缓慢增加。\n\n 重置之前的进度 \+'],
 	[/^boosters\n\n(.+)which are giving a ×(.+) boost to prestige point gain. \n\(Note: Base costs are hardcapped at (.+).\)\n\n(.+)Reset prestige points for \+$/, '助推器\n\n 为声望点增益提供 ×$2 倍。 \n（注意：基本费用硬性规定为 $3。）\n\n 重置声望点数 \+'],
