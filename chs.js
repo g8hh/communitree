@@ -467,7 +467,7 @@ var cnRegReplace = new Map([
     [/^generators\n\n(.+)which are giving a ×(.+) boost to prestige point gain, slowly increases over this Jacorb reset.\n\n(.+)Reset prestige points for \+$/, '生成器\n\n 为声望点增益提供 ×$2 提升，在此 Jacorb 重置后缓慢增加。\n\n 重置声望点数为 \+'],
     [/^prestige points\n(.+)Next at (.+)$/, '声望点\n下一个在 $2'],
     [/^boosters\n\n(.+)which are giving a ×(.+) boost to prestige point gain. \n\n(.+)Reset prestige points for \+$/, '助推器\n\n 为声望点增益提供 ×$2 提升。 \n\n 重置声望点获得 \+'],
-    [/^boosters\n(.+)Next at (.+) prestige points$/, '助推器\n 下一个在 $1 声望点'],
+    [/^boosters\n(.+)Next at (.+) prestige points$/, '助推器\n 下一个在 $2 声望点'],
     [/^Cost: (.+) Acamaeda points\n\t\t\t$/, '成本: $1 Acamaeda点\n\t\t\t'],
     [/^Cost: (.+) Jacorb points\n\t\t\t$/, '成本: $1 Jacorb点\n\t\t\t'],
     [/^\n\n(.+)which are giving a ×(.+) boost to point gain.\n\n(.+)Reset Jacorb points for \+$/, '\n\n 增加了 ×$2 点增益。\n\n 重置 Jacorb 点数为 \+'],
