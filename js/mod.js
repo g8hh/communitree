@@ -12,12 +12,15 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.3.1",
+	num: "0.3.2",
 	name: "Alphablade",
 }
 
 let changelog = `<h1>Changelog:</h1><br/>
 	<i>(Be warned: this may contain spoilers!)</i><br/>
+	<br/>
+	<h3>v0.3.2</h3><br/>
+		Fixed the game formatting numbers greater than 1e9 and less than 1e16 with an extra "e".<br/>
 	<br/>
 	<h3>v0.3.1</h3><br/>
 		Fixed ashes and flames sometimes not working correctly with high numbers.<br/>
@@ -69,6 +72,7 @@ let changelog = `<h1>Changelog:</h1><br/>
 	<br/>
 	<h2>v0.0</h2><br/>
 		Initial release.<br/>
+	<br/>
 `
 
 let winText = `Congratulations! You have reached the end and beaten this game, but for now...`
