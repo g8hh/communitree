@@ -223,9 +223,9 @@ function doReset(layer, force=false) {
 		}
 	
 		tmp[layer].baseAmount = OmegaNumZero // quick fix
-	}
 
-	if (run(layers[layer].resetsNothing, layers[layer])) return
+		if (run(layers[layer].resetsNothing, layers[layer])) return
+	}
 
 
 	for (layerResetting in layers) {
