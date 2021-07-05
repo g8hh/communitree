@@ -763,7 +763,7 @@ var cnRegReplace = new Map([
 	[/^Electricity allocated:\n(.+)\n\n(.+)Translated to an additional\n(.+)\n(.+)bonus levels$/, '电力分配：\n$1\n\n 转化为额外的\n$3\n 奖励等级'],
 	[/^Reset previous progress for (.+) coal\n(.+)Next at (.+) thefinaluptake points$/, '重置 $1 煤的先前进度\n 接下来在 $3 最终吸收点'],
 	[/^electricity, which are giving (.+)\% of your electricity gain on reset each second.$/, '电力，每秒重置时提供 $1\% 的电力增益。'],
-	[/^tickspeed boosts\n(.+)\n(.+)which are making time in Aarex Dimensions ×(.+) faster\n(.+)\n(.+)Requires (.+) dimension (.+)$/, 'tick速度提升\n \n 这使得 Aarex 维度 ×$3 中的时间更快\n \n 需要 $4 维 $5'],
+	[/^tickspeed boosts\n(.+)\n(.+)which are making time in Aarex Dimensions ×(.+) faster\n(.+)\n(.+)Requires (.+) dimension (.+)$/, 'tick速度提升\n \n 这使得 Aarex 维度 ×$3 中的时间更快\n \n 需要 $6 维度 $7'],
 	[/^sacrifice multiplier\n(.+)\n(.+)which are multipling dimension (.+) efficiency by the same amount.\n(.+)\n(.+)Reset all dimensions except dimension (.+)\'s amount for a$/, '牺牲乘数\n \n 将维度 $3 的效率乘以相同的数量。\n \n 重置除维度 $6 的数量之外的所有维度以获得一个'],
 	[/^\(boost is divided by (.+) every further dimension, down to a minimum of (.+)×\)\n(.+)\n(.+)Requires (.+) dimension (.+)$/, '（提升 每进一步除以 $1，最小为 $2×）\n \n 需要 $5 维度 $6'],
 	[/^dimensional boosts\n(.+)\n(.+)which are giving a base ×(.+) boost to dimensions and dimension point effect\'s exponent and unlocking (.+) more dimensions$/, '维度提升\n\n 为维度和维度点效果指数提供基础 ×$3 提升，并解锁 $4 以上维度'],
