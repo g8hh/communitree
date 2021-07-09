@@ -19,6 +19,9 @@ let VERSION = {
 let changelog = `<h1>Changelog:</h1><br/>
 	<i>(Be warned: this may contain spoilers!)</i><br/>
 	<br/>
+	<h3>v0.3.3</h3><br/>
+		Changed v0.1 endgame from ${format([68.475, 6, 1])} to ${format([68.475, 6])}.<br/>
+	<br/>
 	<h3>v0.3.2</h3><br/>
 		Fixed the game formatting numbers greater than 1e9 and less than 1e16 with an extra "e".<br/>
 	<br/>
@@ -68,7 +71,7 @@ let changelog = `<h1>Changelog:</h1><br/>
 		Migrated to The Modding Tree 2.5.9.2.<br/>
 		Changed from using ExpantaNum.js to OmegaNum.js (and therefore will wipe out everybody's saves, I'm sorry).<br/>
 		Modified number formatting. (look ma, I invented new up arrow notation!)<br/>
-		Bumped endgame to ${format([68.475, 6, 1])}.<br/>
+		Bumped endgame to ${format([68.475, 6])}.<br/>
 	<br/>
 	<h2>v0.0</h2><br/>
 		Initial release.<br/>
