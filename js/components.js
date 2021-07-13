@@ -542,6 +542,7 @@ function loadVue() {
 			</select>
 		`
 	})
+
 	// These are for buyables, data is the id of the corresponding buyable
 	Vue.component('sell-one', {
 		props: ['layer', 'data'],
@@ -556,6 +557,20 @@ function loadVue() {
 			<button v-if="tmp[layer].buyables && tmp[layer].buyables[data].sellAll && !(tmp[layer].buyables[data].canSellAll !== undefined && tmp[layer].buyables[data].canSellAll == false)" v-on:click="run(tmp[layer].buyables[data].sellAll, tmp[layer].buyables[data])"
 				v-bind:class="{ longUpg: true, can: player[layer].unlocked, locked: !player[layer].unlocked }">{{tmp[layer].buyables.sellAllText ? tmp[layer].buyables.sellAllText : "Sell All"}}</button>
 	`
+	})
+	
+	
+	Vue.component('dimension', {
+		props: ['layer', 'data'],
+		template: `
+			<div v-if="player.aar.buyables[111].add(3).gte(data)" class="upgRow">
+				<div style="width:85px;font-size:12px;text-align:left">
+					Dimension {{(data + 1)}}<br/>
+					×{{format(buyableEffect("aar", data + 100))}}
+				</div>
+				<div style="width:200px"><b>{{format(player.aar.dims[data])}}</b></div>
+			</div>
+		`
 	})
 
 	// SYSTEM COMPONENTS

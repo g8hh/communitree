@@ -12,12 +12,17 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.3.2",
+	num: "0.3.4",
 	name: "Alphablade",
 }
 
 let changelog = `<h1>Changelog:</h1><br/>
 	<i>(Be warned: this may contain spoilers!)</i><br/>
+	<br/>
+	<h3>v0.3.4</h3><br/>
+		Rebalanced the Aarex layer.<br/>
+		Added automation to <b>The Long Awaited Upgrade</b> and <b>Ticksped</b>.<br/>
+		Fixed the Aarex Dimensions tab consuming performance the more you keep it on.<br/>
 	<br/>
 	<h3>v0.3.3</h3><br/>
 		Changed v0.1 endgame from ${format([68.475, 6, 1])} to ${format([68.475, 6])}.<br/>
