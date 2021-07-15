@@ -80,7 +80,7 @@ function format(decimal, precision = 2, small = false) {
         else mantissa = m[0] + "." + m[1].substring(0, p)
         return mantissa + "e" + commaFormat(exp)
     }
-    else if (decimal.lt("10^^5")) {
+    else if (decimal.lt("10^^6")) {
         let part1 = "e".repeat(egg(decimal.array[1]))
         if (part1 != "e") {
             decimal.array.pop()
@@ -88,7 +88,12 @@ function format(decimal, precision = 2, small = false) {
         }
         return "e" + format(decimal.log10(), precision2)
     }
-    else if (decimal.lt("10^^^5")) {
+    else if (decimal.lt("10^^1000000")) {
+        let tower = decimal.slog(10).floor()
+        let e = ExpantaNum.pow(10, decimal.slog(10).sub(tower))
+        return format(e, precision2) + "F" + commaFormat(tower)
+    }
+    else if (decimal.lt("10^^^6")) {
         let part1 = "F".repeat(egg(decimal.array[2]) + 1 - (decimal.gte(EN.TETRATED_MAX_SAFE_INTEGER)))
         if (part1 != "F") {
             decimal.array.pop()

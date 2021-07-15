@@ -116,7 +116,7 @@ addLayer("aar", {
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
             effect() {
-                let eff = player.points.add(1).log10().add(1).log10().add(1)
+                let eff = player.points.add(1).log10().add(1).log().add(1)
                 return eff
             },
             effectDisplay() { return "×" + format(this.effect()) },
@@ -138,7 +138,7 @@ addLayer("aar", {
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
             effect() {
-                let eff = player.jac.points.max(0).add(1).log10().mul(2).add(1).log10().add(1)
+                let eff = player.jac.points.max(0).add(1).log10().mul(2).add(1).log().add(1)
                 return eff
             },
             effectDisplay() { return "×" + format(this.effect()) },
@@ -160,7 +160,7 @@ addLayer("aar", {
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
             effect() {
-                let eff = player.jac.buyables[101].div(2).add(1).log10().mul(1.5).add(1).log10().add(1)
+                let eff = player.jac.buyables[101].div(2).add(1).log10().mul(1.5).add(1).log().add(1)
                 return eff
             },
             effectDisplay() { return "×" + format(this.effect()) },
@@ -182,7 +182,7 @@ addLayer("aar", {
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
             effect() {
-                let eff = player.aar.bal.add(1).log10().add(1)
+                let eff = player.aar.bal.add(1).log().add(1)
                 return eff
             },
             effectDisplay() { return "×" + format(this.effect()) },
@@ -191,7 +191,15 @@ addLayer("aar", {
         121: {
             title: "Remove",
             description: "Removes <b>Initialize</b>'s softcaps.",
-            cost: EN(1000000),
+            cost() {
+                let cost = 500000
+                let ugs = 2
+                for (let a = 121; a <= 124; a++) if (hasUpgrade("aar", a)) {
+                    cost *= ugs
+                    ugs += ugs - 1
+                }
+                return EN(cost)
+            },
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
@@ -200,7 +208,15 @@ addLayer("aar", {
         122: {
             title: "all",
             description: "Removes <b>Coding</b>'s softcaps.",
-            cost: EN(1000000),
+            cost() {
+                let cost = 500000
+                let ugs = 2
+                for (let a = 121; a <= 124; a++) if (hasUpgrade("aar", a)) {
+                    cost *= ugs
+                    ugs += ugs - 1
+                }
+                return EN(cost)
+            },
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
@@ -209,7 +225,15 @@ addLayer("aar", {
         123: {
             title: "these",
             description: "Removes <b>Release</b>'s softcaps.",
-            cost: EN(1000000),
+            cost() {
+                let cost = 500000
+                let ugs = 2
+                for (let a = 121; a <= 124; a++) if (hasUpgrade("aar", a)) {
+                    cost *= ugs
+                    ugs += ugs - 1
+                }
+                return EN(cost)
+            },
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
@@ -218,7 +242,15 @@ addLayer("aar", {
         124: {
             title: "softcaps",
             description: "Removes Booster and Generator amount softcap in their effect.",
-            cost: EN(1000000),
+            cost() {
+                let cost = 500000
+                let ugs = 2
+                for (let a = 121; a <= 124; a++) if (hasUpgrade("aar", a)) {
+                    cost *= ugs
+                    ugs += ugs - 1
+                }
+                return EN(cost)
+            },
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
@@ -334,7 +366,7 @@ addLayer("aar", {
         213: {
             title: "Soul-Automator",
             description: "Automates getting Phantom Soul gain on reset.",
-            cost: EN("eee3000"),
+            cost: EN("ee10000"),
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
@@ -343,7 +375,7 @@ addLayer("aar", {
         214: {
             title: "Large Number Convention",
             description: "Aarex reset no longer resets anything.",
-            cost: EN("eeee25"),
+            cost: EN("eeee10"),
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "Aarex balancing",
             currencyInternalName: "bal",
@@ -485,18 +517,18 @@ addLayer("aar", {
         241: {
             title: "Cost of Things",
             description: "Dimensions are boosted by ^0.01 of its cost.",
-            cost: EN("eeeee20"),
+            cost: EN("eeeee19.5"),
             unlocked() { return hasUpgrade("aar", 235) },
         },
         242: {
             title: "No Longer a Sacrifice",
             description: "You gain 10% of your remaining Sacrifice Multiplier per second.",
-            cost: EN("eeeee25"),
+            cost: EN("eeeee24"),
             unlocked() { return hasUpgrade("aar", 235) },
         },
         243: {
             title: "The Long Awaited Upgrade",
-            description: "Dimensional Boosts no longer reset.",
+            description: "Dimensional Boosts no longer reset and get automated.",
             cost: EN("eeeee30"),
             unlocked() { return hasUpgrade("aar", 235) },
         },
@@ -508,7 +540,7 @@ addLayer("aar", {
         },
         245: {
             title: "Ticksped",
-            description: "Tickspeed Boosts no longet reset.",
+            description: "Tickspeed Boosts no longer reset and get automated.",
             cost: EN("eeeee50"),
             unlocked() { return hasUpgrade("aar", 235) },
         },
@@ -559,7 +591,7 @@ addLayer("aar", {
         261: {
             title: "Almost There",
             description: "Resets everything in Aarex Dimensions, but multiplier per buy 1.072× → 1.075×",
-            cost: EN("eeeee346153"),
+            cost: EN("eeeee346000"),
             unlocked() { return hasUpgrade("aar", 255) },
             onPurchase() {
                 player.aar.dimPoints = EN(0)
@@ -648,6 +680,8 @@ addLayer("aar", {
             }
             if (hasUpgrade("aar", 232)) clickClickable("aar", 111)
             if (hasUpgrade("aar", 242)) player.aar.buyables[112] = player.aar.buyables[112].add(tmp.aar.buyables[112].cost.sub(player.aar.buyables[112]).max(0).mul(1 - 0.9 ** delta))
+            if (hasUpgrade("aar", 243)) buyBuyable("aar", 111)
+            if (hasUpgrade("aar", 245)) buyBuyable("aar", 113)
         }
     },
 
@@ -870,7 +904,8 @@ addLayer("aar", {
                         let max = this.max()
                         let cost = this.maxcost()
 
-                        if (cost.gte("ee15")) player.aar.dimPoints = player.aar.dimPoints.sub(cost).max(0)
+                        if (cost.gt(player.aar.dimPoints) || !tmp[this.layer].clickables[this.id].unlocked) return
+                        if (cost.lte("ee15")) player.aar.dimPoints = player.aar.dimPoints.sub(cost).max(0)
                         player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(max)
                         player.aar.dims[i] = player.aar.dims[i].add(max)
                     },
@@ -892,11 +927,11 @@ addLayer("aar", {
             },
             onClick() {
                 for (let a of clickableEffect("aar", 112).order)
-                    clickClickable("aar", 100 + a)
+                    layers.aar.clickables[100 + a].onClick()
             },
             onHold() {
                 for (let a of clickableEffect("aar", 112).order)
-                    clickClickable("aar", 100 + a)
+                    layers.aar.clickables[100 + a].onClick()
             },
             style: { width: '100px', "min-height": '35px' }
         },
@@ -958,27 +993,16 @@ addLayer("aar", {
                     ["raw-html", () => `You have <h3 style="color:#fff9ab">${format(player.aar.dimPoints)}</h3> dimension points, which are boosting <b>Aarex Point Generator</b> speed by ×${format(tmp.aar.effect.genMult)}`],
                     ["blank", "20px"],
                     ["row", [["raw-html", "<div style='width:285px'></div>"], ["clickable", 112], ["clickable", 111]]],
-                    ["column", (function () {
-                        let rows = []
-                        for (let a = 0; a < 10; a++) {
-                            function mFunc () {
-                                return player.aar.buyables[111].gte(a - 3) ? `<div style="width:85px;font-size:12px;text-align:left">
-                                    Dimension ${a + 1}<br/>
-                                    ×${format(buyableEffect("aar", a + 100))}
-                                </div>` : ''
-                            }
-                            function aFunc () {
-                                return player.aar.buyables[111].gte(a - 3) ? `<div style="width:200px"><b>${format(player.aar.dims[a])}</b></div>` : ''
-                            }
-                            rows.push(["row", [
-                                ["raw-html", mFunc],
-                                ["raw-html", aFunc],
-                                ["buyable", 100 + a],
-                                ["clickable", 100 + a],
-                            ]])
-                        }
-                        return rows
-                    })()],
+                    ["row", [["dimension", 0], ["buyable", 100], ["clickable", 100]]],
+                    ["row", [["dimension", 1], ["buyable", 101], ["clickable", 101]]],
+                    ["row", [["dimension", 2], ["buyable", 102], ["clickable", 102]]],
+                    ["row", [["dimension", 3], ["buyable", 103], ["clickable", 103]]],
+                    ["row", [["dimension", 4], ["buyable", 104], ["clickable", 104]]],
+                    ["row", [["dimension", 5], ["buyable", 105], ["clickable", 105]]],
+                    ["row", [["dimension", 6], ["buyable", 106], ["clickable", 106]]],
+                    ["row", [["dimension", 7], ["buyable", 107], ["clickable", 107]]],
+                    ["row", [["dimension", 8], ["buyable", 108], ["clickable", 108]]],
+                    ["row", [["dimension", 9], ["buyable", 109], ["clickable", 109]]],
                     ["blank", "10px"],
                     ["row", [["buyable", 111], ["buyable", 112], ["buyable", 113]]]
                 ],
@@ -995,3 +1019,14 @@ addLayer("aar", {
         ["blank", "20px"],
     ],
 })
+
+function getDimMultDiv(id) {
+    return player.aar.buyables[111].gte(id - 3) ? `<div style="width:85px;font-size:12px;text-align:left">
+        Dimension ${id + 1}<br/>
+        ×${format(buyableEffect("aar", id + 100))}
+    </div>` : ""
+}
+
+function getDimAmountDiv(id) {
+    return player.aar.buyables[111].gte(id - 3) ? `<div style="width:200px"><b>${format(player.aar.dims[id])}</b></div>` : ''
+}
