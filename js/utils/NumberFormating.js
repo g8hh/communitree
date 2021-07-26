@@ -122,8 +122,7 @@ function format(decimal, precision = 2, small = false) {
         }*/
         let e = decimal.toHyperE()
         let sp = e.split("#")
-        sp[0] = "E" + format(sp[0].substring(1, 20), precision2)
-        return sp.join("#")/*
+        return "E" + format(sp.shift().substring(1, 20), precision2) + "#" + sp.map(x => commaFormat(EN(x))).join("#")/*
     else{
       if(decimal.lt("10{998}5")){
         let qp = EN(6)
