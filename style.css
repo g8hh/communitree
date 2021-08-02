@@ -582,6 +582,10 @@ ul {
 	opacity: 1;
   }
 
+  .can:hover .tooltip {
+	transform: scale(0.869565, 0.869565);
+  }
+
   .forceTooltip .tooltip{
 	opacity: 1;
   }
@@ -602,10 +606,10 @@ ul {
 	-moz-border-radius: 3px;
 	border-radius: 3px;
 	opacity: 0;
-	transition: opacity 0.5s;
+	transition: opacity 0.5s, transform 0.5s;
   
 	position: absolute;
-	z-index: 20000 ;
+	z-index: 20000;
   
 	background-color: var(--background_tooltip);
 	color: var(--points);

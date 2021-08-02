@@ -798,7 +798,7 @@ addLayer("aar", {
                 let data = tmp[this.layer].buyables[this.id]
                 return `sacrifice multiplier
                 
-                which are multipling dimension 10 efficiency by the same amount.
+                which are multiplying dimension 10 efficiency by the same amount.
                 
                 Reset all dimensions except dimension 10's amount for a <h3>×${format(data.cost.div(data.effect).max(1))}</h3> increase`
             },

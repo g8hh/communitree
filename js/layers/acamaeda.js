@@ -105,8 +105,12 @@ addLayer("aca", {
             pointMult: EN.pent(10, player.aca.compPoints.add(1).log(10).pow(.4)),
             maxHealth: player.aca.candiesEaten.div(10).pow(0.5).add(100).floor(),
             atkPow: player.aca.wpnLevel.add(player.aca.wpnTier.mul(5)).pow(1.5).mul(EN.pow(1.1, player.aca.wpnLevel.add(player.aca.wpnTier.mul(80)))).floor(),
-            devSpeed: player.aca.compPoints.add(10).log10().pow(buyableEffect("aca", 205).add(2)).mul(buyableEffect("aca", 202)),
-            modMultis: []
+            devSpeed: softcap(player.aca.compPoints.add(10).log10(), EN(1e6), 0.2).min(1e9).pow(buyableEffect("aca", 205).add(2)).mul(buyableEffect("aca", 202)),
+            compBonus: EN(1),
+            modMultis: [],
+            modSpeed: [
+                buyableEffect("aca", 211)
+            ],
         }
 
         if (hasUpgrade("aca", 123)) eff.genMult = EN.tetr(10, player.aca.farmCandies.div(2500).max(0).mul(hasUpgrade("aca", 124) ? player.aca.dropCandies.add(10).log10() : 1), eff.genMult)
@@ -132,6 +136,7 @@ addLayer("aca", {
 
         if (hasUpgrade("aca", 331)) eff.devSpeed = eff.devSpeed.mul(upgradeEffect("aca", 331))
         if (hasUpgrade("aca", 333)) eff.devSpeed = eff.devSpeed.mul(upgradeEffect("aca", 333))
+        if (hasUpgrade("aca", 341)) eff.devSpeed = eff.devSpeed.mul(upgradeEffect("aca", 341))
         eff.devSpeed = eff.devSpeed.mul(buyableEffect("aca", 207))
         
         if (player.aca.modTimes.length) {
@@ -139,11 +144,14 @@ addLayer("aca", {
                 (x) => EN.pow(10, EN.pow(10, EN.add(x, 1).log().mul(500).add(EN.mul(x, 25))))
             ]
             for (let i = player.aca.modTimes.length - 1; i >= 0; i--) eff.modMultis.unshift(formulae[i](player.aca.modTimes[i]))
-            eff.devSpeed = eff.devSpeed.mul(eff.modMultis[0])
+            eff.compBonus = eff.compBonus.mul(eff.modMultis[0])
         }
         if (player.aca.modActive) switch (player.aca.modLevel) {
-            case 0: eff.devSpeed = eff.devSpeed.mul(tmp.tfu.effect.devBonus); break;
+            case 0: eff.compBonus = eff.compBonus.mul(tmp.tfu.effect.compBonus); break;
         }
+
+        if (hasUpgrade("aca", 351)) eff.modSpeed[0] = eff.modSpeed[0].mul(upgradeEffect("aca", 351))
+        if (hasUpgrade("aca", 353)) eff.modSpeed[0] = eff.modSpeed[0].mul(upgradeEffect("aca", 353))
         
         if (hasUpgrade("aca", 231) && getBuyableAmount("aca", 113).gt(0)) {
             eff.candyGain = eff.candyGain.mul(10)
@@ -745,7 +753,7 @@ addLayer("aca", {
             currencyDisplayName: "component points",
             currencyInternalName: "compPoints",
             effect() {
-                let eff = player.aca.compPoints.add(1).log(10).pow(.4).sub(1).max(1)
+                let eff = player.aca.compPoints.add(1).log(10).pow(.4).sub(1).max(1).min(1e12)
                 return eff
             },
             effectDisplay() { return "×" + format(this.effect()) },
@@ -755,9 +763,10 @@ addLayer("aca", {
         311: {
             title: "Easier Challenges",
             description: "<b>Challenges</b> are easier based on its amount.",
+            currencyDisplayName: "component points",
             cost() {
                 let cost = EN("1e145")
-                let ugs = EN("e70")
+                let ugs = EN("e69")
                 for (let a = 311; a <= 312; a++) if (hasUpgrade("aca", a)) {
                     cost = cost.mul(ugs)
                     ugs = ugs.mul("e10")
@@ -786,9 +795,10 @@ addLayer("aca", {
         312: {
             title: "Challenge Buyables",
             description: "<b>Challenges</b> are easier based on <b>Buyables</b>' amount.",
+            currencyDisplayName: "component points",
             cost() {
                 let cost = EN("1e145")
-                let ugs = EN("e70")
+                let ugs = EN("e69")
                 for (let a = 311; a <= 312; a++) if (hasUpgrade("aca", a)) {
                     cost = cost.mul(ugs)
                     ugs = ugs.mul("e10")
@@ -817,6 +827,7 @@ addLayer("aca", {
         321: {
             title: "Challenge Upgrades",
             description: "<b>Easier Challenges</b>' effect boosts <b>Upgrades</b>' effect.",
+            currencyDisplayName: "component points",
             cost() {
                 let cost = EN("1e219")
                 let ugs = EN("e171")
@@ -846,6 +857,7 @@ addLayer("aca", {
         322: {
             title: "Buyable Challenges?",
             description: "The previous two upgrades above boosts <b>Buyables</b>' effect.",
+            currencyDisplayName: "component points",
             cost() {
                 let cost = EN("1e219")
                 let ugs = EN("e171")
@@ -875,6 +887,7 @@ addLayer("aca", {
         323: {
             title: "Upgrade Upgrades",
             description: "The previous two upgrades above boosts <b>Upgrades</b>' effect.",
+            currencyDisplayName: "component points",
             cost() {
                 let cost = EN("1e219")
                 let ugs = EN("e171")
@@ -904,6 +917,7 @@ addLayer("aca", {
         324: {
             title: "Challenge Milestones",
             description: "<b>Challenge Buyables</b>' effect boosts <b>Milestones</b>' effect.",
+            currencyDisplayName: "component points",
             cost() {
                 let cost = EN("1e219")
                 let ugs = EN("e171")
@@ -933,6 +947,7 @@ addLayer("aca", {
         331: {
             title: "Upgrade Buyables",
             description: "Boost to dev speed based on connected upgrades.",
+            currencyDisplayName: "component points",
             cost() {
                 let cost = EN("1e1192")
                 let ugs = EN("e500")
@@ -944,7 +959,7 @@ addLayer("aca", {
             },
             req: [321, 322],
             effect() {
-                let eff = upgradeEffect("aca", 321).pow(upgradeEffect("aca", 322).sub(1))
+                let eff = upgradeEffect("aca", 321).pow(upgradeEffect("aca", 322).sub(1)).min(1e12)
                 return eff
             },
             effectDisplay() { return "×" + format(this.effect()) },
@@ -962,6 +977,7 @@ addLayer("aca", {
         332: {
             title: "Just an Upgrade",
             description: "Development speed multiplies component points, thrice.",
+            currencyDisplayName: "component points",
             cost() {
                 let cost = EN("1e1192")
                 let ugs = EN("e500")
@@ -986,6 +1002,7 @@ addLayer("aca", {
         333: {
             title: "Upgrade Milestones",
             description: "Boost to dev speed based on connected upgrades.",
+            currencyDisplayName: "component points",
             cost() {
                 let cost = EN("1e1192")
                 let ugs = EN("e500")
@@ -997,7 +1014,7 @@ addLayer("aca", {
             },
             req: [323, 324],
             effect() {
-                let eff = upgradeEffect("aca", 323).pow(upgradeEffect("aca", 324).max(1).log().div(70))
+                let eff = upgradeEffect("aca", 323).pow(upgradeEffect("aca", 324).max(1).log().div(70)).min(1e12)
                 return eff
             },
             effectDisplay() { return "×" + format(this.effect()) },
@@ -1010,6 +1027,261 @@ addLayer("aca", {
                 let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
                 return this.req.map(x => [x, col]) 
             },
+            style: { margin: "10px" }
+        },
+        341: {
+            title: "Resume the Game",
+            description: "Boost to dev speed based on thefinaluptake time.",
+            currencyDisplayName: "component points",
+            cost: EN("ee4200"),
+            req: [331, 332, 333],
+            effect() {
+                let time = EN(player.aca.modTimes[0] || 0)
+                if (hasUpgrade("aca", 352)) time = time.mul(upgradeEffect("aca", 352))
+                let eff = EN.pow(10, softcap(softcap(time.add(1).log().pow(5), EN(10000), .5), EN(100000), .2).min(1000000))
+                return eff
+            },
+            effectDisplay() { return "×" + format(this.effect()) },
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("aca", a)) return false
+                return player.aca.compPoints.gte(tmp.aca.upgrades[this.id].cost) 
+            },
+            pay() { player.aca.compPoints = player.aca.compPoints.sub(tmp.aca.upgrades[this.id].cost) },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            unlocked() { return player.aca.modTimes[0] },
+            style: { margin: "10px" }
+        },
+        351: {
+            title: "Burn the Game",
+            description: "Fasten thefinaluptake time based on previous upgrade.",
+            currencyDisplayName: "component points",
+            cost() {
+                let cost = EN("e11111")
+                let ugs = EN("e4889")
+                for (let a = 351; a <= 353; a++) if (hasUpgrade("aca", a)) {
+                    cost = cost.mul(ugs)
+                    ugs = ugs.mul("e11111")
+                }
+                return EN.pow(10, cost)
+            },
+            req: [341, 352],
+            effect() {
+                let eff = upgradeEffect("aca", 341).add(1).slog(10).div(2).add(2)
+                if (hasUpgrade("aca", 361)) eff = eff.pow(upgradeEffect("aca", 361))
+                if (hasUpgrade("aca", 362)) eff = eff.pow(upgradeEffect("aca", 362))
+                return eff
+            },
+            effectDisplay() { return "×" + format(this.effect()) },
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("aca", a)) return false
+                return player.aca.compPoints.gte(tmp.aca.upgrades[this.id].cost) 
+            },
+            pay() { player.aca.compPoints = player.aca.compPoints.sub(tmp.aca.upgrades[this.id].cost) },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            unlocked() { return player.aca.buyables[200].gte(5) },
+            style: { margin: "10px" }
+        },
+        352: {
+            title: "Fasten the Game",
+            description: "Boost to <b>Resume the Game</b>'s time based on row 3 component count.",
+            currencyDisplayName: "component points",
+            cost() {
+                let cost = EN("e11111")
+                let ugs = EN("e4889")
+                for (let a = 351; a <= 353; a++) if (hasUpgrade("aca", a)) {
+                    cost = cost.mul(ugs)
+                    ugs = ugs.mul("e1111")
+                }
+                return EN.pow(10, cost)
+            },
+            req: [341],
+            effect() {
+                let x = getBuyableAmount("aca", 209).add(getBuyableAmount("aca", 210))
+                let eff = x.add(1).sqrt()
+                if (hasUpgrade("aca", 361)) eff = eff.pow(upgradeEffect("aca", 361))
+                if (hasUpgrade("aca", 362)) eff = eff.pow(upgradeEffect("aca", 362))
+                return eff
+            },
+            effectDisplay() { return "×" + format(this.effect()) },
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("aca", a)) return false
+                return player.aca.compPoints.gte(tmp.aca.upgrades[this.id].cost) 
+            },
+            pay() { player.aca.compPoints = player.aca.compPoints.sub(tmp.aca.upgrades[this.id].cost) },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            unlocked() { return player.aca.buyables[200].gte(5) },
+            style: { margin: "10px" }
+        },
+        353: {
+            title: "Bars.",
+            description: "Fasten thefinaluptake time based on component points.",
+            currencyDisplayName: "component points",
+            cost() {
+                let cost = EN("e11111")
+                let ugs = EN("e4889")
+                for (let a = 351; a <= 353; a++) if (hasUpgrade("aca", a)) {
+                    cost = cost.mul(ugs)
+                    ugs = ugs.mul("e11111")
+                }
+                return EN.pow(10, cost)
+            },
+            req: [341, 352],
+            effect() {
+                let eff = player.aca.compPoints.add(1).slog(10).div(2).add(1)
+                if (hasUpgrade("aca", 361)) eff = eff.pow(upgradeEffect("aca", 361))
+                if (hasUpgrade("aca", 362)) eff = eff.pow(upgradeEffect("aca", 362))
+                return eff
+            },
+            effectDisplay() { return "×" + format(this.effect()) },
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("aca", a)) return false
+                return player.aca.compPoints.gte(tmp.aca.upgrades[this.id].cost) 
+            },
+            pay() { player.aca.compPoints = player.aca.compPoints.sub(tmp.aca.upgrades[this.id].cost) },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            unlocked() { return player.aca.buyables[200].gte(5) },
+            style: { margin: "10px" }
+        },
+        361: {
+            title: "Row 2 Synergy",
+            description: "Boosts connected row upgrades based on row 2 component count.",
+            currencyDisplayName: "component points",
+            cost() {
+                let cost = EN("e125000")
+                let ugs = EN("e250000")
+                for (let a = 361; a <= 364; a++) if (hasUpgrade("aca", a)) {
+                    cost = cost.mul(ugs)
+                    ugs = ugs.mul("e375000")
+                }
+                return EN.pow(10, cost)
+            },
+            req: [351, 352, 353],
+            effect() {
+                let x = EN(0)
+                for (let a = 205; a <= 208; a++) x = x.add(getBuyableAmount("aca", a))
+                let eff = x.div(100).add(1).cbrt()
+                return eff
+            },
+            effectDisplay() { return "^" + format(this.effect()) },
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("aca", a)) return false
+                return player.aca.compPoints.gte(tmp.aca.upgrades[this.id].cost) 
+            },
+            pay() { player.aca.compPoints = player.aca.compPoints.sub(tmp.aca.upgrades[this.id].cost) },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            unlocked() { return player.aca.buyables[200].gte(5) },
+            style: { margin: "10px" }
+        },
+        362: {
+            title: "Row 3 Synergy",
+            description: "Boosts connected row upgrades based on row 3 component count.",
+            currencyDisplayName: "component points",
+            cost() {
+                let cost = EN("e125000")
+                let ugs = EN("e250000")
+                for (let a = 361; a <= 364; a++) if (hasUpgrade("aca", a)) {
+                    cost = cost.mul(ugs)
+                    ugs = ugs.mul("e375000")
+                }
+                return EN.pow(10, cost)
+            },
+            req: [351, 352, 353],
+            effect() {
+                let x = EN(0)
+                for (let a = 209; a <= 211; a++) x = x.add(getBuyableAmount("aca", a))
+                let eff = x.div(10).add(1).cbrt()
+                return eff
+            },
+            effectDisplay() { return "^" + format(this.effect()) },
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("aca", a)) return false
+                return player.aca.compPoints.gte(tmp.aca.upgrades[this.id].cost) 
+            },
+            pay() { player.aca.compPoints = player.aca.compPoints.sub(tmp.aca.upgrades[this.id].cost) },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            unlocked() { return player.aca.buyables[200].gte(5) },
+            style: { margin: "10px" }
+        },
+        363: {
+            title: "Row 2 Reboost",
+            description: "Boosts row 2 components' amount in their effects based on connected upgrades.",
+            currencyDisplayName: "component points",
+            cost() {
+                let cost = EN("e125000")
+                let ugs = EN("e250000")
+                for (let a = 361; a <= 364; a++) if (hasUpgrade("aca", a)) {
+                    cost = cost.mul(ugs)
+                    ugs = ugs.mul("e375000")
+                }
+                return EN.pow(10, cost)
+            },
+            req: [351, 361],
+            effect() {
+                let x = upgradeEffect("aca", 351).mul(upgradeEffect("aca", 361))
+                let eff = x.log().add(1).pow(0.3)
+                return eff
+            },
+            effectDisplay() { return "×" + format(this.effect()) },
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("aca", a)) return false
+                return player.aca.compPoints.gte(tmp.aca.upgrades[this.id].cost) 
+            },
+            pay() { player.aca.compPoints = player.aca.compPoints.sub(tmp.aca.upgrades[this.id].cost) },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            unlocked() { return player.aca.buyables[200].gte(5) },
+            style: { margin: "10px" }
+        },
+        364: {
+            title: "Row 3 Reboost",
+            description: "Boosts row 3 components' amount in their effects based on connected upgrades.",
+            currencyDisplayName: "component points",
+            cost() {
+                let cost = EN("e125000")
+                let ugs = EN("e250000")
+                for (let a = 361; a <= 364; a++) if (hasUpgrade("aca", a)) {
+                    cost = cost.mul(ugs)
+                    ugs = ugs.mul("e375000")
+                }
+                return EN.pow(10, cost)
+            },
+            req: [353, 362],
+            effect() {
+                let x = upgradeEffect("aca", 353).mul(upgradeEffect("aca", 362))
+                let eff = x.log().add(1).pow(0.15)
+                return eff
+            },
+            effectDisplay() { return "×" + format(this.effect()) },
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("aca", a)) return false
+                return player.aca.compPoints.gte(tmp.aca.upgrades[this.id].cost) 
+            },
+            pay() { player.aca.compPoints = player.aca.compPoints.sub(tmp.aca.upgrades[this.id].cost) },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            unlocked() { return player.aca.buyables[200].gte(5) },
             style: { margin: "10px" }
         },
     },
@@ -1452,6 +1724,7 @@ addLayer("aca", {
                     "v1.2",
                     "v1.2.3",
                     "v1.3",
+                    "v2.0",
                 ][x.array[0]]
             },
             effect() {
@@ -1461,6 +1734,7 @@ addLayer("aca", {
                     "The next update unlocks a new tab.",
                     "The next update unlocks 2 new features and more upgrades.",
                     "The next update unlocks 2 new features and a new tab.",
+                    "The next update unlocks 3 new features and more upgrades.",
                     "Max level reached",
                 ][x.array[0]]
             },
@@ -1471,6 +1745,7 @@ addLayer("aca", {
                     1e16,
                     2.5e58,
                     1e100,
+                    "e10000",
                     "0",
                 ][x.array[0]])
             },
@@ -1524,7 +1799,7 @@ addLayer("aca", {
                 if (hasUpgrade("aca", 321)) eff = eff.mul(upgradeEffect("aca", 321))
                 if (hasUpgrade("aca", 323)) eff = eff.mul(upgradeEffect("aca", 323))
                 if (hasUpgrade("aca", 332)) eff = eff.mul(tmp.aca.effect.devSpeed.max(1).pow(3))
-                return eff
+                return eff.mul(tmp.aca.effect.compBonus)
             },
             max: EN(80),
             cost() {
@@ -1570,7 +1845,7 @@ addLayer("aca", {
                 return hasUpgrade("aca", 125)
             },
             effect() {
-                let x = player[this.layer].buyables[this.id].mul(buyableEffect("aca", 204))
+                let x = player[this.layer].buyables[this.id].mul(buyableEffect("aca", 204)).mul(buyableEffect("aca", 209))
                 let eff = EN.pow(3, x.pow(0.75))
                 if (hasUpgrade("aca", 301)) eff = eff.mul(upgradeEffect("aca", 301))
                 if (hasUpgrade("aca", 324)) eff = eff.mul(upgradeEffect("aca", 324))
@@ -1672,7 +1947,7 @@ addLayer("aca", {
                 return getBuyableAmount("aca", 200).gte(1)
             },
             effect() {
-                let x = player[this.layer].buyables[this.id]
+                let x = player[this.layer].buyables[this.id].mul(buyableEffect("aca", 210))
                 let eff = EN.pow(1.5, x.pow(0.75))
                 if (hasUpgrade("aca", 322)) eff = eff.mul(upgradeEffect("aca", 322))
                 return eff
@@ -1722,6 +1997,7 @@ addLayer("aca", {
             },
             effect() {
                 let x = player[this.layer].buyables[this.id]
+                if (hasUpgrade("aca", 363)) x = x.mul(upgradeEffect("aca", 363))
                 let eff = x.mul(buyableEffect("aca", 206))
                 return eff
             },
@@ -1770,6 +2046,7 @@ addLayer("aca", {
             },
             effect() {
                 let x = player[this.layer].buyables[this.id]
+                if (hasUpgrade("aca", 363)) x = x.mul(upgradeEffect("aca", 363))
                 let eff = x.mul(.25).add(1)
                 return eff
             },
@@ -1818,7 +2095,8 @@ addLayer("aca", {
             },
             effect() {
                 let x = player[this.layer].buyables[this.id].mul(buyableEffect("aca", 208))
-                let eff = EN.pow(2, player.aca.compPoints.add(1).log10().pow(0.3)).pow(x.pow(0.3))
+                if (hasUpgrade("aca", 363)) x = x.mul(upgradeEffect("aca", 363))
+                let eff = EN.pow(2, player.aca.compPoints.add(1).log10().min(1e12).pow(0.3)).pow(x.pow(0.3))
                 return eff
             },
             max: EN(35),
@@ -1866,6 +2144,7 @@ addLayer("aca", {
             },
             effect() {
                 let x = player[this.layer].buyables[this.id]
+                if (hasUpgrade("aca", 363)) x = x.mul(upgradeEffect("aca", 363))
                 let eff = x.mul(0.1).add(1)
                 return eff
             },
@@ -1873,6 +2152,153 @@ addLayer("aca", {
             cost() {
                 let x = player[this.layer].buyables[this.id]
                 return EN.pow("e175", x.div(5).add(1).pow(EN.pow(2, x.mul(.05).add(.75).max(1))))
+            },
+            canAfford() {
+                let data = tmp[this.layer].buyables[this.id]
+                return player.aca.buyables[this.id].lt(data.max) && ["", this.id].includes(player.aca.devTarget)
+            }, 
+            buy() { 
+                player.aca.devProgress = ExpantaNumZero
+                player.aca.devTarget = player.aca.devTarget == this.id ? "" : this.id
+            },
+            style() { 
+                let active = player.aca.devTarget == this.id
+                let data = tmp[this.layer].buyables[this.id]
+                if (active) {
+                    let prog = player.aca.devProgress.div(data.cost)
+                    return { ...tmtBuyable, 
+                        "background": tmp.aca.color,
+                        "box-shadow": `0 0 10px var(--points), inset 0 -${prog.mul(120).toString()}px #ffffff3f`,
+                    }
+                } else return { ...tmtBuyable,  background: !data.canAfford ? "#3f3f3f" : tmp.aca.color}
+            }
+        },
+        209: {
+            title() {
+                return ""
+            }, 
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>Achievements</h3>\n(${formatWhole(x)} / ${formatWhole(data.max)})
+                    Multiplies <b>Milestones</b>' amount in their effect by ${format(data.effect)}×, based on dev speed.
+                ` + (player.aca.devTarget != this.id ? `
+                    Diff: ${format(data.cost)}
+                ` : `
+                    Developing...\n${format(player.aca.devProgress)} / ${format(data.cost)}
+                `)
+            },
+            unlocked() {
+                return getBuyableAmount("aca", 200).gte(5)
+            },
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                if (hasUpgrade("aca", 364)) x = x.mul(upgradeEffect("aca", 364))
+                let eff = x.mul(tmp.aca.effect.devSpeed.log10().sqrt()).add(1)
+                return eff
+            },
+            max: EN(15),
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow("e5000", EN.pow(x, 2)).mul("e10000")
+            },
+            canAfford() {
+                let data = tmp[this.layer].buyables[this.id]
+                return player.aca.buyables[this.id].lt(data.max) && ["", this.id].includes(player.aca.devTarget)
+            }, 
+            buy() { 
+                player.aca.devProgress = ExpantaNumZero
+                player.aca.devTarget = player.aca.devTarget == this.id ? "" : this.id
+            },
+            style() { 
+                let active = player.aca.devTarget == this.id
+                let data = tmp[this.layer].buyables[this.id]
+                if (active) {
+                    let prog = player.aca.devProgress.div(data.cost)
+                    return { ...tmtBuyable, 
+                        "background": tmp.aca.color,
+                        "box-shadow": `0 0 10px var(--points), inset 0 -${prog.mul(120).toString()}px #ffffff3f`,
+                    }
+                } else return { ...tmtBuyable,  background: !data.canAfford ? "#3f3f3f" : tmp.aca.color}
+            }
+        },
+        210: {
+            title() {
+                return ""
+            }, 
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>Clickables</h3>\n(${formatWhole(x)} / ${formatWhole(data.max)})
+                    Multiplies <b>Buyables</b>' amount in their effect by ${format(data.effect)}×, based on dev speed.
+                ` + (player.aca.devTarget != this.id ? `
+                    Diff: ${format(data.cost)}
+                ` : `
+                    Developing...\n${format(player.aca.devProgress)} / ${format(data.cost)}
+                `)
+            },
+            unlocked() {
+                return getBuyableAmount("aca", 200).gte(5)
+            },
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                if (hasUpgrade("aca", 364)) x = x.mul(upgradeEffect("aca", 364))
+                let eff = x.mul(tmp.aca.effect.devSpeed.log()).add(1).log().cbrt().div(10).add(1)
+                return eff
+            },
+            max: EN(15),
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow("e10000", EN.pow(x, 2)).mul("e20000")
+            },
+            canAfford() {
+                let data = tmp[this.layer].buyables[this.id]
+                return player.aca.buyables[this.id].lt(data.max) && ["", this.id].includes(player.aca.devTarget)
+            }, 
+            buy() { 
+                player.aca.devProgress = ExpantaNumZero
+                player.aca.devTarget = player.aca.devTarget == this.id ? "" : this.id
+            },
+            style() { 
+                let active = player.aca.devTarget == this.id
+                let data = tmp[this.layer].buyables[this.id]
+                if (active) {
+                    let prog = player.aca.devProgress.div(data.cost)
+                    return { ...tmtBuyable, 
+                        "background": tmp.aca.color,
+                        "box-shadow": `0 0 10px var(--points), inset 0 -${prog.mul(120).toString()}px #ffffff3f`,
+                    }
+                } else return { ...tmtBuyable,  background: !data.canAfford ? "#3f3f3f" : tmp.aca.color}
+            }
+        },
+        211: {
+            title() {
+                return ""
+            }, 
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>Bars</h3>\n(${formatWhole(x)} / ${formatWhole(data.max)})
+                    Fastens thefinaluptake time by ${format(data.effect)}×.
+                ` + (player.aca.devTarget != this.id ? `
+                    Diff: ${format(data.cost)}
+                ` : `
+                    Developing...\n${format(player.aca.devProgress)} / ${format(data.cost)}
+                `)
+            },
+            unlocked() {
+                return getBuyableAmount("aca", 200).gte(5)
+            },
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                if (hasUpgrade("aca", 364)) x = x.mul(upgradeEffect("aca", 364))
+                let eff = EN.pow(2, x)
+                return eff
+            },
+            max: EN(15),
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow("e15000", EN.pow(x, 2)).mul("e25000")
             },
             canAfford() {
                 let data = tmp[this.layer].buyables[this.id]
@@ -2231,7 +2657,7 @@ addLayer("aca", {
         }
         if (player.aca.modTimes.length) {
             for (let i = player.aca.modTimes.length - 1; i >= 0; i--) {
-                player.aca.modTimes[i] = EN.add(player.aca.modTimes[i], EN.add(player.aca.modTimes[i+1] || 0, 1).mul(delta))
+                player.aca.modTimes[i] = EN.add(player.aca.modTimes[i], EN.add(player.aca.modTimes[i+1] || 0, 1).mul(tmp.aca.effect.modSpeed[i]).mul(delta))
             }
         }
     },
@@ -2430,7 +2856,7 @@ addLayer("aca", {
                 unlocked: () => hasUpgrade("aca", 125),
                 content: [
                     ["blank", "10px"],
-                    ["raw-html", () => `You have <h2 style"color:8fa140">${formatWhole(player.aca.compPoints)}</h2> component points, which are multipling point gain by ${formatWhole(tmp.aca.effect.pointMult)}`],
+                    ["raw-html", () => `You have <h2 style"color:8fa140">${formatWhole(player.aca.compPoints)}</h2> component points, which are multiplying point gain by ${formatWhole(tmp.aca.effect.pointMult)}`],
                     ["raw-html", () => `(Your development speed is <h3>${format(tmp.aca.effect.devSpeed)}</h3>/s)`],
                     ["blank", "10px"],
                     ["microtabs", "tmt"],
@@ -2548,6 +2974,7 @@ addLayer("aca", {
                     ["blank", "10px"],
                     ["row", [["buyable", 201], ["buyable", 202], ["buyable", 203], ["buyable", 204]]],
                     ["row", [["buyable", 205], ["buyable", 206], ["buyable", 207], ["buyable", 208]]],
+                    ["row", [["buyable", 209], ["buyable", 210], ["buyable", 211], ["buyable", 212]]],
                 ],
             },
             "upgTree": {
@@ -2563,6 +2990,9 @@ addLayer("aca", {
                     ["row", [["upgrade", 311], ["upgrade", 312]]],
                     ["row", [["upgrade", 321], ["upgrade", 322], ["upgrade", 323], ["upgrade", 324]]],
                     ["row", [["upgrade", 331], ["upgrade", 332], ["upgrade", 333]]],
+                    ["row", [["upgrade", 341]]],
+                    ["row", [["upgrade", 351], ["upgrade", 352], ["upgrade", 353]]],
+                    ["row", [["upgrade", 363], ["upgrade", 361], ["upgrade", 362], ["upgrade", 364]]],
                 ],
             },
             "modders": {
