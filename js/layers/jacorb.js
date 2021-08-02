@@ -1293,7 +1293,7 @@ addLayer("jac", {
                 let data = tmp[this.layer].buyables[this.id]
                 return `balance energy
 
-                    which are giving a ×${format(data.effect.ps)} bonus to Quirk effect and are multipling Subspace Energy and Time Capsules in their effects by ${format(data.effect.ng)}×, slowly increases over this Jacorb reset.
+                    which are giving a ×${format(data.effect.ps)} bonus to Quirk effect and are multiplying Subspace Energy and Time Capsules in their effects by ${format(data.effect.ng)}×, slowly increases over this Jacorb reset.
 
                     Reset previous progress for +<h3>${format(data.prestigeGain, 0)}</h3> balance energy
                     ${data.prestigeGain.lt(100) ? "Next at " + format(data.prestigeNext, 0) + " quirks" : ""}

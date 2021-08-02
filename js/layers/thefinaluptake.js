@@ -54,7 +54,7 @@ addLayer("tfu", {
 
     effect() {
         let eff = {
-            devBonus: player.tfu.best.div(10).max(1).div(player.tfu.best.max(10).log10()),
+            compBonus: player.tfu.best.div(10).max(1).mul(player.tfu.best.max(10).log10()).pow(2),
             maxFlames: buyableEffect("tfu", 101).mul(buyableEffect("tfu", 102)),
             decaySpeed: buyableEffect("tfu", 101).mul(.05),
             coalBonus: EN(0),
@@ -63,7 +63,7 @@ addLayer("tfu", {
         return eff
     },
     effectDescription() {
-        return `which are making Acamaeda dev speed ${format(tmp.tfu.effect.devBonus)} faster, based on your highest amount.`
+        return `which are making ${format(tmp.tfu.effect.compBonus)}× more component points, based on your highest amount.`
     },
     clickables: {
         100: {
@@ -819,8 +819,8 @@ addLayer("tfu", {
                 title: "The Burning Tree",
                 content: [
                     ["blank", "10px"],
-                    ["raw-html", () => `You have <h3>${format(player.tfu.ashes)}</h3> ashes, which produces thefinaluptake points.`],
-                    ["raw-html", () => `You have <h3>${format(player.tfu.flames)} / ${format(tmp.tfu.effect.maxFlames)}</h3> flames, which produces ashes.`],
+                    ["raw-html", () => `You have <h3>${format(player.tfu.ashes)}</h3> ashes, which produce thefinaluptake points.`],
+                    ["raw-html", () => `You have <h3>${format(player.tfu.flames)} / ${format(tmp.tfu.effect.maxFlames)}</h3> flames, which produce ashes.`],
                     ["blank", "10px"],
                     ["raw-html", () => `You lose ${format(tmp.tfu.effect.decaySpeed)} flames per second.`],
                     ["blank", "10px"],

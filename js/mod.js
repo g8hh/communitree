@@ -12,13 +12,17 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.3.4",
+	num: "0.3.5",
 	name: "Alphablade",
 }
 
 let changelog = `<h1>Changelog:</h1><br/>
 	<i>(Be warned: this may contain spoilers!)</i><br/>
 	<br/>
+	<h3>v0.3.5</h3><br/>
+		Added some more content.<br/>
+		Fixed TMT upgrade tree showings upgrades need Acamaeda points instead of component points.<br/>
+		Bumped endgame to ${format([1500000, 1, 0, 1])}.<br/>
 	<h3>v0.3.4</h3><br/>
 		Rebalanced the Aarex layer.<br/>
 		Added automation to <b>The Long Awaited Upgrade</b> and <b>Ticksped</b>.<br/>
@@ -131,7 +135,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format([5000, 1, 0, 1])} points)`,
+	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format([1500000, 1, 0, 1])} points)`,
 	() => !player.isWarned ? `
 		<div style="border:2px solid var(--color);margin-top:10px;padding:5px;display:inline-block">
 		Important notice: Some parts of the game may contain flashing lights.<br/>
@@ -143,7 +147,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte([5000, 1, 0, 1])
+	return player.points.gte([1500000, 1, 0, 1])
 }
 
 
