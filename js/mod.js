@@ -3,8 +3,8 @@ let modInfo = {
 	id: "allofem",
 	author: "ducdat0507",
 	pointsName: "points",
-	discordName: "",
-	discordLink: "",
+	discordName: "The Prestreestuck Server",
+	discordLink: "https://discord.gg/fHcWmmprGm",
 	initialStartPoints: EN (10), // Used for hard resets and new players
 	
 	offlineLimit: 1,  // In hours
@@ -12,17 +12,26 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.3.5",
-	name: "Alphablade",
+	num: "0.4",
+	name: "Highly Responsive to Modifications",
 }
 
 let changelog = `<h1>Changelog:</h1><br/>
 	<i>(Be warned: this may contain spoilers!)</i><br/>
 	<br/>
+	<h2>v0.4</h2><br/>
+	<h4><i>- Highly Responsive to Modifications -</i></h4>
+		Added despacit creator layer.<br/>
+		Fixed Aarex dimension buying was inconsistent.<br/>
+		Fixed generator resets shown as reset for boosters.<br/>
+		Added a link to the Prestreestuck server. <i>(why?)</i><br/>
+		Bumped endgame to ${format([16, 2, 0, 1])}.<br/>
+	<br/>
 	<h3>v0.3.5</h3><br/>
 		Added some more content.<br/>
 		Fixed TMT upgrade tree showings upgrades need Acamaeda points instead of component points.<br/>
 		Bumped endgame to ${format([1500000, 1, 0, 1])}.<br/>
+	<br/>
 	<h3>v0.3.4</h3><br/>
 		Rebalanced the Aarex layer.<br/>
 		Added automation to <b>The Long Awaited Upgrade</b> and <b>Ticksped</b>.<br/>
@@ -135,7 +144,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format([1500000, 1, 0, 1])} points)`,
+	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format([1e16, 1, 0, 1])} points)`,
 	() => !player.isWarned ? `
 		<div style="border:2px solid var(--color);margin-top:10px;padding:5px;display:inline-block">
 		Important notice: Some parts of the game may contain flashing lights.<br/>
@@ -147,7 +156,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte([1500000, 1, 0, 1])
+	return player.points.gte([16, 2, 0, 1])
 }
 
 

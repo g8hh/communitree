@@ -171,7 +171,7 @@ function loadVue() {
 	Vue.component('upgrade', {
 		props: ['layer', 'data'],
 		template: `
-		<button v-if="tmp[layer].upgrades && tmp[layer].upgrades[data]!== undefined && tmp[layer].upgrades[data].unlocked" :id='"upgrade-" + layer + "-" + data' v-on:click="buyUpg(layer, data)" v-bind:class="{ [layer]: true, upg: true, bought: hasUpgrade(layer, data), locked: (!(canAffordUpgrade(layer, data))&&!hasUpgrade(layer, data)), can: (canAffordUpgrade(layer, data)&&!hasUpgrade(layer, data))}"
+		<button v-if="tmp[layer].upgrades && tmp[layer].upgrades[data]!== undefined && tmp[layer].upgrades[data].unlocked" :id='"upgrade-" + layer + "-" + data' v-on:click="buyUpg(layer, data)" v-bind:class="{ [layer]: true, tooltipBox: true, upg: true, bought: hasUpgrade(layer, data), locked: (!(canAffordUpgrade(layer, data))&&!hasUpgrade(layer, data)), can: (canAffordUpgrade(layer, data)&&!hasUpgrade(layer, data))}"
 			v-bind:style="[((!hasUpgrade(layer, data) && canAffordUpgrade(layer, data)) ? {'background-color': tmp[layer].color} : {}), tmp[layer].upgrades[data].style]">
 			<span v-if="layers[layer].upgrades[data].fullDisplay" v-html="run(layers[layer].upgrades[data].fullDisplay, layers[layer].upgrades[data])"></span>
 			<span v-else>
@@ -180,7 +180,8 @@ function loadVue() {
 				<span v-if="layers[layer].upgrades[data].effectDisplay"><br>Currently: <span v-html="run(layers[layer].upgrades[data].effectDisplay, layers[layer].upgrades[data])"></span></span>
 				<br><br>Cost: {{ formatWhole(tmp[layer].upgrades[data].cost) }} {{(tmp[layer].upgrades[data].currencyDisplayName ? tmp[layer].upgrades[data].currencyDisplayName : tmp[layer].resource)}}
 			</span>	
-			</button>
+			<tooltip v-if="tmp[layer].upgrades[data].tooltip" :text="tmp[layer].upgrades[data].tooltip"></tooltip>
+		</button>
 		`
 	})
 
@@ -270,12 +271,13 @@ function loadVue() {
 		props: ['layer', 'data', 'size'],
 		template: `
 		<div v-if="tmp[layer].buyables && tmp[layer].buyables[data]!== undefined && tmp[layer].buyables[data].unlocked" style="display: grid">
-			<button v-bind:class="{ buyable: true, can: tmp[layer].buyables[data].canBuy, locked: !tmp[layer].buyables[data].canAfford, bought: player[layer].buyables[data].gte(tmp[layer].buyables[data].purchaseLimit)}"
+			<button v-bind:class="{ buyable: true, tooltipBox: true, can: tmp[layer].buyables[data].canBuy, locked: !tmp[layer].buyables[data].canAfford, bought: player[layer].buyables[data].gte(tmp[layer].buyables[data].purchaseLimit)}"
 			v-bind:style="[tmp[layer].buyables[data].canBuy ? {'background-color': tmp[layer].color} : {}, size ? {'height': size, 'width': size} : {}, tmp[layer].componentStyles.buyable, tmp[layer].buyables[data].style]"
 			v-on:click="buyBuyable(layer, data)" @mousedown="start" @mouseleave="stop" @mouseup="stop" @touchstart="start" @touchend="stop" @touchcancel="stop">
 				<span v-if= "tmp[layer].buyables[data].title"><h2 v-html="tmp[layer].buyables[data].title"></h2><br></span>
 				<span v-bind:style="{'white-space': 'pre-line'}" v-html="run(layers[layer].buyables[data].display, layers[layer].buyables[data])"></span>
 				<node-mark :layer='layer' :data='tmp[layer].buyables[data].marked'></node-mark>
+				<tooltip v-if="tmp[layer].buyables[data].tooltip" :text="tmp[layer].buyables[data].tooltip"></tooltip>
 			</button>
 			<br v-if="(tmp[layer].buyables[data].sellOne !== undefined && !(tmp[layer].buyables[data].canSellOne !== undefined && tmp[layer].buyables[data].canSellOne == false)) || (tmp[layer].buyables[data].sellAll && !(tmp[layer].buyables[data].canSellAll !== undefined && tmp[layer].buyables[data].canSellAll == false))">
 			<sell-one :layer="layer" :data="data" v-bind:style="tmp[layer].componentStyles['sell-one']" v-if="(tmp[layer].buyables[data].sellOne)&& !(tmp[layer].buyables[data].canSellOne !== undefined && tmp[layer].buyables[data].canSellOne == false)"></sell-one>
@@ -569,6 +571,38 @@ function loadVue() {
 					×{{format(buyableEffect("aar", data + 100))}}
 				</div>
 				<div style="width:200px"><b>{{format(player.aar.dims[data])}}</b></div>
+			</div>
+		`
+	})
+
+	Vue.component('gacha-items', {
+		props: ['layer', 'data'],
+		template: `
+			<div>
+				<gacha-item v-for="item, ind in run(data)" v-bind:data="item" :index="ind"></gacha-item>
+			</div>
+		`
+	})
+
+
+	Vue.component('gacha-item', {
+		props: ['layer', 'data', 'index'],
+		computed: {
+			disp() { return player.des.buyables[201].sqrt().max(1).min(player.des.mergePool.length).toNumber() }
+		},
+		template: `
+			<div class="upgRow" v-bind:style="{ opacity: disp > index ? 1 : .5, background: 'url(resources/mergeIcons/' + (player.des.gachaDraws[data] ? data: 'unknown') + '.png) no-repeat right 25%' }"
+				style="border-bottom:2px solid var(--color);width:fit-content;padding-right:10px;margin-right:-5px">
+				<button v-if="hasUpgrade('des', 284)" class="upg" style="width:100px;min-height:30px;margin-right:5px;border-radius:4px;">
+					+{{format(player.des.gachaMastery[data] || 0, 3)}}<br/>bonus tiers
+				</button>
+				<div style="width:240px;text-align:left;margin:0;padding:5px 0px">
+					<b>{{player.des.gachaDraws[data] ? typeNames[data] : "?????"}}</b>
+					<div style="text-align:left;font-size:12px"><i>{{player.des.gachaDraws[data] ? typeDescriptions[data] : "Not yet discovered"}}</i></div>
+				</div>
+				<div style="width:120px;text-align:right;margin:0;padding-top:10px;">
+					<h2>{{format(Math.min(Math.max(disp - index, 0), 1) * 100 / disp)}}%</h2>
+				</div>
 			</div>
 		`
 	})
