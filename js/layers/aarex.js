@@ -726,7 +726,7 @@ addLayer("aar", {
                     buy() {
                         let i = this.id - 100
                         let cost = this.cost()
-                        if (cost.gte("ee15")) player.aar.dimPoints = player.aar.dimPoints.sub().max(0)
+                        if (cost.lte("ee15")) player.aar.dimPoints = player.aar.dimPoints.sub().max(0)
                         player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(1)
                         player.aar.dims[i] = player.aar.dims[i].add(1)
                     },

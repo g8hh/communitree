@@ -11,6 +11,19 @@ function createUpgradeTable(index, height, width) {
     return table
 }
 
+function createBuyableTable(index, height, width) {
+    var table = []
+    for (var x = 0; x < height; x++) {
+        var row = ["row", []]
+        for (var y = 1; y <= width; y++) {
+            var upg = ["buyable", index * 100 + x * 10 + y]
+            row[1].push(upg)
+        }
+        table.push(row)
+    }
+    return table
+}
+
 function resetBuyableRow(layer, row) {
     for (var a = row * 10; a < (row + 1) * 10; a++) {
         if (player[layer].buyables[a]) player[layer].buyables[a] = ExpantaNumZero

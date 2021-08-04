@@ -583,7 +583,7 @@ ul {
   }
 
   .can:hover .tooltip {
-	transform: scale(0.869565, 0.869565);
+	transform: scale(0.869565, 0.869565) translateY(10%);
   }
 
   .forceTooltip .tooltip{

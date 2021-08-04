@@ -641,7 +641,7 @@ addLayer("jac", {
 
                     which are giving a ×${format(data.effect)} boost to prestige point gain, slowly increases over this Jacorb reset.
 
-                    Reset prestige points for +<h3>${format(data.prestigeGain, 0)}</h3> boosters
+                    Reset prestige points for +<h3>${format(data.prestigeGain, 0)}</h3> generators
                     ${data.prestigeGain.lt(100) ? "Next at " + format(data.prestigeNext, 0) + " prestige points" : ""}
                 `
             },
