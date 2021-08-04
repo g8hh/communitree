@@ -136,7 +136,7 @@ var systemComponents = {
         The Prestige Tree made by Jacorb and Aarex
 		<br><br>
 		<div class="link" onclick="showTab('changelog-tab')">Changelog</div><br>
-        <span v-if="modInfo.discordLink"><a class="link" v-bind:href="modInfo.discordLink" target="_blank">{{modInfo.discordName}}</a><br></span>
+        <span v-if="modInfo.discordLink"><a class="link" v-bind:href="modInfo.discordLink" target="_blank">{{modInfo.discordName}}</a><h5>(we have a communitree channel)</h5><br></span>
         <a class="link" href="https://discord.gg/F3xveHV" target="_blank" v-bind:style="modInfo.discordLink ? {'font-size': '16px'} : {}">The Modding Tree Discord</a><br>
         <a class="link" href="http://discord.gg/wwQfgPa" target="_blank" v-bind:style="{'font-size': '16px'}">Main Prestige Tree server</a><br>
 		<br><br>

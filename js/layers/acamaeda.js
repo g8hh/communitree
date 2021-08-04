@@ -148,6 +148,7 @@ addLayer("aca", {
         }
         if (player.aca.modActive) switch (player.aca.modLevel) {
             case 0: eff.compBonus = eff.compBonus.mul(tmp.tfu.effect.compBonus); break;
+            case 1: eff.modSpeed[0] = eff.modSpeed[0].mul(tmp.des.effect.compBonus); break;
         }
 
         if (hasUpgrade("aca", 351)) eff.modSpeed[0] = eff.modSpeed[0].mul(upgradeEffect("aca", 351))
@@ -2510,10 +2511,12 @@ addLayer("aca", {
             },
             startReqs: [
                 [1000000, 5, 35],
+                [1500000, 1, 0, 1],
                 [1, 1, 1, 1, 1],
             ],
             endReqs: [
                 [() => player.tfu.points.gte("ee2000"), "ee2,000 thefinaluptake points"],
+                [() => player.des.mods.gte(999), "⑨⑨⑨ despacit mods"],
                 [() => false, ""],
             ],
             layers: ["tfu"],

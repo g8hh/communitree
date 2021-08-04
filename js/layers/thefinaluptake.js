@@ -45,7 +45,7 @@ addLayer("tfu", {
     }},
 
     resource: "thefinaluptake (α) points",
-    color: () => "#c5cdef",
+    color: "#c5cdef",
     nodeStyle: {
         background: "linear-gradient(-30deg, #ffffff, #c5cdef)",
         "background-origin": "border-box !important",
