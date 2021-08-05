@@ -12,12 +12,15 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.4",
+	num: "0.4.1",
 	name: "Highly Responsive to Modifications",
 }
 
 let changelog = `<h1>Changelog:</h1><br/>
 	<i>(Be warned: this may contain spoilers!)</i><br/>
+	<br/>
+	<h3>v0.4.1</h3><br/>
+		Changed all "barrels" to "mergables".<br/>
 	<br/>
 	<h2>v0.4</h2><br/>
 	<h4><i>- Highly Responsive to Modifications -</i></h4>
