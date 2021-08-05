@@ -980,8 +980,8 @@ addLayer("des", {
             style: { margin: "10px 10px 50px 80px" }
         },
         251: {
-            title: "More Faster Barrels",
-            description: "Incrase the <b>Faster Barrels</b> upgrade cap by 5.",
+            title: "More Faster Mergables",
+            description: "Incrase the <b>Faster Mergables</b> upgrade cap by 5.",
             currencyDisplayName: "power tokens",
             cost() {
                 return EN.pow(2, player.des.branchOrders["pow1"] || player.des.powBranchs).mul(50)
@@ -2039,7 +2039,7 @@ addLayer("des", {
         },
         311: {
             title: "More",
-            description: "Increases <b>Faster Barrels</b> cap by 5.",
+            description: "Increases <b>Faster Mergables</b> cap by 5.",
             currencyDisplayName: "golden mergents",
             cost: EN(2e9),
             unlocked() { return hasUpgrade("des", 281) },
@@ -2061,7 +2061,7 @@ addLayer("des", {
         },
         312: {
             title: "of",
-            description: "Increases <b>Faster Barrels</b> cap by 5.",
+            description: "Increases <b>Faster Mergables</b> cap by 5.",
             currencyDisplayName: "golden mergents",
             cost: EN(6e9),
             unlocked() { return hasUpgrade("des", 281) },
@@ -2083,7 +2083,7 @@ addLayer("des", {
         },
         313: {
             title: "the",
-            description: "Increases <b>Faster Barrels</b> cap by 5.",
+            description: "Increases <b>Faster Mergables</b> cap by 5.",
             currencyDisplayName: "golden mergents",
             cost: EN(18e9),
             unlocked() { return hasUpgrade("des", 281) },
@@ -2105,7 +2105,7 @@ addLayer("des", {
         },
         314: {
             title: "same",
-            description: "Increases <b>Faster Barrels</b> cap by 5.",
+            description: "Increases <b>Faster Mergables</b> cap by 5.",
             currencyDisplayName: "golden mergents",
             cost: EN(54e9),
             unlocked() { return hasUpgrade("des", 281) },
