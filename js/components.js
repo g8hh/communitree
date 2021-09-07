@@ -523,6 +523,13 @@ function loadVue() {
 		props: ['layer', 'data'],
 		template: `
 			<input class="instant" :id="'input-' + layer + '-' + data" :value="player[layer][data].toString()" v-on:focus="focused(true)" v-on:blur="focused(false)"
+			v-on:change="player[layer][data] = document.getElementById('input-' + layer + '-' + data).value || player[layer][data]">
+		`
+	})
+	Vue.component('num-input', {
+		props: ['layer', 'data'],
+		template: `
+			<input class="instant" :id="'input-' + layer + '-' + data" :value="player[layer][data].toString()" v-on:focus="focused(true)" v-on:blur="focused(false)"
 			v-on:change="player[layer][data] = toValue(document.getElementById('input-' + layer + '-' + data).value, player[layer][data])">
 		`
 	})
@@ -588,19 +595,25 @@ function loadVue() {
 	Vue.component('gacha-item', {
 		props: ['layer', 'data', 'index'],
 		computed: {
-			disp() { return player.des.buyables[201].sqrt().max(1).min(player.des.mergePool.length).toNumber() }
+			disp() { return player.des.buyables[201].sqrt().max(1).min(player.des.mergePool.length).toNumber() },
 		},
 		template: `
-			<div class="upgRow" v-bind:style="{ opacity: disp > index ? 1 : .5, background: 'url(resources/mergeIcons/' + (player.des.gachaDraws[data] ? data: 'unknown') + '.png) no-repeat right 25%' }"
-				style="border-bottom:2px solid var(--color);width:fit-content;padding-right:10px;margin-right:-5px">
+			<div class="upgRow" v-bind:style="{ background: 'url(resources/mergeIcons/' + (player.des.gachaDraws[data] ? data: 'unknown') + '.png) no-repeat right 25%' }"
+				style="border-bottom:2px solid var(--color);width:fit-content;padding-right:10px;margin-right:-5px;margin-left:-5px">
+				<button v-if="hasUpgrade('des', 104)" class="upg" style="width:100px;min-height:30px;margin-left:10px;margin-right:5px;border-radius:4px;"
+					v-on:click="clickGachaMerge(data)"
+					v-html="player.des.gachaMerges[data] ? '+' + format(EN.pow(2.4, player.des.gachaMerges[data]).mul(0.001), 3) + '<br/>bonus tiers' : ''"
+					v-bind:style="getMergeGachaStyle(data)">
+				</button>
 				<button v-if="hasUpgrade('des', 284)" class="upg" style="width:100px;min-height:30px;margin-right:5px;border-radius:4px;">
 					+{{format(player.des.gachaMastery[data] || 0, 3)}}<br/>bonus tiers
 				</button>
-				<div style="width:240px;text-align:left;margin:0;padding:5px 0px">
+				<div style="width:240px;text-align:left;margin:0;padding:5px 0px" v-bind:style="{ opacity: disp > index ? 1 : .5 }">
 					<b>{{player.des.gachaDraws[data] ? typeNames[data] : "?????"}}</b>
-					<div style="text-align:left;font-size:12px"><i>{{player.des.gachaDraws[data] ? typeDescriptions[data] : "Not yet discovered"}}</i></div>
+					<div style="text-align:left;font-size:12px"><i>{{player.des.gachaDraws[data] ? typeDescriptions[data] : "Not yet discovered"}}</i>
+					<span style="font-size:0px">{{player.timePlayed}}</span></div>
 				</div>
-				<div style="width:120px;text-align:right;margin:0;padding-top:10px;">
+				<div style="width:120px;text-align:right;margin:0;padding-top:10px;" v-bind:style="{ opacity: disp > index ? 1 : .5 }">
 					<h2>{{format(Math.min(Math.max(disp - index, 0), 1) * 100 / disp)}}%</h2>
 				</div>
 			</div>
@@ -626,6 +639,7 @@ function loadVue() {
 			player,
 			tmp,
 			options,
+			softcap,
 			OmegaNum,
 			gameEnded,
 			format,
@@ -671,6 +685,8 @@ function loadVue() {
 			run,
 			gridRun,
 			readData,
+			clickGachaMerge,
+			getMergeGachaStyle,
 		},
 	})
 }
