@@ -170,7 +170,7 @@ addLayer("aca", {
     upgrades: {
         101: {
             title: "Start... again?",
-            description: "Boost to point gain based on Acamaeda reset te.im",
+            description: "Boost to point gain based on Acamaeda reset time.",
             cost: EN(1),
             effect() {
                 let time = EN(player.aca.resetTime)
