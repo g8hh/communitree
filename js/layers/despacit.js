@@ -2457,7 +2457,7 @@ addLayer("des", {
             description: "Increases the bonus mergable cap by 30.",
             currencyDisplayName: "golden mergents",
             cost: () => EN(hasUpgrade("des", 332) ? 3e13 : 1e13),
-            unlocked() { return hasUpgrade("des", 104) },
+            unlocked() { return hasUpgrade("des", 281) },
             req: [321, 322],
             canAfford() {
                 for (let a of this.req) if (!hasUpgrade("des", a)) return false
@@ -2479,7 +2479,7 @@ addLayer("des", {
             description: "Increases the bonus mergable cap by 30.",
             currencyDisplayName: "golden mergents",
             cost: () => EN(hasUpgrade("des", 331) ? 3e13 : 1e13),
-            unlocked() { return hasUpgrade("des", 104) },
+            unlocked() { return hasUpgrade("des", 281) },
             req: [327, 328],
             canAfford() {
                 for (let a of this.req) if (!hasUpgrade("des", a)) return false
@@ -2501,7 +2501,7 @@ addLayer("des", {
             description: "Increases the bonus mergable cap by 100.",
             currencyDisplayName: "golden mergents",
             cost: () => EN(hasUpgrade("des", 334) ? 5e14 : 1e14),
-            unlocked() { return hasUpgrade("des", 104) },
+            unlocked() { return hasUpgrade("des", 281) },
             req: [323, 324],
             canAfford() {
                 for (let a of this.req) if (!hasUpgrade("des", a)) return false
@@ -2523,7 +2523,7 @@ addLayer("des", {
             description: "Increases the bonus mergable cap by 100.",
             currencyDisplayName: "golden mergents",
             cost: () => EN(hasUpgrade("des", 333) ? 5e14 : 1e14),
-            unlocked() { return hasUpgrade("des", 104) },
+            unlocked() { return hasUpgrade("des", 281) },
             req: [325, 326],
             canAfford() {
                 for (let a of this.req) if (!hasUpgrade("des", a)) return false
@@ -2545,7 +2545,7 @@ addLayer("des", {
             description: "Increases the bonus mergable cap by 200.",
             currencyDisplayName: "golden mergents",
             cost: EN(5e15),
-            unlocked() { return hasUpgrade("des", 104) },
+            unlocked() { return hasUpgrade("des", 281) },
             req: [324, 325],
             canAfford() {
                 for (let a of this.req) if (!hasUpgrade("des", a)) return false
@@ -2567,7 +2567,7 @@ addLayer("des", {
             description: "Unlocks the Giftcode Generator, which is the next tab of the layer.",
             currencyDisplayName: "golden mergents",
             cost: EN(1e18),
-            unlocked() { return hasUpgrade("des", 104) },
+            unlocked() { return hasUpgrade("des", 281) },
             req: [331, 332, 333, 334, 335],
             canAfford() {
                 for (let a of this.req) if (!hasUpgrade("des", a)) return false
@@ -2595,6 +2595,7 @@ addLayer("des", {
         402: {
             title: "Automator",
             description: "Automates <b>Loyal Player</b>.",
+            unlocked() { return player.des.giftHunterStates.game3 },
             cost: EN(1e210),
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "gift points",
@@ -2603,6 +2604,7 @@ addLayer("des", {
         403: {
             title: "Automator II",
             description: "Automates <b>gift1337</b>.",
+            unlocked() { return player.des.giftHunterStates.game3 },
             cost: EN(1e250),
             currencyLocation() {return player[this.layer]}, 
             currencyDisplayName: "gift points",
@@ -4440,7 +4442,7 @@ addLayer("des", {
             }
         } else {
             if (player.des.currentCode == player.des.giftcodeInput) {
-                let gain = EN(player.des.currentCode.length).mul(getBuyableAmount("des", 412)).mul(tmp.des.effect.giftMulti)
+                let gain = EN(player.des.currentCode.length).mul(buyableEffect("des", 414)).mul(tmp.des.effect.giftMulti)
                 player.des.giftPoints = player.des.giftPoints.add(gain)
                 consolePrint("[REDEEMED] " + player.des.currentCode + " -> " + format(gain, 0) + " GP")
                 player.des.currentCode = generateCode();
