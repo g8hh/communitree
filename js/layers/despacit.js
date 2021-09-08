@@ -5837,8 +5837,9 @@ let giftHunter = {
                 } else if (args[1] == format(player.des.giftHunterMulti)) {
                     if (player.des.giftHunterMulti.gte(2.595e11)) {
                         player.des.giftHunterState = "3.2"
-                    } else if (player.des.giftHunterMulti.gte(2.595e11)) {
-                        consolePrint(`You did it right, but it's not the time yet...`)
+                    } else {
+                        consolePrint(`You did it right, but it's not the time yet.`)
+                        consolePrint(`Try again when your multiplier is bigger.`)
                     }
                 } else {
                     consolePrint(`That's not the password!`)
