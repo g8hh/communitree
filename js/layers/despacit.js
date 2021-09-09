@@ -4869,6 +4869,9 @@ let giftHunter = {
             if (args[0] == "open") {
                 if (!args[1]) {
                     consolePrint(`Which mail do you want to open?`)
+                } else if (args[1] == "mail" && !player.des.giftHunterStates.msg1) {
+                    consolePrint(`I know what you're trying to do. Unfortunately, the mail service doesn't`)
+                    consolePrint(`actually work that way! Try to enter the underlined words next time.`)
                 } else if (args[1] == "system" && !player.des.giftHunterStates.msg1) {
                     consolePrint(`From: <i>The YCDAYWTD Mail Service</i> [SYSTEM]`)
                     consolePrint(`Title: <u>v903.1624.0 Content Update!</u>`)
