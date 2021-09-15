@@ -12,15 +12,22 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.4.1",
+	num: "0.4.2",
 	name: "Highly Responsive to Modifications",
 }
 
-let changelog = `<h1>Changelog:</h1><br/>
-	<i>(Be warned: this may contain spoilers!)</i><br/>
+let changelog = () => `<h1>Changelog:</h1><br/>
+	<i>(Be warned: this contains spoilers!)</i><br/>
+	<br/>
+	<h3>v0.4.2</h3><br/>
+		Added the Giftcode tab in the despacit creator layer. This is basically my first attempt at making a text adventure.<br/>
+		Added a notation system. Now you can change your preferred way of expressing numbers using a bunch of pre-crafted notations!<br/>
+		Attempted to optimize the game by disabling inactive modder layers.<br/>
+		Bumped endgame to ${format([800, 2, 0, 1])}.<br/>
 	<br/>
 	<h3>v0.4.1</h3><br/>
 		Changed all "barrels" to "mergables".<br/>
+		Bumped endgame to ${format([240, 2, 0, 1])}.<br/>
 	<br/>
 	<h2>v0.4</h2><br/>
 	<h4><i>- Highly Responsive to Modifications -</i></h4>
@@ -147,7 +154,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format([1e16, 1, 0, 1])} points)`,
+	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format([800, 2, 0, 1])} points)`,
 	() => !player.isWarned ? `
 		<div style="border:2px solid var(--color);margin-top:10px;padding:5px;display:inline-block">
 		Important notice: Some parts of the game may contain flashing lights.<br/>
@@ -159,7 +166,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte([16, 2, 0, 1])
+	return player.points.gte([800, 2, 0, 1])
 }
 
 

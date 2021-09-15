@@ -32,6 +32,10 @@ td {
 	padding: 0
 }
 
+r {
+	color: red;
+}
+
 .upgTable {
 	display: flex !important;
 	flex-flow: column wrap;
