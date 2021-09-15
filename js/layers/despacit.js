@@ -26,6 +26,25 @@ let despacitBuyable = {
         return { ...smallBuyable }
     }
 }
+let giftBuyable = {
+    title() {
+        return ""
+    }, 
+    canAfford() {
+        let data = tmp[this.layer].buyables[this.id]
+        return player.des.giftPoints.gte(data.cost)
+    }, 
+    buy() { 
+        let data = tmp[this.layer].buyables[this.id]
+        if (player.des.giftPoints.lt(data.cost)) return;
+        player.des.giftPoints = player.des.giftPoints.sub(data.cost)
+        player.des.buyables[this.id] = player.des.buyables[this.id].add(1)
+        player.des.mods = player.des.mods.add(1)
+    },
+    style() { 
+        return { ...smallBuyable }
+    }
+}
 
 const typeNames = {
     normal: "Normal",
@@ -101,6 +120,78 @@ function getMergeColor(seed, tier) {
     return "#" + value.toString(16).padStart(6, '0')
 }
 
+function clickGachaMerge(type) {
+    let sel = player.des.selectedGachaMerge
+    if (!sel) player.des.selectedGachaMerge = type
+    else if (sel == type) player.des.selectedGachaMerge = ""
+    else if (player.des.gachaMerges[sel] == player.des.gachaMerges[type]) {
+        player.des.gachaMerges[type]++
+        delete player.des.gachaMerges[sel]
+        player.des.selectedGachaMerge = ""
+    } else {
+        let data = player.des.gachaMerges[type]
+        player.des.gachaMerges[type] = player.des.gachaMerges[sel]
+        player.des.gachaMerges[sel] = data
+        player.des.selectedGachaMerge = ""
+    }
+}
+
+function getMergeGachaStyle(id) {
+    let data = player.des.gachaMerges[id]
+    if (!data) return {
+        background: "#ffffff11",
+        cursor: "default",
+        transform: "none",
+        "box-shadow": "none",
+        "border-color": "#00000017",
+    }
+    
+    if (player.des.selectedGachaMerge == id) return {
+        background: "#ffffff",
+        transform: "translate(-3px, -3px)",
+        "box-shadow": "3px 3px 5px black",
+        "border-style": "outset",
+        "border-color": "#ffffff7f",
+    }
+    
+    return {
+        background: getMergeColor(133742069, data),
+        transform: "none",
+        "box-shadow": "none",
+        "border-style": "outset",
+        "border-color": "#ffffff7f",
+    }
+}
+
+Math.randomFloor = (max) => Math.floor(Math.random() * max)
+
+function generateCode() {
+    let seed = Math.floor(Math.random() * 3)
+    let words = [
+        "gacha", "merge", "life", "power", "summer", "winter", "cm", "tree", "prestige", "despacit",
+        "number", "idle", "comm", "mod", "communitree", "large", "christmas", "easter", "father", "mother",
+        "patrick", "luck", "code", "game", "incremental", "newyear", "community", "lgbt", "pride", "candy",
+        "lollipop", "dimension", "prestige", "something"
+    ]
+    let chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+    let num = Math.random() > .5 ? Math.randomFloor(10000) : (Math.randomFloor(4) + 6).toString().repeat(Math.floor(Math.random() * 3 + 2))
+    let len = Math.randomFloor(4) + 6
+    let str = ""
+    switch (seed) {
+        case 0:
+            return words[Math.randomFloor(words.length)] + num
+        case 1: 
+            while (str.length < len) str += chars[Math.randomFloor(chars.length)]
+            return str
+        case 2:
+            chars = Math.random() > .5 ? "abcdefghijklmnopqrstuvwxyz" : "aeiou"
+            str += chars[Math.randomFloor(chars.length)]
+            chars = Math.random() > .5 ? "abcdefghijklmnopqrstuvwxyz" : "aeiou"
+            str += chars[Math.randomFloor(chars.length)]
+            return str + num
+    }
+}
+
 addLayer("des", {
     name: "despacit",
     symbol: "☯",
@@ -149,6 +240,28 @@ addLayer("des", {
 
         bonusMerges: 0,
         gachaMastery: {},
+        gachaMerges: {},
+        selectedGachaMerge: "",
+        gachaMergeTime: 0,
+        gachaAutoTime: 0,
+        gachaCycleTime: 0,
+
+        giftPoints: EN(0),
+        currentCode: generateCode(),
+        giftcodeInput: "",
+        consoleLines: ["", "", "", "", "", "", "",
+            "-------- Welcome to Giftcode Generator --------", 
+            "Please input giftcodes shown below into the box",
+            "then press [ENTER] for some rewards"
+        ],
+        giftHunterEnabled: false,
+        giftHunterState: 0,
+        giftHunterInventory: {
+            doubler: 1,
+        },
+        giftHunterStates: {},
+        giftHunterMulti: EN(1),
+        giftHunterGameData: {},
     }},
 
     resource: "despacit points",
@@ -156,7 +269,9 @@ addLayer("des", {
     type: "none",
     
     effect() {
-        let bonus = buyableEffect("des", 132)
+        if (tmp[this.layer].deactivated) return {}
+
+        let bonus = buyableEffect("des", 132).add(buyableEffect("des", 431))
         for (let a = 302; a <= 305; a++) if (hasUpgrade("des", a)) bonus = bonus.add(upgradeEffect("des", a))
         let mb = player.des.mergents.add(1).log().pow(1.5)
         bonus = bonus.add(mb)
@@ -164,7 +279,7 @@ addLayer("des", {
 
         let eff = {
             bonusMods: bonus,
-            compBonus: EN.pow(2, player.des.points.add(1).log10().pow(0.2)),
+            compBonus: EN.pow(2, player.des.points.add(1).log10().pow(0.2)).mul(buyableEffect("des", 421)),
             pointGain: mods.pow(softcap(mods, EN(3), 0.5).add(1)).mul(EN.pow(player.des.mods.max(1), getBuyableAmount("des", 131))),
             mergentPerSec: EN(0),
             mergentBonus: mb,
@@ -180,7 +295,11 @@ addLayer("des", {
             bonusLifeTokens: EN(0),
             maxBonusMerges: 20,
             bonusMergesChance: 0.1,
+            giftMulti: buyableEffect("des", 413).mul(buyableEffect("des", 422)).mul(buyableEffect("des", 423)).mul(buyableEffect("des", 424)).mul(buyableEffect("des", 433))
+                .mul(buyableEffect("des", 434)).mul(player.des.giftHunterMulti),
         }
+
+        eff.compBonus = eff.compBonus.mul(buyableEffect("des", 441))
         if (getBuyableAmount("des", 114).gte(1)) eff.compBonus = eff.compBonus.mul(player.des.mods.max(1))
         if (hasUpgrade("des", 322)) for (let a = 244; a <= 247; a++) 
             if (hasUpgrade("des", a)) eff.compBonus = eff.compBonus.mul(upgradeEffect("des", a))
@@ -235,6 +354,11 @@ addLayer("des", {
         for (let a = 321; a <= 323; a += 2) if (hasUpgrade("des", a)) eff.maxBonusMerges += upgradeEffect("des", a)
         if (hasUpgrade("des", 325)) eff.maxBonusMerges += buyableEffect("des", 304)
         if (hasUpgrade("des", 327)) eff.maxBonusMerges += upgradeEffect("des", 327)
+        if (hasUpgrade("des", 331)) eff.maxBonusMerges += 30
+        if (hasUpgrade("des", 332)) eff.maxBonusMerges += 30
+        if (hasUpgrade("des", 333)) eff.maxBonusMerges += 100
+        if (hasUpgrade("des", 334)) eff.maxBonusMerges += 100
+        if (hasUpgrade("des", 335)) eff.maxBonusMerges += 200
 
         if (hasUpgrade("des", 301)) eff.bonusMergesChance += upgradeEffect("des", 301)
         if (hasUpgrade("des", 306)) eff.bonusMergesChance += 0.05
@@ -262,6 +386,12 @@ addLayer("des", {
             title: "Stars",
             description: "Unlocks Stars.",
             cost: EN("1e450"),
+            unlocked() { return hasUpgrade("des", 101) },
+        },
+        104: {
+            title: "Gacha Mergables",
+            description: "Unlocks Gacha Mergables.",
+            cost: EN("1e1550"),
             unlocked() { return hasUpgrade("des", 101) },
         },
         201: {
@@ -518,6 +648,7 @@ addLayer("des", {
                 return EN.pow(9, player.des.branchOrders["premerge"] || player.des.firstBranchs).mul(1000 / 9)
             },
             effect() {
+                if (tmp[this.layer].deactivated) return EN(1)
                 return EN.pow(2.5, tmp.des.effect.compBonus.log10().sqrt()).pow(0.3)
             },
             effectDisplay() { return "×" + format(upgradeEffect(this.layer, this.id)) },
@@ -570,6 +701,7 @@ addLayer("des", {
                 return EN.pow(9, player.des.branchOrders["postmerge"] || player.des.firstBranchs).mul(1000 / 9)
             },
             effect() {
+                if (tmp[this.layer].deactivated) return EN(1)
                 return EN.pow(2, tmp.des.effect.mergentMulti.log10().sqrt()).pow(0.3)
             },
             effectDisplay() { return "×" + format(upgradeEffect(this.layer, this.id)) },
@@ -721,6 +853,7 @@ addLayer("des", {
             },
             req: [226],
             effect() {
+                if (tmp[this.layer].deactivated) return EN(1)
                 return tmp.des.effect.compBonus.cbrt()
             },
             effectDisplay() { return "×" + format(upgradeEffect(this.layer, this.id)) },
@@ -748,6 +881,7 @@ addLayer("des", {
             },
             req: [227],
             effect() {
+                if (tmp[this.layer].deactivated) return EN(1)
                 return tmp.des.effect.mergentPerSec.add(10).log10()
             },
             effectDisplay() { return "×" + format(upgradeEffect(this.layer, this.id)) },
@@ -928,6 +1062,7 @@ addLayer("des", {
             description: "Despacit effect boost token gain.",
             currencyDisplayName: "golden mergents",
             effect() {
+                if (tmp[this.layer].deactivated) return EN(1)
                 return tmp.des.effect.compBonus.log10().div(50).add(1)
             },
             effectDisplay() { return "×" + format(upgradeEffect(this.layer, this.id)) },
@@ -1192,6 +1327,7 @@ addLayer("des", {
             description: "Boosts mergent gain based on your bonus despacit mods.",
             currencyDisplayName: "power tokens",
             effect() {
+                if (tmp[this.layer].deactivated) return EN(1)
                 return tmp.des.effect.bonusMods.div(65).add(1)
             },
             effectDisplay() { return "×" + format(upgradeEffect(this.layer, this.id)) },
@@ -1275,6 +1411,7 @@ addLayer("des", {
             description: "Boosts golden mergent gain based on your bonus despacit mods.",
             currencyDisplayName: "life tokens",
             effect() {
+                if (tmp[this.layer].deactivated) return EN(1)
                 return tmp.des.effect.bonusMods.div(320).add(1).pow(0.15)
             },
             effectDisplay() { return "×" + format(upgradeEffect(this.layer, this.id)) },
@@ -1455,7 +1592,7 @@ addLayer("des", {
         },
         274: {
             title: "Fast Mergeyard",
-            description: "Pressing on Mergeyard will now spent the most amount of mergents until the next upgrade.",
+            description: "Pressing on Mergeyard will now spend the most amount of mergents until the next upgrade.",
             currencyDisplayName: "life tokens",
             cost() {
                 return EN.pow(1.6, player.des.branchOrders["life1"] || player.des.lifeBranchs).mul(1000)
@@ -2315,6 +2452,164 @@ addLayer("des", {
             },
             style: { margin: "10px" }
         },
+        331: {
+            title: "uf4shqjngq",
+            description: "Increases the bonus mergable cap by 30.",
+            currencyDisplayName: "golden mergents",
+            cost: () => EN(hasUpgrade("des", 332) ? 3e13 : 1e13),
+            unlocked() { return hasUpgrade("des", 281) },
+            req: [321, 322],
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("des", a)) return false
+                return player.des.goldenMergents.gte(tmp.des.upgrades[this.id].cost) 
+            },
+            pay() { 
+                let cost = tmp.des.upgrades[this.id].cost
+                player.des.goldenMergents = player.des.goldenMergents.sub(cost) 
+                player.des.goldenMergentsSpent = player.des.goldenMergentsSpent.add(cost) 
+            },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            style: { margin: "10px" }
+        },
+        332: {
+            title: "dqy4aq3pym",
+            description: "Increases the bonus mergable cap by 30.",
+            currencyDisplayName: "golden mergents",
+            cost: () => EN(hasUpgrade("des", 331) ? 3e13 : 1e13),
+            unlocked() { return hasUpgrade("des", 281) },
+            req: [327, 328],
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("des", a)) return false
+                return player.des.goldenMergents.gte(tmp.des.upgrades[this.id].cost) 
+            },
+            pay() { 
+                let cost = tmp.des.upgrades[this.id].cost
+                player.des.goldenMergents = player.des.goldenMergents.sub(cost) 
+                player.des.goldenMergentsSpent = player.des.goldenMergentsSpent.add(cost) 
+            },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            style: { margin: "10px" }
+        },
+        333: {
+            title: "summer777",
+            description: "Increases the bonus mergable cap by 100.",
+            currencyDisplayName: "golden mergents",
+            cost: () => EN(hasUpgrade("des", 334) ? 5e14 : 1e14),
+            unlocked() { return hasUpgrade("des", 281) },
+            req: [323, 324],
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("des", a)) return false
+                return player.des.goldenMergents.gte(tmp.des.upgrades[this.id].cost) 
+            },
+            pay() { 
+                let cost = tmp.des.upgrades[this.id].cost
+                player.des.goldenMergents = player.des.goldenMergents.sub(cost) 
+                player.des.goldenMergentsSpent = player.des.goldenMergentsSpent.add(cost) 
+            },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            style: { margin: "10px" }
+        },
+        334: {
+            title: "WE-[redacted]",
+            description: "Increases the bonus mergable cap by 100.",
+            currencyDisplayName: "golden mergents",
+            cost: () => EN(hasUpgrade("des", 333) ? 5e14 : 1e14),
+            unlocked() { return hasUpgrade("des", 281) },
+            req: [325, 326],
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("des", a)) return false
+                return player.des.goldenMergents.gte(tmp.des.upgrades[this.id].cost) 
+            },
+            pay() { 
+                let cost = tmp.des.upgrades[this.id].cost
+                player.des.goldenMergents = player.des.goldenMergents.sub(cost) 
+                player.des.goldenMergentsSpent = player.des.goldenMergentsSpent.add(cost) 
+            },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            style: { margin: "10px" }
+        },
+        335: {
+            title: "YH8888",
+            description: "Increases the bonus mergable cap by 200.",
+            currencyDisplayName: "golden mergents",
+            cost: EN(5e15),
+            unlocked() { return hasUpgrade("des", 281) },
+            req: [324, 325],
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("des", a)) return false
+                return player.des.goldenMergents.gte(tmp.des.upgrades[this.id].cost) 
+            },
+            pay() { 
+                let cost = tmp.des.upgrades[this.id].cost
+                player.des.goldenMergents = player.des.goldenMergents.sub(cost) 
+                player.des.goldenMergentsSpent = player.des.goldenMergentsSpent.add(cost) 
+            },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            style: { margin: "10px" }
+        },
+        336: {
+            title: "Giftcode Generator",
+            description: "Unlocks the Giftcode Generator, which is the next tab of the layer.",
+            currencyDisplayName: "golden mergents",
+            cost: EN(1e18),
+            unlocked() { return hasUpgrade("des", 281) },
+            req: [331, 332, 333, 334, 335],
+            canAfford() {
+                for (let a of this.req) if (!hasUpgrade("des", a)) return false
+                return player.des.goldenMergents.gte(tmp.des.upgrades[this.id].cost) 
+            },
+            pay() { 
+                let cost = tmp.des.upgrades[this.id].cost
+                player.des.goldenMergents = player.des.goldenMergents.sub(cost) 
+                player.des.goldenMergentsSpent = player.des.goldenMergentsSpent.add(cost) 
+            },
+            branches() { 
+                let col = hasUpgrade(this.layer, this.id) ? "#77df5f" : "#9c7575"
+                return this.req.map(x => [x, col]) 
+            },
+            style: { margin: "10px" }
+        },
+        401: {
+            title: "Giftcode Hunter",
+            description: "Unlocks the Giftcode Hunter minigame. Type \"run giftcode hunter\" to start.",
+            cost: EN(1e188),
+            currencyLocation() {return player[this.layer]}, 
+            currencyDisplayName: "gift points",
+            currencyInternalName: "giftPoints",
+        },
+        402: {
+            title: "Automator",
+            description: "Automates <b>Loyal Player</b>.",
+            unlocked() { return player.des.giftHunterStates.game3 },
+            cost: EN(1e210),
+            currencyLocation() {return player[this.layer]}, 
+            currencyDisplayName: "gift points",
+            currencyInternalName: "giftPoints",
+        },
+        403: {
+            title: "Automator II",
+            description: "Automates <b>gift1337</b>.",
+            unlocked() { return player.des.giftHunterStates.game3 },
+            cost: EN(1e250),
+            currencyLocation() {return player[this.layer]}, 
+            currencyDisplayName: "gift points",
+            currencyInternalName: "giftPoints",
+        },
     },
 
     clickables: {
@@ -2325,6 +2620,7 @@ addLayer("des", {
             },
             unlocked: true,
             canClick() {
+                if (tmp[this.layer].deactivated) return false
                 return tmp.des.effect.goldenGain.gt(0)
             },
             onClick() {
@@ -2359,7 +2655,7 @@ addLayer("des", {
         },
         respec() {
             layers.des.clickables[101].onClick()
-            player.des.upgrades = player.des.upgrades.filter(x => +x < 200)
+            player.des.upgrades = player.des.upgrades.filter(x => +x < 200 || +x > 400)
             player.des.goldenMergents = player.des.goldenMergents.add(player.des.goldenMergentsSpent)
             player.des.goldenMergentsSpent = EN(0)
 
@@ -2860,6 +3156,7 @@ addLayer("des", {
                 return getBuyableAmount("des", 123).gte(1)
             },
             effect() {
+                if (tmp[this.layer].deactivated) return EN(0)
                 return getBuyableAmount("des", this.id).mul(tmp.des.effect.compBonus.log())
             },
             cost() {
@@ -3432,6 +3729,278 @@ addLayer("des", {
                 player.des.buyables[this.id] = player.des.buyables[this.id].add(mul)
             },
         },
+        411: {
+            ...giftBuyable,
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>Auto-Gacha-Merge</h3>\n(${format(x, 0)} / ${format(data.purchaseLimit, 0)})
+                Unlocks auto-merge for gacha mergents. Each level makes it 1.05× faster.
+
+                Cost: ${format(data.cost, 0)} gift points`
+            },
+            purchaseLimit: 50,
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                return 1.05 ** x.toNumber()
+            },
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(1.4, x).mul(100)
+            },
+        },
+        412: {
+            ...giftBuyable,
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>Giftcode Macros</h3>\n(${format(x, 0)} / ${format(data.purchaseLimit, 0)})
+                Generates 1 gift points per second.
+
+                Cost: ${format(data.cost, 0)} gift points`
+            },
+            purchaseLimit: 100,
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                return 1.05 ** x.toNumber()
+            },
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(2, x).mul(100)
+            },
+        },
+        413: {
+            ...giftBuyable,
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>Loyal Player</h3>\n(${format(x, 0)})
+                Add a 40% bonus to all gift point gain, compounding.
+                Currently: ×${format(data.effect)}
+
+                Cost: ${format(data.cost, 0)} gift points`
+            },
+            effect() {
+                let x = softcap(player[this.layer].buyables[this.id], EN(250), .8)
+                return EN(1.4).pow(x)
+            },
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(2, x).mul(250)
+            },
+        },
+        414: {
+            ...giftBuyable,
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>Keep Grinding</h3>\n(${format(x, 0)} / ${format(data.purchaseLimit, 0)})
+                Add a 50% bonus to gift points gained from entering codes, additively.
+                Currently: ×${format(data.effect)}
+
+                Cost: ${format(data.cost, 0)} gift points`
+            },
+            purchaseLimit: 25,
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                return x.mul(0.5).add(1)
+            },
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(2, x).mul(1000)
+            },
+        },
+        421: {
+            ...giftBuyable,
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>gift1337</h3>\n(${format(x, 0)})
+                Boosts despacit effect based on gift points.
+                Currently: ×${format(data.effect)}
+
+                Cost: ${format(data.cost, 0)} gift points`
+            },
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                return player.des.giftPoints.pow(0.1).add(10).log(10).pow(x)
+            },
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(x.add(9), x).mul(1e20)
+            },
+        },
+        422: {
+            ...giftBuyable,
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>mod9999</h3>\n(${format(x, 0)} / ${format(data.purchaseLimit, 0)})
+                Boosts gift points based on bonus despacit mods.
+                Currently: ×${format(data.effect)}
+
+                Cost: ${format(data.cost, 0)} gift points`
+            },
+            purchaseLimit: 80,
+            effect() {
+                if (tmp[this.layer].deactivated) return EN(1)
+                let x = player[this.layer].buyables[this.id]
+                return tmp.des.effect.bonusMods.div(100).add(1).pow(0.1).pow(x)
+            },
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(x.add(4), x).mul(10000)
+            },
+        },
+        423: {
+            ...giftBuyable,
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>flame777</h3>\n(${format(x, 0)} / ${format(data.purchaseLimit, 0)})
+                Boosts gift points based on despacit effect.
+                Currently: ×${format(data.effect)}
+
+                Cost: ${format(data.cost, 0)} gift points`
+            },
+            purchaseLimit: 80,
+            effect() {
+                if (tmp[this.layer].deactivated) return EN(1)
+                let x = player[this.layer].buyables[this.id]
+                return tmp.des.effect.compBonus.add(2).log().div(Math.LOG2E).pow(0.2).pow(x)
+            },
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(x.add(3), x).mul(20000)
+            },
+        },
+        424: {
+            ...giftBuyable,
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>despacit88</h3>\n(${format(x, 0)} / ${format(data.purchaseLimit, 0)})
+                Boosts gift points based on despacit points.
+                Currently: ×${format(data.effect)}
+
+                Cost: ${format(data.cost, 0)} gift points`
+            },
+            purchaseLimit: 80,
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                return player.des.points.add(10).log10().pow(0.05).pow(x)
+            },
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(x.add(2), x).mul(50000)
+            },
+        },
+        431: {
+            ...giftBuyable,
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>The Present Tree</h3>\n(${format(x, 0)})
+                Gives bonus despacit mods based on gift points.
+                Currently: +${format(data.effect, 0)}
+
+                Cost: ${format(data.cost, 0)} gift points`
+            },
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                return player.des.giftPoints.add(1).log10().pow(2).floor().mul(x)
+            },
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(x.add(9).pow(2), x).mul(1e40)
+            },
+        },
+        432: {
+            ...giftBuyable,
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>Conveyor Belts</h3>\n(${format(x, 0)} / ${format(data.purchaseLimit, 0)})
+                Make the gacha mergables cycle. Each level makes it 1.05× faster.
+
+                Cost: ${format(data.cost, 0)} gift points`
+            },
+            purchaseLimit: 25,
+            unlocked() {
+                return getBuyableAmount("des", 123).gte(1)
+            },
+            effect() {
+                let x = softcap(player[this.layer].buyables[this.id], EN(10), .5)
+                return 1.05 ** x.toNumber()
+            },
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(x.add(19).pow(2), x).mul(1e60)
+            },
+        },
+        433: {
+            ...giftBuyable,
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>APTMAM: Rewritten</h3>\n(${format(x, 0)})
+                Boosts gift points based on mergents.
+                Currently: ×${format(data.effect)}
+
+                Cost: ${format(data.cost, 0)} gift points`
+            },
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                return player.des.mergents.add(10).log10().pow(0.1).pow(x)
+            },
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(x.add(9).pow(2), x).pow(1.2).mul(1e100)
+            },
+        },
+        434: {
+            ...giftBuyable,
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>Mods, for real</h3>\n(${format(x, 0)})
+                Boosts gift points based on non-bonus despacit mods.
+                Currently: ×${format(data.effect)}
+
+                Cost: ${format(data.cost, 0)} gift points`
+            },
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                return player.des.mods.add(1).pow(0.2).pow(x)
+            },
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(x.add(4), x).mul(1e160)
+            },
+        },
+        441: {
+            ...giftBuyable,
+            display() {
+                let x = player[this.layer].buyables[this.id]
+                let data = tmp[this.layer].buyables[this.id]
+                return `<h3>Flame Master</h3>\n(${format(x, 0)})
+                Giftcode Hunter multiplier multiplies despacit effect.
+                Currently: ×${format(data.effect)}
+
+                Cost: ${format(data.cost, 0)} gift points`
+            },
+            unlocked() {
+                return player.des.giftHunterStates.game3
+            },
+            effect() {
+                let x = player[this.layer].buyables[this.id]
+                return player.des.giftHunterMulti.pow(x)
+            },
+            cost() {
+                let x = player[this.layer].buyables[this.id]
+                return EN.pow(EN.pow(10, x).mul(1e8), x).mul(1e225)
+            },
+        },
     },
 
     grid: {
@@ -3498,7 +4067,9 @@ addLayer("des", {
         },
         getEffect(data, id) {
             if (!id) return 
-            let power = EN.pow(3.2, data.tier + (player.des.gachaMastery[data.type] || 0) - 1)
+            let tier = data.tier + (player.des.gachaMastery[data.type] || 0) - 1
+            if (player.des.gachaMerges[data.type]) tier = EN.pow(2.4, player.des.gachaMerges[data.type]).mul(0.001).add(tier)
+            let power = EN.pow(3.2, tier)
             switch (data.type) {
                 case "normal": return power
                 case "multi": return power.mul(0.475)
@@ -3604,9 +4175,38 @@ addLayer("des", {
             borderStyle: { "margin-top": "-2px" },
             textStyle: { color: "#1a3d25", "mix-blend-mode": "difference", "font-size": "14px" },
         },
+        gachaMergeBar: {
+            direction: UP,
+            width: 16,
+            height: () => 43 * player.des.mergePool.length,
+            progress() { return player.des.gachaMergeTime },
+            display() { return player.des.gachaMergeTime > 1 ? "+" + format(player.des.gachaMergeTime - 1) : "" },
+            borderStyle: { transform: "translateY(-2px)" },
+            unlocked() { return hasUpgrade("des", 104) },
+        },
+        gachaAutoBar: {
+            direction: UP,
+            width: 8,
+            height: () => 43 * player.des.mergePool.length,
+            progress() { return player.des.gachaAutoTime },
+            display() { return player.des.gachaAutoTime > 1 ? "+" + format(player.des.gachaAutoTime - 1) : "" },
+            borderStyle: { transform: "translateY(-2px)", "margin-right": "4px" },
+            unlocked() { return getBuyableAmount("des", 411).gt(0) },
+        },
+        gachaCycleBar: {
+            direction: DOWN,
+            width: 8,
+            height: () => 43 * player.des.mergePool.length,
+            progress() { return player.des.gachaCycleTime },
+            display() { return player.des.gachaCycleTime > 1 ? "+" + format(player.des.gachaCycleTime - 1) : "" },
+            borderStyle: { transform: "translateY(-2px)", "margin-right": "4px" },
+            unlocked() { return getBuyableAmount("des", 411).gt(0) },
+        },
     },
 
     update(delta) {
+        if (tmp[this.layer].deactivated) return
+
         addPoints("des", tmp.des.effect.pointGain.mul(delta))
         player.des.upg105Time = player.des.upg105Time.add(getBuyableAmount("des", 105).mul(buyableEffect("des", 135)).mul(delta))
         player.des.upg115Time = player.des.upg115Time.add(getBuyableAmount("des", 115).mul(buyableEffect("des", 135)).mul(delta))
@@ -3631,7 +4231,7 @@ addLayer("des", {
                 if (slots.length) {
                     while (slots.length && player.des.mergeTime > 1) {
                         let slot = slots[Math.floor(Math.random() * slots.length)]
-                        if (hasUpgrade("des", 282) && player.des.bonusMerges < tmp.des.effect.maxBonusMerges && Math.random() < tmp.des.effect.bonusMergesChance) {
+                        if (hasUpgrade("des", 282) && player.des.bonusMerges < tmp.des.effect.maxBonusMerges && tmp.des.effect.mergentPerSec.gt(0) && Math.random() < tmp.des.effect.bonusMergesChance) {
                             let pool = player.des.mergePool
                             let type = pool[Math.floor(Math.random() * Math.min(pool.length, player.des.buyables[201].toNumber() ** 0.5))]
                             player.des.grid[slot] = { type: type, tier: bonus + 1 }
@@ -3687,6 +4287,61 @@ addLayer("des", {
             if (hasUpgrade("des", 243)) player.des.lifeTokens = player.des.lifeTokens.add(upgradeEffect("des", 243).mul(delta))
         }
 
+        if (hasUpgrade("des", 104)) {
+            player.des.gachaMergeTime += delta / 5
+            if (player.des.buyables[411].gt(0)) player.des.gachaAutoTime += delta / 15 * buyableEffect("des", 411)
+            if (player.des.buyables[432].gt(0)) player.des.gachaCycleTime += delta / 15 * buyableEffect("des", 432)
+
+            if (player.des.gachaMergeTime >= 1) {
+                let grid = player.des.mergePool
+                let slots = grid.filter(x => !player.des.gachaMerges[x])
+                let bonus = 0
+                if (slots.length) {
+                    while (slots.length && player.des.gachaMergeTime > 1) {
+                        let slot = slots[Math.floor(Math.random() * slots.length)]
+                        player.des.gachaMerges[slot] = 1
+                        slots.pop(slot)
+                        player.des.gachaMergeTime -= 1
+                    }
+                } else {
+                    player.des.gachaMergeTime = 1
+                }
+            }
+            if (player.des.gachaAutoTime >= 1) {
+                let map = {}
+                let merged = false
+                for (let a in player.des.gachaMerges) {
+                    if (!player.des.gachaMerges[a]) continue
+                    let key = player.des.gachaMerges[a]
+                    if (map[key]) {
+                        let data = player.des.gachaMerges[a]
+                        player.des.gachaMerges[map[key]] = data + 1
+                        delete player.des.gachaMerges[a]
+                        merged = true
+                        break;
+                    } else {
+                        map[key] = a
+                    }
+                }
+                if (merged) player.des.gachaAutoTime -= 1
+                else player.des.gachaAutoTime = 1
+            }
+            if (player.des.gachaCycleTime >= 1) {
+                let array = player.des.gachaMerges
+                let keys = [...player.des.mergePool]
+                let newArray = {}
+                let newKeys = [...keys]
+                keys.push(keys.shift())
+                for (let a = 0; a < keys.length; a++) if (array[keys[a]]) {
+                    newArray[newKeys[a]] = array[keys[a]]
+                }
+                player.des.gachaMerges = newArray;
+                player.des.gachaCycleTime = 0;
+            }
+
+            player.des.giftPoints = player.des.giftPoints.add(getBuyableAmount("des", 412).mul(tmp.des.effect.giftMulti).mul(delta))
+        }
+
         if (hasUpgrade("des", 255)) {
             for (let a = 0; a <= 3; a++) for (let b = 1; b <= 5; b++) {
                 buyBuyable("des", 100 + a * 10 + b)
@@ -3695,6 +4350,139 @@ addLayer("des", {
         if (hasUpgrade("des", 256)) {
             for (let a = 200; a <= 208; a++) {
                 buyBuyable("des", a)
+            }
+        }
+        if (hasUpgrade("des", 402)) buyBuyable("des", 413)
+        if (hasUpgrade("des", 403)) buyBuyable("des", 421)
+
+        if (player.des.giftHunterEnabled) {
+            if (player.des.giftcodeInput == "exit") {
+                player.des.consoleLines = ["", "", "", "", "", "", "",
+                    "-------- Welcome to Giftcode Generator --------", 
+                    "Please input giftcodes shown below into the box",
+                    "then press [ENTER] for some rewards"
+                ]
+
+                if (player.des.giftHunterStates.msg1 && !player.des.giftHunterStates.msg1Reddemed)
+                    consolePrint(`Try the gift code "v903.1624update"`)
+                else if (player.des.giftHunterStates.msg2 && !player.des.giftHunterStates.msg2Reddemed)
+                    consolePrint(`Try the gift code "wearesorry"`)
+                else if (player.des.giftHunterStates.msg3 && !player.des.giftHunterStates.msg3Reddemed)
+                    consolePrint(`Try the gift code "newupdate"`)
+                else if (player.des.giftHunterStates.msg4 && !player.des.giftHunterStates.msg4Reddemed)
+                    consolePrint(`Try the gift code "yadmir2164"`)
+                else if (player.des.giftHunterStates.chat1 && !player.des.giftHunterStates.chat1Reddemed)
+                    consolePrint(`Try the gift code "christmas_event_perm"`)
+
+                player.des.giftHunterEnabled = false
+                player.des.giftcodeInput = ""
+            }
+            if (player.des.giftHunterGameData.id) {
+                let state = player.des.giftHunterState
+                if (player.des.giftcodeInput == "up" || player.des.giftcodeInput == "w") {
+                    giftHunterGameMoveRelative([1, 0])
+                    player.des.consoleLines = getGiftHunterGameDisplay();
+                    player.des.giftcodeInput = ""
+                } else if (player.des.giftcodeInput == "down" || player.des.giftcodeInput == "s") {
+                    giftHunterGameMoveRelative([-1, 0])
+                    player.des.consoleLines = getGiftHunterGameDisplay();
+                    player.des.giftcodeInput = ""
+                } else if (player.des.giftcodeInput == "left" || player.des.giftcodeInput == "a") {
+                    giftHunterGameMoveRelative([0, -1])
+                    player.des.consoleLines = getGiftHunterGameDisplay();
+                    player.des.giftcodeInput = ""
+                } else if (player.des.giftcodeInput == "right" || player.des.giftcodeInput == "d") {
+                    giftHunterGameMoveRelative([0, 1])
+                    player.des.consoleLines = getGiftHunterGameDisplay();
+                    player.des.giftcodeInput = ""
+                } else if (player.des.giftcodeInput == "restart") {
+                    startGiftHunterGame(player.des.giftHunterGameData.id)
+                    player.des.consoleLines = getGiftHunterGameDisplay();
+                    player.des.giftcodeInput = ""
+                }
+                if (player.des.giftHunterState != state) {
+                    for (let msg of giftHunter[player.des.giftHunterState].message) consolePrint(msg)
+                }
+            } else if (player.des.giftcodeInput == "clear") {
+                player.des.consoleLines = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
+                for (let msg of giftHunter[player.des.giftHunterState].message) consolePrint(msg)
+                consolePrint(" ")
+                player.des.giftcodeInput = ""
+            } else if (player.des.giftcodeInput) {
+                consolePrint("> " + player.des.giftcodeInput)
+                let input = player.des.giftcodeInput.split(" ")
+                player.des.giftcodeInput = ""
+                
+                if (input[0] == "") {
+                    consolePrint("I beg your pardon?")
+                } else if (input[0] == "help") {
+                    consolePrint("Command list (beside those that are listed at the bottom of the game):")
+                    consolePrint("| clear    | exit     | help     | multi    |          |          |")
+                } else if (input[0] == "multi") {
+                    consolePrint(`Your current Giftcode Hunter multiplier is ×${format(player.des.giftHunterMulti)}.`)
+                    consolePrint(`This mutliplier boosts your gift point gain.`)
+                } else if (giftHunter[player.des.giftHunterState].commands.includes(input[0])) {
+                    let state = player.des.giftHunterState
+                    giftHunter[player.des.giftHunterState].onCommand(input)
+                    if (player.des.giftHunterState != state) {
+                        for (let msg of giftHunter[player.des.giftHunterState].message) consolePrint(msg)
+                    }
+                    if (player.des.giftHunterGameData.id) {
+                        player.des.consoleLines = getGiftHunterGameDisplay();
+                        consolePrint(" ")
+                        consolePrint("Welcome to The Towers (tm)!")
+                        consolePrint("Rules: w = up, s = down, a = left, d = right")
+                        consolePrint("You know what else to do ;P")
+                    }
+                } else {
+                    consolePrint(`I dont know what "${input[0]}" means.`)
+                    consolePrint(`Type "help" for a list of commands.`)
+                }
+                consolePrint(" ")
+            }
+        } else {
+            if (player.des.currentCode == player.des.giftcodeInput) {
+                let gain = EN(player.des.currentCode.length).mul(buyableEffect("des", 414)).mul(tmp.des.effect.giftMulti)
+                player.des.giftPoints = player.des.giftPoints.add(gain)
+                consolePrint("[REDEEMED] " + player.des.currentCode + " -> " + format(gain, 0) + " GP")
+                player.des.currentCode = generateCode();
+                player.des.giftcodeInput = "";
+            } else if (hasUpgrade("des", 401) && player.des.giftcodeInput == "run giftcode hunter") {
+                player.des.consoleLines = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
+                for (let msg of giftHunter[player.des.giftHunterState].message) consolePrint(msg)
+                consolePrint(" ")
+                player.des.giftHunterEnabled = true
+                player.des.giftcodeInput = ""
+            } else if (player.des.giftHunterStates.msg1 && !player.des.giftHunterStates.msg1Reddemed && player.des.giftcodeInput == "v903.1624update") {
+                player.des.giftHunterMulti = player.des.giftHunterMulti.mul(100)
+                consolePrint(`The code multiplied your multiplier by 100!`)
+                consolePrint(`It is now ×${format(player.des.giftHunterMulti)}.`)
+                player.des.giftHunterStates.msg1Reddemed = true
+                player.des.giftcodeInput = ""
+            } else if (player.des.giftHunterStates.msg2 && !player.des.giftHunterStates.msg2Reddemed && player.des.giftcodeInput == "wearesorry") {
+                player.des.giftHunterMulti = player.des.giftHunterMulti.mul(3.1415926535)
+                consolePrint(`The code multiplied your multiplier by 3.1415926535!`)
+                consolePrint(`It is now ×${format(player.des.giftHunterMulti)}.`)
+                player.des.giftHunterStates.msg2Reddemed = true
+                player.des.giftcodeInput = ""
+            } else if (player.des.giftHunterStates.msg3 && !player.des.giftHunterStates.msg3Reddemed && player.des.giftcodeInput == "newupdate") {
+                player.des.giftHunterMulti = player.des.giftHunterMulti.mul(13.37)
+                consolePrint(`The code multiplied your multiplier by 13.37!`)
+                consolePrint(`It is now ×${format(player.des.giftHunterMulti)}.`)
+                player.des.giftHunterStates.msg3Reddemed = true
+                player.des.giftcodeInput = ""
+            } else if (player.des.giftHunterStates.msg4 && !player.des.giftHunterStates.msg4Reddemed && player.des.giftcodeInput == "yadmir2164") {
+                player.des.giftHunterMulti = player.des.giftHunterMulti.mul(420.69)
+                consolePrint(`The code multiplied your multiplier by 420.69!`)
+                consolePrint(`It is now ×${format(player.des.giftHunterMulti)}.`)
+                player.des.giftHunterStates.msg4Reddemed = true
+                player.des.giftcodeInput = ""
+            } else if (player.des.giftHunterStates.chat1 && !player.des.giftHunterStates.chat1Reddemed && player.des.giftcodeInput == "christmas_event_perm") {
+                player.des.giftHunterMulti = player.des.giftHunterMulti.mul(25.12)
+                consolePrint(`The code multiplied your multiplier by 25.12!`)
+                consolePrint(`It is now ×${format(player.des.giftHunterMulti)}.`)
+                player.des.giftHunterStates.chat1Reddemed = true
+                player.des.giftcodeInput = ""
             }
         }
         if (hasUpgrade("des", 276)) buyBuyable("des", 301)
@@ -3708,7 +4496,7 @@ addLayer("des", {
                     ["blank", "10px"],
                     ["column", createBuyableTable(1, 5, 5)],
                     ["blank", "10px"],
-                    ["row", [["upgrade", 101], ["upgrade", 102], ["upgrade", 103]]],
+                    ["row", [["upgrade", 101], ["upgrade", 102], ["upgrade", 103], ["upgrade", 104]]],
                 ],
             },
             "merge": {
@@ -3729,6 +4517,32 @@ addLayer("des", {
                     ["raw-html", () => tmp.des.effect.bonusMergesChance > .1 ? `Your bonus special chance is ${format(tmp.des.effect.bonusMergesChance * 100)}%.` : ""],
                     ["blank", "10px"],
                     ["microtabs", "merge"]
+                ],
+            },
+            "codes": {
+                unlocked() { return hasUpgrade("des", 336) },
+                title: "Giftcodes",
+                content: [
+                    ["blank", "10px"],
+                    ["raw-html", () => `You have <h3>${format(player.des.giftPoints, 0)}</h3> gift points.`],
+                    ["raw-html", () => `<div style="width:${player.des.giftHunterEnabled ? 604 : 404}px;text-align:left;margin:10px;">
+                        ${player.des.consoleLines.map((x, i) => `<span style="opacity:${player.des.giftHunterEnabled ? 1 : (i + 1) * .10}">${x}</span><br/>`).join("")}
+                        &gt; <span style="color:black;background:var(--color)">${player.des.giftHunterEnabled ? (player.des.giftHunterGameData.id ? "up/down/left/right" : giftHunter[player.des.giftHunterState].commands.join("/")) : `Please enter code ${player.des.currentCode}.`}</span>
+                    </div>`, { 
+                    }],
+                    ["text-input", "giftcodeInput", { 
+                        color: "var(--color)", 
+                        width: "400px",
+                        "font-family": "Inconsolata, monospace",
+                        "text-align": "left",
+                        "font-size": "16px",
+                        border: "2px solid #ffffff17", 
+                        background: "var(--background)", 
+                    }],
+                    ["blank", "10px"],
+                    ["column", createBuyableTable(4, 5, 5)],
+                    ["blank", "10px"],
+                    ["row", [["upgrade", 401], ["upgrade", 402], ["upgrade", 403], ["upgrade", 404]]],
                 ],
             },
         },
@@ -3784,6 +4598,8 @@ addLayer("des", {
                         ["row", [["upgrade", 301], ["upgrade", 302], ["upgrade", 303], ["upgrade", 304], ["upgrade", 305], ["upgrade", 306]]],
                         ["row", [["upgrade", 311], ["upgrade", 312], ["upgrade", 313], ["upgrade", 314]]],
                         ["row", [["upgrade", 321], ["upgrade", 322], ["upgrade", 323], ["upgrade", 324], ["upgrade", 325], ["upgrade", 326], ["upgrade", 327], ["upgrade", 328]]],
+                        ["row", [["upgrade", 331], ["upgrade", 333], ["upgrade", 335], ["upgrade", 334], ["upgrade", 332]]],
+                        ["row", [["upgrade", 336]]],
                     ], {width: "max-content"}],
                 ],
             },
@@ -3808,7 +4624,7 @@ addLayer("des", {
                         The more you draw, the more frequently the lowest item will be in the next draw, but so will make others less likely to be drawn again.</h5>
                     `],
                     ["blank", "10px"],
-                    ["row", [["gacha-items", () => player.des.mergePool], ["bar", "dispBar"]]],
+                    ["row", [["bar", "gachaCycleBar"], ["bar", "gachaAutoBar"], ["bar", "gachaMergeBar"], ["gacha-items", () => player.des.mergePool], ["bar", "dispBar"]]],
                 ],
             },
         },
@@ -3825,3 +4641,1462 @@ addLayer("des", {
     ],
 
 })
+
+function consolePrint(line) {
+    player.des.consoleLines.push(line.replaceAll(' ', '&nbsp;'))
+    player.des.consoleLines.shift()
+}
+
+
+let giftHunter = {
+    0: {
+        message: [
+            "---------------------- Welcome to Giftcode Hunter ----------------------",
+            "This is a text adventure game about getting gift codes. Yeah, that's",
+            "pretty much it. Type commands into the box for the in-game character to",
+            "act. Each situation may present you with different commands highlighted",
+            "in white, or global commands that can be seen using the \"help\" command.",
+            "Type \"begin\" to continue.",
+        ],
+        commands: ["begin"],
+        onCommand(args) {
+            if (args[0] == "begin") {
+                player.des.giftHunterState = 1
+            }
+        }
+    },
+    1: {
+        message: [
+            // -----------------------------------------------------------------------
+            "Ok. Let's start things straight.",
+            "You are currently in your room, playing a Free-2-Play game that is very",
+            "critically acclaimed by 93 streamers that you followed, maybe that isn't",
+            "the right word, they all said the same thing. Anyways, you're at the",
+            "point where the game gets throttled to the point where you need a lot of",
+            "giftcodes to be able to continue playing the game. Grinding would take a",
+            "long time and micro-transactions didn't help much. There's only one clear",
+            "thing right now, and that is: you need more giftcodes. What will you do?",
+        ],
+        commands: ["find"],
+        onCommand(args) {
+            if (args[0] == "find") {
+                if (args[1] == "for") {
+                    args.splice(1, 1); 
+                }
+                if (args[1] == "some" || args[1] == "a") {
+                    args.splice(1, 1); 
+                }
+
+                if (!args[1]) {
+                    consolePrint("Find? Find what? Girlfriends?")
+                    consolePrint("You need to type the entire thing here if you want to do something!")
+                } else if (["giftcode", "giftcodes", "code", "codes"].includes(args[1])) {
+                    if (!args[2]) {
+                        consolePrint("You decided to find for some giftcodes, but where to start?")
+                        consolePrint("(ingame, online, outside)")
+                    } else if (args[2] == "ingame") {
+                        player.des.giftHunterState = "1.1"
+                    } else if (args[2] == "online") {
+                        player.des.giftHunterState = "2.1"
+                    }
+                } else if (args[1] == "girlfriend" || args[1] == "girlfriends") {
+                    consolePrint("Nice try, but you already have one! It isn't like you are too hooked on")
+                    consolePrint("playing video game to the point that your crush left you, right? Right?")
+                    consolePrint("She do regularly play games, and you're friend with her in-game anyways.")
+                } else if (args[1] == "boyfriend" || args[1] == "boyfriends") {
+                    consolePrint("You already have a girlfriend, so... no.")
+                } else {
+                    consolePrint(`You don't feel like finding ${args[1]} right now.`)
+                }
+            }
+        }
+    },
+    "1.1": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You decided to find some giftcodes in-game. There's not much place to",
+            "find them though, so it could be hard. But you've heard from some",
+            "streamers that there are codes that are player-dependant, so you might",
+            "have no choice but find them yourself.",
+        ],
+        commands: ["look", "find", "press", "go"],
+        onCommand(args) {
+            if (args[0] == "press") {
+                if (args[1] == "the") {
+                    args.splice(1, 1); 
+                }
+                if (!args[1]) {
+                    consolePrint("Which button do you want to press?")
+                } else if (args[1] == "inventory") {
+                    player.des.giftHunterState = "1.2"
+                } else if (args[1] == "friends") {
+                    player.des.giftHunterState = "1.3"
+                } else if (args[1] == "pause") {
+                    player.des.giftHunterState = "1.4"
+                } else if (args[1] == "news") {
+                    player.des.giftHunterState = "1.5"
+                } else {
+                    consolePrint(`You don't see any ${args[1]} button in the game.`)
+                }
+            } else if (args[0] == "go") {
+                if (args[1] == "to") {
+                    args.splice(1, 1); 
+                    if (args[1] == "the") {
+                        args.splice(1, 1); 
+                    }
+                }
+                if (!args[1]) {
+                    consolePrint("Where do you want to go?")
+                } else if (args[1] == "north" || args[1] == "village") {
+                    player.des.giftHunterState = "1.6"
+                } else if (args[1] == "west" || args[1] == "windmill") {
+                    if (player.des.giftHunterStates.game4) player.des.giftHunterState = "1.11d"
+                    player.des.giftHunterState = "1.11"
+                } else {
+                    consolePrint(`You don't see any ${args[1]} in the game.`)
+                }
+            } else if (args[0] == "look") {
+                             // -----------------------------------------------------------------------
+                consolePrint("There's like, not much buttons, since most of the game's interactions")
+                consolePrint("are done in the game world. There's a inventory button, a friends button,")
+                consolePrint("a pause button, and a button to check the game's news everywhere in the")
+                consolePrint("game that you unlock quite a while ago by completing a quest given by a")
+                consolePrint("town's NPC. You also see a windmill in the west of your avatar, and a")
+                consolePrint("small village in the north.")
+            } else if (args[0] == "find") {
+                if (args[1] == "for") {
+                    args.splice(1, 1); 
+                }
+                if (args[1] == "some" || args[1] == "a") {
+                    args.splice(1, 1); 
+                }
+
+                if (!args[1]) {
+                    consolePrint(`Find? Find what? There's a lot to find in this game!`)
+                } else if (["giftcode", "giftcodes", "code", "codes"].includes(args[1])) {
+                    if (!args[2]) {
+                        consolePrint(`You don't think that you can find any gift codes in this area.`)
+                        consolePrint("(ingame, online, outside)")
+                    } else if (args[2] == "ingame") {
+                        consolePrint(`You already trying to do that, you doofus!`)
+                    } else if (args[2] == "online") {
+                        player.des.giftHunterState = "2.1"
+                    } else if (args[2] == "outside") {
+                        player.des.giftHunterState = "3.1"
+                    }
+                } else {
+                    consolePrint(`You don't feel like wanting to find ${args[1]} in the game right now.`)
+                }
+            }
+        }
+    },
+    "1.2": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You decided to check your inventory. You are carrying a lot of things,",
+            "probably some of them should give you a hint about getting a gift code,",
+            "shouldn't they?",
+        ],
+        commands: ["back", "check", "use"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.1"
+            }
+            if (args[0] == "check") {
+                consolePrint(`You have:`)
+                let empty = true
+                for (let thing in player.des.giftHunterInventory) if (player.des.giftHunterInventory[thing] > 0) {
+                    consolePrint(`- ${player.des.giftHunterInventory[thing]} ${thing}`)
+                    empty = false
+                }
+                if (empty) {
+                    consolePrint(`- Nothing :(`)
+                }
+            }
+            if (args[0] == "use") {
+                if (!args[1]) {
+                    consolePrint(`Which item do you want to use?`)
+                } else if (!player.des.giftHunterInventory[args[1]]) {
+                    consolePrint(`You do not have any ${args[1]} right now.`)
+                } else {
+                    player.des.giftHunterInventory[args[1]]--;
+                    consolePrint(`You used a ${args[1]}.`)
+                    if (args[1] == "smallBoost") {
+                        player.des.giftHunterMulti = player.des.giftHunterMulti.mul(1.2)
+                        consolePrint(`The boost multiplied your multiplier by ×1.2! It is now ×${format(player.des.giftHunterMulti)}.`)
+                    } else if (args[1] == "mediumBoost") {
+                        player.des.giftHunterMulti = player.des.giftHunterMulti.mul(1.5)
+                        consolePrint(`The boost multiplied your multiplier by ×1.5! It is now ×${format(player.des.giftHunterMulti)}.`)
+                    } else if (args[1] == "doubler") {
+                        player.des.giftHunterMulti = player.des.giftHunterMulti.mul(2)
+                        consolePrint(`The doubler doubled your multiplier! It is now ×${format(player.des.giftHunterMulti)}.`)
+                    } else if (args[1] == "tripler") {
+                        player.des.giftHunterMulti = player.des.giftHunterMulti.mul(3)
+                        consolePrint(`The tripler tripled your multiplier! It is now ×${format(player.des.giftHunterMulti)}.`)
+                    } else if (args[1] == "quintupler") {
+                        player.des.giftHunterMulti = player.des.giftHunterMulti.mul(5)
+                        consolePrint(`The quintupler quintupled your multiplier! It is now ×${format(player.des.giftHunterMulti)}.`)
+                    }
+                }
+            }
+        }
+    },
+    "1.3": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You decided to check your friends page. You're friends with a bunch of",
+            "people in-game, but it seems like only a few of them are online though.",
+            "Thers is an in-game mailbox where you and your friends can send things.",
+        ],
+        commands: ["back", "check", "open"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.1"
+            }
+            if (args[0] == "check") {
+                let empty = true
+                if (!player.des.giftHunterStates.msg1) {
+                    consolePrint(`You have a mail! It's a <u>system</u> message.`)
+                    empty = false
+                }
+                if (player.des.giftHunterStates.easter1 && !player.des.giftHunterStates.easter1Redeemed) {
+                    consolePrint(`You have a mail! It's a <u>reward</u> from your easter egg.`)
+                    empty = false
+                }
+                if (empty)
+                    consolePrint(`No one had sent you anything since you last checked here.`)
+            }
+            if (args[0] == "open") {
+                if (!args[1]) {
+                    consolePrint(`Which mail do you want to open?`)
+                } else if (args[1] == "mail" && !player.des.giftHunterStates.msg1) {
+                    consolePrint(`I know what you're trying to do. Unfortunately, the mail service doesn't`)
+                    consolePrint(`actually work that way! Try to enter the underlined words next time.`)
+                } else if (args[1] == "system" && !player.des.giftHunterStates.msg1) {
+                    consolePrint(`From: <i>The YCDAYWTD Mail Service</i> [SYSTEM]`)
+                    consolePrint(`Title: <u>v903.1624.0 Content Update!</u>`)
+                    consolePrint(`This is the moment we have all been waiting for... we have released the`)
+                    consolePrint(`v903.1624.0 Content Update! This update includes:`)
+                    consolePrint(`- <r><+ohc:i^,gFD5B!+B*Q,FCf:</r>! You can now <r>E,oN2FD5B!</r> all your <r>E,oN5BlA-8+</r>`)
+                    consolePrint(`<r>E2@>B6%R)Er</r> to get powerful <r>E,Tr3Eb9H1+E2@4F*),/AKYr1Bl8$6</r> of which you`)
+                    consolePrint(`can <r>@Wcr=E,Tr3Eb9H1+E2@4F*),/AKZ,7B6%EkATI!</r> This will make your gaming`)
+                    consolePrint(`experience 1,000,000,000,000 times more immersive!`)
+                    consolePrint(`- Miniscule new content, because <r>FD,5.DIn#7:i^,gFD5B!+B*Q,FCf:</r> is`)
+                    consolePrint(`already a very large content addition!`)
+                    consolePrint(`- Miscellaneous bug fixes`)
+                    consolePrint(`We would also love to share al of our current active player with a 100×`)
+                    consolePrint(`multiplier to everybody in the game with the code "v903.1624update"!`)
+                    consolePrint(`Exit the game to enter it! Thanks for supporting us for such a long time!`)
+                    player.des.giftHunterStates.msg1 = true;
+                } else if (args[1] == "reward" && player.des.giftHunterStates.easter1 && !player.des.giftHunterStates.easter1Redeemed) {
+                                 // -----------------------------------------------------------------------
+                    consolePrint(`From: <i>The YCDAYWTD Mail Service</i> [SYSTEM]`)
+                    consolePrint(`Title: <u>Easter Egg Reward</u>`)
+                    consolePrint(`You got a tripler from the mail.`)
+                    player.des.giftHunterInventory.tripler = (player.des.giftHunterInventory.tripler || 0) + 1
+                    player.des.giftHunterStates.easter1Redeemed = true;
+                } else {
+                    consolePrint(`There's no such mail in the mailbox.`)
+                }
+            }
+        }
+    },
+    "1.4": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You decided to click pause. Nothing particularly interesting here.",
+        ],
+        commands: ["back", "???"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.1"
+            }
+            if (args[0] == "???") {
+                if (!player.des.giftHunterStates.easter1) {
+                    consolePrint(`<u>You found an easter egg!</u>`)
+                    consolePrint(`A tripler has been sent to your mailbox.`)
+                    player.des.giftHunterStates.easter1 = true;
+                } else {
+                    consolePrint(`<u>You've already found this easter egg!</u>`)
+                }
+            }
+        }
+    },
+    "1.5": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You decided to check the news. There is three section, each has their own",
+            "purpose. There's one for announcements, one is the changelog, and one is",
+            "literally a chat.",
+        ],
+        commands: ["back", "check"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.1"
+            }
+            if (args[0] == "check") {
+                if (!args[1]) {
+                    consolePrint(`Which mail do you want to open?`)
+                } else if (args[1] == "announcements") {
+                    if (!args[2]) {
+                        consolePrint(`Type "check announcements [number]" to view details`)
+                        consolePrint(`[1] From: <i>The YCDAYWTD Mail Service</i> [SYSTEM]`)
+                        consolePrint(`Title: <u>v903.1624.0 Content Update!</u>`)
+                        consolePrint(`[2] From: <i>The YCDAYWTD Mail Service</i> [SYSTEM]`)
+                        consolePrint(`Title: <u><r>:N^\\#:1\\Vl6=jeDDJj0+B)</r></u>`)
+                    } else if (args[2] == "1") {
+                        if (!player.des.giftHunterStates.msg1) {
+                            consolePrint(`From: <i>The YCDAYWTD Mail Service</i> [SYSTEM]`)
+                            consolePrint(`Title: <u>v903.1624.0 Content Update!</u>`)
+                            consolePrint(`This is the moment we have all been waiting for... we have released the`)
+                            consolePrint(`v903.1624.0 Content Update! This update includes:`)
+                            consolePrint(`- <r><+ohc:i^,gFD5B!+B*Q,FCf:</r>! You can now <r>E,oN2FD5B!</r> all your <r>E,oN5BlA-8+</r>`)
+                            consolePrint(`<r>E2@>B6%R)Er</r> to get powerful <r>E,Tr3Eb9H1+E2@4F*),/AKYr1Bl8$6</r> of which you`)
+                            consolePrint(`can <r>@Wcr=E,Tr3Eb9H1+E2@4F*),/AKZ,7B6%EkATI!</r> This will make your gaming`)
+                            consolePrint(`experience 1,000,000,000,000 times more immersive!`)
+                            consolePrint(`- Miniscule new content, because <r>FD,5.DIn#7:i^,gFD5B!+B*Q,FCf:</r> is`)
+                            consolePrint(`already a very large content addition!`)
+                            consolePrint(`- Miscellaneous bug fixes`)
+                            consolePrint(`We would also love to share al of our current active player with a 100×`)
+                            consolePrint(`multiplier to everybody in the game with the code "v903.1624update"!`)
+                            consolePrint(`Exit the game to enter it! Thanks for supporting us for such a long time!`)
+                            player.des.giftHunterStates.msg1 = true;
+                        } else {
+                            consolePrint(`From: <i>The YCDAYWTD Mail Service</i> [SYSTEM]`)
+                            consolePrint(`Title: <u>v903.1624.0 Content Update!</u>`)
+                            consolePrint(`<r>\<+oue+Dk\\2F(&]m+Ceht+Du+>+C\\n)Ci\<\`mARmD9<+oue+DGm>E,ol+@:F%u+C\nl@\<H</r>`)
+                            consolePrint(`<r>X&+E(j7@rHC.F\`;G6A0>DkFC?;1EZfI;AKZ&*DId=!+D>2)+Co&"ATVKo+DGpM+A$/fH</r>`)
+                            consolePrint(`<r>#IgJFD,B+CER_4BlbD6ATMp$B4W3"F!,"-F)Yr(H"CM/Bl5&)EcQ)=/0JnJARTXk+Cf></r>`)
+                            consolePrint(`<r>-FCA[$+EV:.+CTD7BQ%o6@<<VWF"(i_6tReo.mI3:AKaPiCI\`J(?9\`1!5Wim24[Cf95q</r>`)
+                            consolePrint(`<r>tbP/0I2Z@m"Kp@PBSj7:Tb'Cd;u#,&Tn;5X7q,E_%r:+E)9C80_YA2+0lR7r(D/6p,9N</r>`)
+                            consolePrint(`<r>:bkF&05s<N</r>`)
+                        }
+                    } else if (args[2] == "2") {
+                                      // -----------------------------------------------------------------------
+                        consolePrint(`From: <i>The YCDAYWTD Mail Service</i> [SYSTEM]`)
+                        consolePrint(`Title: <u><r>:N^\\#:1\\Vl6=jeDDJj0+B)</r></u>`)
+                        consolePrint(`IMPORTANT: This message is only intended to be viewed by the YCDAYWTD`)
+                        consolePrint(`staff member. If you can see this in public, please use this gift code as`)
+                        consolePrint(`our letter of apology: wearesorry`)
+                        consolePrint(`<r>:i'i\\+Dkm:@V0BuGp$g<F),>sF"SS.H".t,ASlT5D/18=Chdu5E,9).F(ooDAS#LhCG$\`2H"C</r>`)
+                        consolePrint(`<r>e7CN^hCD'3S-G\\F1@<uE+F(6>.H#b$;ASYs%Ecc>5F)ET</r>`)
+                        player.des.giftHunterStates.msg2 = true;
+                    }
+                } else if (args[1] == "changelog") {
+                    consolePrint(`The changelog is empty. That's... weird. This shouldn't happen, especially`)
+                    consolePrint(`since you remember that the game has updates virtually <i>daily, every day.</i>`)
+                } else if (args[1] == "chat") {
+                    consolePrint(`-- current channel: OFFLINE`)
+                    consolePrint(`The chat is currently temporarily closed for maintainance. Please wait patiently`)
+                    consolePrint(`and we will bring it back, soon.`)
+                }
+            }
+        }
+    },
+    "1.6": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You go to the village. It's a peaceful place with a church, a bar and a",
+            "park and a few houses. You have not much things to do here though, you've",
+            "completed all the sidequest here a few days ago. The village seems a bit",
+            "empty though, it's usually a little bit crowder than this.",
+        ],
+        commands: ["back", "go", "???"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.1"
+            }
+            if (args[0] == "go") {
+                if (args[1] == "to") {
+                    args.splice(1, 1); 
+                    if (args[1] == "the") {
+                        args.splice(1, 1); 
+                    }
+                } 
+                if (!args[1]) {
+                    consolePrint("Where do you want to go?")
+                } else if (args[1] == "back") {
+                    player.des.giftHunterState = "1.1"
+                } else if (args[1] == "church") {
+                    if (player.des.giftHunterStates.game1) player.des.giftHunterState = "1.7c"
+                    else player.des.giftHunterState = "1.7a"
+                } else if (args[1] == "bar") {
+                    if (player.des.giftHunterStates.game2) player.des.giftHunterState = "1.8c"
+                    else player.des.giftHunterState = "1.8a"
+                } else if (args[1] == "park") {
+                    player.des.giftHunterState = "1.9"
+                } else {
+                    consolePrint(`You don't even see a single ${args[1]} here.`)
+                }
+            }
+            if (args[0] == "???") {
+                if (!player.des.giftHunterStates.easter2) {
+                    consolePrint(`You found a doubler!`)
+                    consolePrint(`You put the doubler into the inventory.`)
+                    player.des.giftHunterInventory.doubler = (player.des.giftHunterInventory.doubler || 0) + 1
+                    player.des.giftHunterStates.easter2 = true;
+                } else {
+                    consolePrint(`There's nothing interesting here.`)
+                }
+            }
+        }
+    },
+    "1.7a": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You go to the church. There is only one person here.",
+        ],
+        commands: ["back", "talk"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.6"
+            }
+            if (args[0] == "talk") {
+                player.des.giftHunterState = "1.7b"
+            }
+        }
+    },
+    "1.7a2": {
+        message: [
+            // -----------------------------------------------------------------------
+            "\"Don't fool around here, we're in a church. Come talk at me again when",
+            "you want to play.\"",
+        ],
+        commands: ["back", "talk"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.6"
+            }
+            if (args[0] == "talk") {
+                player.des.giftHunterState = "1.7b"
+            }
+        }
+    },
+    "1.7b": {
+        message: [
+            // -----------------------------------------------------------------------
+            "\"Do you want to play a game? Don't worry, a quiet game.\"",
+        ],
+        commands: ["yes", "no"],
+        onCommand(args) {
+            if (args[0] == "no") {
+                player.des.giftHunterState = "1.7a2"
+            }
+            if (args[0] == "yes") {
+                startGiftHunterGame(1)
+            }
+        }
+    },
+    "1.7b2": {
+        message: [
+            // -----------------------------------------------------------------------
+            "\"You have potential.\"",
+            "The person hands you some multipliers and then leaves. You don't even",
+            "understand what happened.",
+        ],
+        commands: ["back"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.6"
+            }
+        }
+    },
+    "1.7c": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You go to the church. No one is here.",
+        ],
+        commands: ["back"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.6"
+            }
+        }
+    },
+    "1.8a": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You go to the church. There is only the bartender here. He is calling",
+            "you.",
+        ],
+        commands: ["back", "talk"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.6"
+            }
+            if (args[0] == "talk") {
+                player.des.giftHunterState = "1.8b"
+            }
+        }
+    },
+    "1.8a2": {
+        message: [
+            // -----------------------------------------------------------------------
+            "\"Not ready yet? Fine, that's okay. Come talk at me ready when you are.\"",
+        ],
+        commands: ["back", "talk"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.6"
+            }
+            if (args[0] == "talk") {
+                player.des.giftHunterState = "1.8b"
+            }
+        }
+    },
+    "1.8b": {
+        message: [
+            // -----------------------------------------------------------------------
+            "\"Hey, kid. I need you to do something for me. One of my worker dropped",
+            "something into my basement and now everything turned into a maze! I don't",
+            "even know how this even happen! Can you deal with all the tiles there? I",
+            "will give you something if you can clear it.\"",
+        ],
+        commands: ["yes", "no"],
+        onCommand(args) {
+            if (args[0] == "no") {
+                player.des.giftHunterState = "1.8a2"
+            }
+            if (args[0] == "yes") {
+                startGiftHunterGame(2)
+            }
+        }
+    },
+    "1.8b2": {
+        message: [
+            // -----------------------------------------------------------------------
+            "The basement turns into normal as you clear the last tile. The bartender",
+            "thanks you and then gives you a quintupler as a compensation for helping",
+            "him.",
+        ],
+        commands: ["back"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.6"
+            }
+        }
+    },
+    "1.8c": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You go to the bar. The only person here is the bartender, who are looking",
+            "for his customers to come.",
+        ],
+        commands: ["back"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.6"
+            }
+        }
+    },
+    "1.9": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You go to the park. It's very crowded, seems like there is a festival",
+            "being celebrated around here. There is a puzzle stall giving a reward to",
+            "people who can solve their puzzles.",
+        ],
+        commands: ["back", "go"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.6"
+            }
+            if (args[0] == "go") {
+                if (args[1] == "to") {
+                    args.splice(1, 1); 
+                    if (args[1] == "the") {
+                        args.splice(1, 1); 
+                    }
+                } 
+                if (!args[1]) {
+                    consolePrint("Where do you want to go?")
+                } else if (args[1] == "back") {
+                    player.des.giftHunterState = "1.6"
+                } else if (args[1] == "stall") {
+                    if (player.des.giftHunterStates.game3) player.des.giftHunterState = "1.10c"
+                    else player.des.giftHunterState = "1.10a"
+                } else {
+                    consolePrint(`You don't even see a single ${args[1]} here.`)
+                }
+            }
+        }
+    },
+    "1.10a": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You go to the puzzle stall. There is a lot of puzzles hanging around all",
+            "three walls. The puzzle seller is telling nearby people to try and solve",
+            "the puzzles.",
+        ],
+        commands: ["back", "talk"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.9"
+            }
+            if (args[0] == "talk") {
+                player.des.giftHunterState = "1.10b"
+            }
+        }
+    },
+    "1.10a2": {
+        message: [
+            // -----------------------------------------------------------------------
+            "\"Come on, don't be that shy. Don't you like free rewards?\"",
+        ],
+        commands: ["back", "talk"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.9"
+            }
+            if (args[0] == "talk") {
+                player.des.giftHunterState = "1.10b"
+            }
+        }
+    },
+    "1.10b": {
+        message: [
+            // -----------------------------------------------------------------------
+            "\"Hey, are you here for the puzzles? If you try to solve only one of my",
+            "puzzles, I will give you a great reward! How's that sounds?\"",
+        ],
+        commands: ["yes", "no"],
+        onCommand(args) {
+            if (args[0] == "no") {
+                player.des.giftHunterState = "1.10a2"
+            }
+            if (args[0] == "yes") {
+                startGiftHunterGame(3)
+            }
+        }
+    },
+    "1.10b2": {
+        message: [
+            // -----------------------------------------------------------------------
+            "\"Hey, you did it! As I said, a special reward: You unlocked a few",
+            "upgrades! These will help you a lot on your journey! Oh, and have some",
+            "multipliers too! Very great, am I right?\"",
+        ],
+        commands: ["back"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.9"
+            }
+        }
+    },
+    "1.10c": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You go to the puzzle stall. There is a lot of puzzles hanging around all",
+            "three walls. The puzzle seller is telling nearby people to try and solve",
+            "the puzzles.",
+        ],
+        commands: ["back"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.9"
+            }
+        }
+    },
+    "1.11": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You go to the abandoned windmill. This place is wrecked, but it still",
+            "somehow managed to stand itself up. Probably someone has built this place",
+            "a very long time ago and never bothered to actually bulldoze it and now",
+            "time is the person who decided its fate. You can still able to go inside",
+            "it, what will it hurt?",
+        ],
+        commands: ["back", "go", "???"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.1"
+            }
+            if (args[0] == "go") {
+                if (!args[1]) {
+                    consolePrint("Where do you want to go?")
+                } else if (args[1] == "back") {
+                    player.des.giftHunterState = "1.1"
+                } else if (args[1] == "inside") {
+                    player.des.giftHunterState = "1.12"
+                } else {
+                    consolePrint(`You don't even see a single ${args[1]} here.`)
+                }
+            }
+            if (args[0] == "???") {
+                if (!player.des.giftHunterStates.easter3) {
+                    consolePrint(`You found a doubler!`)
+                    consolePrint(`You put the doubler into the inventory.`)
+                    player.des.giftHunterInventory.doubler = (player.des.giftHunterInventory.doubler || 0) + 1
+                    player.des.giftHunterStates.easter3 = true;
+                } else {
+                    consolePrint(`There's nothing interesting here.`)
+                }
+            }
+        }
+    },
+    "1.11b": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You exit the abandoned windmill. A large slime suddenly approaches you.",
+            "What will you do?",
+        ],
+        commands: ["fight", "spare"],
+        onCommand(args) {
+            if (args[0] == "fight") {
+                startGiftHunterGame(4)
+            }
+            if (args[0] == "spare") {
+                player.des.giftHunterState = "1.11"
+            }
+        }
+    },
+    "1.11c": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You manage to fight the slime. The slime slams into the abandon windmill,",
+            "causing the entirety of it to collapses. Luckily, you dodged it. It",
+            "wasn't really a special thing anyways, it fells way off where you're", 
+            "standing. Anyways, since you beaten the slime, you get to loot the",
+            "following:",
+            "- 3 smallBoosts",
+            "- 2 mediumBoosts",
+            "You still don't get the reason why they group the item names into one",
+            "single word but hey, multipliers!",
+        ],
+        commands: ["continue"],
+        onCommand(args) {
+            if (args[0] == "continue") {
+                player.des.giftHunterState = "1.11d"
+            }
+        }
+    },
+    "1.11d": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You're standing next to the collapsed windmill. It was a place, but your",
+            "recent brawl with a slime has made this place collapsed. It wasn't a big",
+            "deal anyways, since people has abandoned this probably a very long time",
+            "ago.",
+        ],
+        commands: ["back", "???"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.1"
+            }
+            if (args[0] == "???") {
+                if (!player.des.giftHunterStates.easter3) {
+                    consolePrint(`You found a doubler!`)
+                    consolePrint(`You put the doubler into the inventory.`)
+                    player.des.giftHunterInventory.doubler = (player.des.giftHunterInventory.doubler || 0) + 1
+                    player.des.giftHunterStates.easter3 = true;
+                } else {
+                    consolePrint(`There's nothing interesting here.`)
+                }
+            }
+        }
+    },
+    "1.12": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You go inside the windmill through the holes on the walls. Gosh the place",
+            "could literally collapse at any moment and you wouldn't even know it.",
+            "Anyways, the place seems empty. Not even a single thing is here for you",
+            "to even think about looting. Or maybe you need to look really hard to",
+            "find a valuable thing here, but you're not going to want to make this",
+            "already not-in-a-good-condition building collapse on your head.",
+        ],
+        commands: ["back"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "1.11b"
+            }
+        }
+    },
+    "2.1": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You decided to find some giftcodes in-game. You open your trust-worthy",
+            "Aireagle Browser(tm) and soon realized a problem. The Internet is just",
+            "impossibly vast. Finding giftcodes here is like finding diamond in the",
+            "middle of the ocean. Is that even possible? Where should you even start?",
+        ],
+        commands: ["search", "find", "open"],
+        onCommand(args) {
+            if (args[0] == "search") {
+                if (!args[1]) {
+                                 // -----------------------------------------------------------------------
+                    consolePrint(`You search your browser for some clues about places to find giftcodes.`)
+                    consolePrint(`There is a news article place where you can find gaming news. You also`)
+                    consolePrint(`have a chat client installed, for when you want to have casual chit-chat`)
+                    consolePrint(`with some of the gaming crew members. Yeah, you're all about gaming and`)
+                    consolePrint(`gaming. The fact that your girlfriend also support gaming means you two`)
+                    consolePrint(`goes pretty well with each other, too, and also you're even more into`)
+                    consolePrint(`gaming. Maybe you should do something else for your life. I don't know,`)
+                    consolePrint(`it's just a suggestion.`)
+                } else {
+                                 // -----------------------------------------------------------------------
+                    consolePrint(`Your search engine service seems to be offline. Gosh, we do you even`)
+                    consolePrint(`choose to use <i>that</i> search engine? There is no way you can switch`)
+                    consolePrint(`it to something else now, because the people who made the browser think`)
+                    consolePrint(`"hey, we can ship a half-done project" and everytime you try to change`)
+                    consolePrint(`search engines now the browser just... crashes. Yeah, you can't do`)
+                    consolePrint(`anything now, tough luck, I guess.`)
+                }
+            } else if (args[0] == "find") {
+                if (args[1] == "for") {
+                    args.splice(1, 1); 
+                }
+                if (args[1] == "some" || args[1] == "a") {
+                    args.splice(1, 1); 
+                }
+
+                if (!args[1]) {
+                    consolePrint(`Find? Find what? There's a lot to find in this game!`)
+                } else if (["giftcode", "giftcodes", "code", "codes"].includes(args[1])) {
+                    if (!args[2]) {
+                        consolePrint(`You don't think that you can find any gift codes in this area.`)
+                        consolePrint("(ingame, online, outside)")
+                    } else if (args[2] == "ingame") {
+                        player.des.giftHunterState = "1.1"
+                    } else if (args[2] == "online") {
+                        consolePrint(`You already trying to do that, you doofus!`)
+                    } else if (args[2] == "outside") {
+                        player.des.giftHunterState = "3.1"
+                    }
+                } else {
+                    consolePrint(`You don't feel like wanting to find ${args[1]} in the game right now.`)
+                }
+            } else if (args[0] == "open") {
+                if (!args[1]) {
+                    consolePrint(`Which program do you want to open?`)
+                } else if (["news"].includes(args[1])) {
+                    player.des.giftHunterState = "2.2"
+                } else if (["chat"].includes(args[1])) {
+                    player.des.giftHunterState = "2.3"
+                } else {
+                    consolePrint(`You don't have ${args[1]} installed on your computer.`)
+                }
+            }
+        }
+    },
+    "2.2": {
+        message: [
+            // -----------------------------------------------------------------------
+            `You open the news. There are only news articles about the game you're`,
+            `currently playing.`,
+            ``,
+            `Type "check [number]" to view details.`,
+            "[1]: YCDAYWTD becomes the first video game to reach 1 billion players",
+            "[2]: YCDAYWTD celebrates its new update with a gift code hunt",
+            "[3]: Questions about the YCDAYWTD team",
+            "[4]: All known YCDAYWTD gift codes",
+        ],
+        commands: ["back", "check"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "2.1"
+            } else if (args[0] == "check") {
+                if (!args[1]) {
+                    consolePrint(`Which article do you want to check?`)
+                } else if (args[1] == "1") {
+                                 // -----------------------------------------------------------------------
+                    consolePrint(`<u>YCDAYWTD becomes the first video game to reach 1 billion players</u>`)
+                    consolePrint(`The recent hit game, YCDAYWTD, has broken two world records at once. It`)
+                    consolePrint(`not only became the first video game to surpass 1 billion registered`)
+                    consolePrint(`accounts, but it also did it in record time - only 3 months since it was`)
+                    consolePrint(`released. The game, as in its name, allows players to do everything they`)
+                    consolePrint(`can think of, including <r>CM@U$Bl7Q+E+Ns,Ch3</r>, <r>E,8s#+Cf>-F)Yi6@:O"_Er</r>,`)
+                    consolePrint(`and even <r>@rH7,Ec5b:FD,5.B5_s)Ec,\`*DKG</r>. It has got an extra-`)
+                    consolePrint(`ordinary rating and is the only game that has a perfect 100% rating with`)
+                    consolePrint(`over 50 million reviews. Expert claims it will continue to rise in`)
+                    consolePrint(`popularity, since more and more people are starting to join in this`)
+                    consolePrint(`masterpiece.`)
+                } else if (args[1] == "2") {
+                                 // -----------------------------------------------------------------------
+                    consolePrint(`<u>YCDAYWTD celebrates its new update with a gift code hunt</u>`)
+                    consolePrint(`Today is the day that the recent hit video game, TCDAYWTD, releases a`)
+                    consolePrint(`new update that it quotes, "changes everything that you see about video`)
+                    consolePrint(`game, forever". As a way to compensate players, they also opened a new,`)
+                    consolePrint(`global scale gift code hunt. Over 300,000 new gift codes has been created`)
+                    consolePrint(`only for this event. The hunt happens both in-game and in real life, so`)
+                    consolePrint(`players are now encouraged to go outside to get new in-game items and`)
+                    consolePrint(`real life rewards. News outlets and celebrities are also given unique`)
+                    consolePrint(`codes, for example, the code "newupdate" is exclusive to this news`)
+                    consolePrint(`articles and will give you a solid ×13.37 multiplier to its unique`)
+                    consolePrint(`multiplier ranking system.`)
+                    player.des.giftHunterStates.msg3 = true;
+                } else if (args[1] == "3") {
+                                 // -----------------------------------------------------------------------
+                    consolePrint(`<u>Questions about the YCDAYWTD team</u>`)
+                    consolePrint(`<i>This article has been taken down due to very frequent unexpected</i>`)
+                    consolePrint(`<i>corruption randomly happening. Sorry for the inconvenience.</i>`)
+                    consolePrint(`<r>/Ke#+AKY,C6pXsW<(%j.ARTE</r>`)
+                } else if (args[1] == "4") {
+                                 // -----------------------------------------------------------------------
+                    consolePrint(`<u>All known YCDAYWTD gift codes</u>`)
+                    consolePrint(`These are all the available giftcodes that I managed to find:`)
+                    consolePrint(`- <r>>B4:c@:OCjA6f</r>`)
+                    consolePrint(`- <r>HXpQ,@3B-+E-6&2ARp2</r>`)
+                    consolePrint(`- yadmir2164`)
+                    consolePrint(`- <r>BOPR_/0JhK</r>`)
+                    consolePrint(`- <r>H#IgJ@\<,p%DJsV\>F*2G@Df]K#+EVNE@V$ZqATD\></r>`)
+                    consolePrint(`- <r>FE2YDAT2Hs@<5u</r> <i>(hint: .11 .3 -1^4 (.2)^2 -32 .5 ...?)</i>`)
+                    player.des.giftHunterStates.msg4 = true;
+                } else {
+                    consolePrint(`No such article exists, sorry`)
+                }
+            }
+        },
+    },
+    "2.3": {
+        message: [
+            // -----------------------------------------------------------------------
+            `You open the chat. No one was online. You can still check the previous`,
+            `chat logs though.`,
+            ``,
+            `Type "view [number] {page}" to view details.`,
+            "[1]: lobby 2194-2-6",
+            "[2]: announcement 2194-2-7",
+        ],
+        commands: ["back", "view"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "2.1"
+            } else if (args[0] == "view") {
+                if (!args[1]) {
+                    consolePrint(`Which log do you want to view?`)
+                } else if (args[1] == "1") {
+                    if (!args[2] || args[2] == "1") {
+                                    // -----------------------------------------------------------------------
+                        consolePrint(`==== <u>MESSAGE LOG | 2194 02 06 | @aethercamp.dze.us : lobby</u> ==============`)
+                        consolePrint(`aetrMker: hey ^FC000000`)
+                        consolePrint(`aetrMker: so about the codes that you found`)
+                        consolePrint(`FC000000: Oh`)
+                        consolePrint(`FC000000: What happened?`)
+                        consolePrint(`aetrMker: some of the codes are corrupted`)
+                        consolePrint(`aetrMker: they appear as random mess of characters written in red`)
+                        consolePrint(`FC000000: Not again`)
+                        consolePrint(`FC000000: Things like this happen a lot recently now`)
+                        consolePrint(`FC000000: It's like all of the electronics in the world are getting`)
+                        consolePrint(`FC000000: simultaniously degraded at the same time`)
+                        consolePrint(`aetrMker: yeah, it do be happen pretty frequently`)
+                        consolePrint(`aetrMker: do you still have any leftovers`)
+                        consolePrint(`==== Page 1 of 6 =[ #..... ]=============================================`)
+                    } else if (args[2] == "2") {
+                                    // -----------------------------------------------------------------------
+                        consolePrint(`==== <u>MESSAGE LOG | 2194 02 06 | @aethercamp.dze.us : lobby</u> ==============`)
+                        consolePrint(`FC000000: I do not remember all of them`)
+                        consolePrint(`FC000000: Let me check`)
+                        consolePrint(`[ FC000000 left chat. 1 online. ]`)
+                        consolePrint(`[ FC000000 joined chat. 2 online. ]`)
+                        consolePrint(`FC000000: Yeah, most of them are corrupted`)
+                        consolePrint(`FC000000: I'm still able to get a few though`)
+                        consolePrint(`FC000000: Like "christmas_event_perm"`)
+                        consolePrint(`aetrMker: i already reddemed it though`)
+                        consolePrint(`FC000000: or how about <r>4C\`29F)u&-Bk:ftBl7O$Ec#6,Bl@lQ</r>`)
+                        consolePrint(`aetrMker: ooh didn't try it yet`)
+                        consolePrint(`aetrMker: let's see`)
+                        consolePrint(`aetrMker: oh the game says it's invalid`)
+                        consolePrint(`==== Page 2 of 6 =[ =#.... ]=============================================`)
+                        player.des.giftHunterStates.chat1 = true;
+                    } else if (args[2] == "3") {
+                                    // -----------------------------------------------------------------------
+                        consolePrint(`==== <u>MESSAGE LOG | 2194 02 06 | @aethercamp.dze.us : lobby</u> ==============`)
+                        consolePrint(`FC000000: Well, the code might have been temporary`)
+                        consolePrint(`FC000000: They make that all the time, just to lure new people into a`)
+                        consolePrint(`FC000000: game that's already succeed`)
+                        consolePrint(`FC000000: People just don't get enough taste of money`)
+                        consolePrint(`aetrMker: the game's not that pay2win though`)
+                        consolePrint(`aetrMker: it's all about gift codes`)
+                        consolePrint(`aetrMker: and a constant search of them`)
+                        consolePrint(`aetrMker: even the real world is filled with codes for a single game`)
+                        consolePrint(`aetrMker: i don't even think they can even do this for just under three`)
+                        consolePrint(`aetrMker: month`)
+                        consolePrint(`FC000000: Yeah, they did something very great`)
+                        consolePrint(`aetrMker: anyways, how the search's going`)
+                        consolePrint(`==== Page 3 of 6 =[ ==#... ]=============================================`)
+                    } else if (args[2] == "4") {
+                                    // -----------------------------------------------------------------------
+                        consolePrint(`==== <u>MESSAGE LOG | 2194 02 06 | @aethercamp.dze.us : lobby</u> ==============`)
+                        consolePrint(`FC000000: Not very well actually`)
+                        consolePrint(`FC000000: Most of the codes I tried are just plain invalid`)
+                        consolePrint(`FC000000: I can only be able to find a working one every week and a half`)
+                        consolePrint(`aetrMker: well that sucks`)
+                        consolePrint(`aetrMker: codes are literally everything in the game`)
+                        consolePrint(`aetrMker: it used to be abundant`)
+                        consolePrint(`FC000000: They just have no idea for the new codes`)
+                        consolePrint(`FC000000: But they announced a feature that's will rebalance the game`)
+                        consolePrint(`FC000000: And make the code finding obsolete`)
+                        consolePrint(`FC000000: They said`)
+                        consolePrint(`aetrMker: seems good`)
+                        consolePrint(`aetrMker: no one gonna need to take half of their time finding codes`)
+                        consolePrint(`==== Page 4 of 6 =[ ===#.. ]=============================================`)
+                    } else if (args[2] == "5") {
+                                    // -----------------------------------------------------------------------
+                        consolePrint(`==== <u>MESSAGE LOG | 2194 02 06 | @aethercamp.dze.us : lobby</u> ==============`)
+                        consolePrint(`aetrMker: and instead just focus on the game itself`)
+                        consolePrint(`FC000000: I think code finding to be interesting though`)
+                        consolePrint(`FC000000: It's when you go to a place that's you don't expect to find`)
+                        consolePrint(`FC000000: game codes anywhere, and bam, game codes`)
+                        consolePrint(`aetrMker: that's what i hate about it`)
+                        consolePrint(`aetrMker: code finding is just way too hard for my taste`)
+                        consolePrint(`aetrMker: there's literally one people found on the middle of the ocean`)
+                        consolePrint(`aetrMker: like, the literal ocean`)
+                        consolePrint(`aetrMker: the game would be okay if progression doesn't rely on basically`)
+                        consolePrint(`aetrMker: finding a grain of rice in a dessert`)
+                        consolePrint(`aetrMker: but this, i just basical`)
+                        consolePrint(`[ aetrMker left chat. 1 online. ]`)
+                        consolePrint(`==== Page 5 of 6 =[ ====#. ]=============================================`)
+                    } else if (args[2] == "6") {
+                                    // -----------------------------------------------------------------------
+                        consolePrint(`==== <u>MESSAGE LOG | 2194 02 06 | @aethercamp.dze.us : lobby</u> ==============`)
+                        consolePrint(`FC000000: You offline?`)
+                        consolePrint(`FC000000: I guess I'll talk to you next time, I guess`)
+                        consolePrint(`[ FC000000 left chat. 0 online. ]`)
+                        consolePrint(`[ END OF MESSAGE LOG. ]`)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(`==== Page 6 of 6 =[ =====# ]=============================================`)
+                    } else {
+                                    // -----------------------------------------------------------------------
+                        consolePrint(`==== <u>MESSAGE LOG | 2194 02 06 | @aethercamp.dze.us : lobby</u> ==============`)
+                        consolePrint(``)
+                        consolePrint(`....../.  An error has occurred:`)
+                        consolePrint(`.##..|..`)
+                        consolePrint(`.....|..  Invalid page or page not exists`)
+                        consolePrint(`.##..|..`)
+                        consolePrint(`......\\.`)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(`==== Page ??? of 6 =[ ?????? ]===========================================`)
+                    }
+                } else if (args[1] == "2") {
+                    if (!args[2] || args[2] == "1") {
+                                    // -----------------------------------------------------------------------
+                        consolePrint(`==== <u>MESSAGE LOG | 2194 02 07 | @aethercamp.dze.us : announcement</u> =======`)
+                        consolePrint(`[SYSTEM]: +----------------------------------------+`)
+                        consolePrint(`[SYSTEM]: | == WE ARE REGRET TO INFORM YOU THAT == |`)
+                        consolePrint(`[SYSTEM]: |         CAMP LEADER: ^aetrMker         |`)
+                        consolePrint(`[SYSTEM]: | ========== HAS DISAPPEARED =========== |`)
+                        consolePrint(`[SYSTEM]: +----------------------------------------+`)
+                        consolePrint(`[SYSTEM]: The camp leader role has been temporarily transfered to`)
+                        consolePrint(`[SYSTEM]: ^FC000000 until any extra information is found.`)
+                        consolePrint(`[ END OF MESSAGE LOG. ]`)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(`==== Page 1 of 1 =[ # ]==================================================`)
+                    } else {
+                                    // -----------------------------------------------------------------------
+                        consolePrint(`==== <u>MESSAGE LOG | 2194 02 07 | @aethercamp.dze.us : announcement</u> =======`)
+                        consolePrint(``)
+                        consolePrint(`....../.  An error has occurred:`)
+                        consolePrint(`.##..|..`)
+                        consolePrint(`.....|..  Invalid page or page not exists`)
+                        consolePrint(`.##..|..`)
+                        consolePrint(`......\\.`)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(``)
+                        consolePrint(`==== Page ??? of 1 =[ ? ]================================================`)
+                    }
+                } else {
+                    consolePrint(`There's no such log.`)
+                }
+            }
+        }
+    },
+    "3.1": {
+        message: [
+            // -----------------------------------------------------------------------
+            "You decided to find some giftcodes outside. Well, outside your computer,",
+            "at least. You start looking at your room. Since I just suck at describing",
+            "things in words, here's an ASCII map representation of your room instead.",
+            "",
+            " +---=---+   =  door         C  computer",
+            " |B..@...|   -| walls        h  bed",
+            " |C.....h|   @  you",
+            " +-------+   B  bookshelf",
+            "",
+            "Yeah, it's small and has almost nothing in it. You're planning on getting",
+            "a bigger one, but you'll need to have a larger multiplier though.",
+        ],
+        commands: ["find", "inspect", "multi?"],
+        onCommand(args) {
+            if (args[0] == "find") {
+                if (args[1] == "for") {
+                    args.splice(1, 1); 
+                }
+                if (args[1] == "some" || args[1] == "a") {
+                    args.splice(1, 1); 
+                }
+
+                if (!args[1]) {
+                    consolePrint(`Find? Find what? There's a lot to find in this game!`)
+                } else if (["giftcode", "giftcodes", "code", "codes"].includes(args[1])) {
+                    if (!args[2]) {
+                        consolePrint(`You don't think that you can find any gift codes in this area.`)
+                        consolePrint("(ingame, online, outside)")
+                    } else if (args[2] == "ingame") {
+                        player.des.giftHunterState = "1.1"
+                    } else if (args[2] == "online") {
+                        player.des.giftHunterState = "2.1"
+                    } else if (args[2] == "outside") {
+                        consolePrint(`You already trying to do that, you doofus!`)
+                    }
+                } else {
+                    consolePrint(`You don't feel like wanting to find ${args[1]} in the game right now.`)
+                }
+            } else if (args[0] == "inspect") {
+                if (!args[1]) {
+                    consolePrint(`Which item do you want to inspect?`)
+                } else if (args[1] == "bookshelf") {
+                                // -----------------------------------------------------------------------
+                    consolePrint(` +---=---+`)
+                    consolePrint(` |B@.....|`)
+                    consolePrint(` |C.....h|`)
+                    consolePrint(` +-------+`)
+                    consolePrint(``)
+                    consolePrint(`The bookshelf contains a large amount of games, most of them are role-`)
+                    consolePrint(`playing ones. You have an obsession with role-playing games. The feeling`)
+                    consolePrint(`of emerging yourself with another world, where you can forget about this`)
+                    consolePrint(`stupid pathetic world and the awful multiplier hierarchy system. You`)
+                    consolePrint(`just can't resist it. You rebought most of these though, since you have`)
+                    consolePrint(`a very low multiplier, therefore you can't even afford new and modern`)
+                    consolePrint(`games. The only modern game you can actually get is the only one you`)
+                    consolePrint(`previously played. It's okay though, since most of the new games suck`)
+                    consolePrint(`anyways.`)
+                } else if (args[1] == "computer") {
+                                // -----------------------------------------------------------------------
+                    consolePrint(` +---=---+`)
+                    consolePrint(` |B......|`)
+                    consolePrint(` |C@....h|`)
+                    consolePrint(` +-------+`)
+                    consolePrint(``)
+                    consolePrint(`You have this one old computer you got quite a few years ago. It's can`)
+                    consolePrint(`still be able to do useful things though, such as browsing the internet`)
+                    consolePrint(`and play low to mid end games, but you're starting to run low on physical`)
+                    consolePrint(`disk space. You recently used it to play a game, of which you're needing`)
+                    consolePrint(`to find gift-codes for it. It's such a good game, being able to keep you`)
+                    consolePrint(`and your friend for hours and hours. But hey, you're here to find codes,`)
+                    consolePrint(`that's why you stepped off your computer in the first place!`)
+                } else if (args[1] == "bed") {
+                                // -----------------------------------------------------------------------
+                    consolePrint(` +---=---+`)
+                    consolePrint(` |B......|`)
+                    consolePrint(` |C....@h|`)
+                    consolePrint(` +-------+`)
+                    consolePrint(``)
+                    consolePrint(`A bed. You sleep on this.`)
+                } else if (args[1] == "door") {
+                    player.des.giftHunterState = "3.1.1"
+                } else {
+                    consolePrint(`You don't have any ${args[1]} on your room.`)
+                }
+            } else if (args[0] == "multi?") {
+                            // -----------------------------------------------------------------------
+                consolePrint(`Oh, you're asking about the multiplier? That's basically the way you`)
+                consolePrint(`people decided to rank everyone in this world now. Just like money, the`)
+                consolePrint(`larger multiplier you have, the better things you can do. It's kinda`)
+                consolePrint(`like an experience system, but for each meaningful things you do, it`)
+                consolePrint(`multiplies instead of adds. The problem with it is they tried to apply`)
+                consolePrint(`it to basically <i>everything</i> in your life, including something as basic`)
+                consolePrint(`as opening doors!? Why do they even lock such thing behind a grind wall?`)
+            }
+        }
+    },
+    "3.1.1": {
+        message: [
+            // -----------------------------------------------------------------------
+            " +---=---+",
+            " |B..@...|",
+            " |C.....h|",
+            " +-------+",
+            "",
+            "The door seems to be locked by a password. It insists you on opening it.",
+        ],
+        commands: ["back", "enter"],
+        onCommand(args) {
+            if (args[0] == "back") {
+                player.des.giftHunterState = "3.1"
+            } else if (args[0] == "enter") {
+                if (!args[1]) {
+                    consolePrint(`What's the password?`)
+                    consolePrint(`Hint: multiplier`)
+                } else if (args[1] == format(player.des.giftHunterMulti)) {
+                    if (player.des.giftHunterMulti.gte(2.595e11)) {
+                        player.des.giftHunterState = "3.2"
+                    } else {
+                        consolePrint(`You did it right, but it's not the time yet.`)
+                        consolePrint(`Try again when your multiplier is bigger.`)
+                    }
+                } else {
+                    consolePrint(`That's not the password!`)
+                    consolePrint(`Hint: multiplier`)
+                }
+            }
+        },
+    },
+    "3.2": {
+        message: [
+            // -----------------------------------------------------------------------
+            " +--- ---+",
+            " |B..@...|",
+            " |C.....h|",
+            " +-------+",
+            "",
+            "The door opens. You can now step outside.",
+        ],
+        commands: ["go"],
+        onCommand(args) {
+            if (args[0] == "go") {
+                player.des.giftHunterMulti = player.des.giftHunterMulti.mul(1000000)
+                player.des.giftHunterState = "3.3"
+            }
+        }
+    },
+    "3.3": {
+        message: [
+            // -----------------------------------------------------------------------
+            "ok, i'm not going to do anymore of this",
+            "here's a 1,000,000 multiplier so I can end this game quick",
+        ],
+        commands: [],
+        onCommand(args) {
+        }
+    },
+}
+
+function startGiftHunterGame(id) {
+    player.des.giftHunterGameData.id = id
+    player.des.giftHunterGameData.data = JSON.parse(JSON.stringify(giftHunterGames[id].data))
+}
+
+function getGiftHunterGameCoordinate(x, y) {
+    let yData = player.des.giftHunterGameData.data[y]
+    if (!yData) return null
+    return yData[x] || null
+}
+
+function getGiftHunterGamePlayer() {
+    let data = player.des.giftHunterGameData.data
+    let y = 0
+    for (let yData of data) {
+        let x = 0
+        for (let xData of yData) {
+            if (xData && xData.find) {
+                let find = xData.find(x => x[0] == "p")
+                if (find) return [x, y]
+            }
+            x++
+        }
+        y++
+    }
+    return null
+}
+
+function isGiftHunterGameCompleted() {
+    let data = player.des.giftHunterGameData.data
+    for (let yData of data) {
+        for (let xData of yData) {
+            if (xData && xData.find) {
+                let find = xData.find(x => x[0] == "e")
+                if (find) return false
+            }
+        }
+    }
+    return true
+}
+
+function getGiftHunterGameDisplay() {
+    if (!player.des.giftHunterGameData.data) return ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
+
+    let pos = getGiftHunterGamePlayer()
+    if (!pos) pos = [0, 0, true]
+    let data = player.des.giftHunterGameData.data
+    let height = giftHunterGames[player.des.giftHunterGameData.id].height
+    let lines = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
+
+    let yOffset = Math.max(pos[0] * height - 6, -1)
+    
+    for (let yData of data) {
+        for (let a = 1; a <= lines.length; a++) {
+            let xData = yData[Math.floor((a + yOffset - 1) / height)]
+            if (xData) {
+                if ((a + yOffset) % height == 0) lines[lines.length - a] += " >------< "
+                else if (xData[(a + yOffset - 1) % height]) {
+                    let node = xData[(a + yOffset - 1) % height]
+                    let plus = Math.max(node.lastIndexOf("+"), 0)
+                    let txt = node.substring(1, plus || node.length).padStart(6, " ")
+                    switch (node[0]) {
+                        case 'p': txt = `<span style="color:black;background:var(--color)">${txt}</span>`; break
+                        case 'e': txt = "<r" + (plus ? ` style='text-shadow:0 0 10px red'` : "") + ">" + txt + "</r>"; break
+                        case '+': txt = "<g>" + "+" + txt.substring(1) + "</r>"; break
+                        case '*': txt = (+txt < 100 ? "<r>" : "") + "×" + txt.substring(2) + "%</r>"; break
+                    }
+
+                    lines[lines.length - a] += " |" + txt + "| "
+                } else lines[lines.length - a] += " |      | ";
+            } else {
+                if (a + yOffset == 0) lines[lines.length - a] += "----------";
+                else if (yData[Math.floor((a + yOffset - 1) / height) + 1] && (a + yOffset) % height == 0) lines[lines.length - a] += " >------< ";
+                else if (yData[Math.floor((a + yOffset - 1) / height) - 1] && (a + yOffset) % height == 1) lines[lines.length - a] += " /^^^^^^\\ ";
+                else lines[lines.length - a] += "          ";
+            }
+        }
+    }
+    if (pos[2]) {
+        lines.shift(); lines.push(`Type "restart" to try again.`);
+    }
+    return lines
+}
+
+function giftHunterGameMoveRelative(dir) {
+    let pos = getGiftHunterGamePlayer()
+    if (!pos) return
+    let target = getGiftHunterGameCoordinate(pos[0] + dir[0], pos[1] + dir[1])
+    if (!target) return
+    
+    let pData = player.des.giftHunterGameData.data[pos[1]][pos[0]].shift()
+    player.des.giftHunterGameData.data[pos[1] + dir[1]][pos[0] + dir[0]].unshift(pData)
+
+    let data = player.des.giftHunterGameData.data[pos[1] + dir[1]][pos[0] + dir[0]]
+    if (data[1]) {
+        let hp0 = +data[0].substring(1, Math.max(data[0].lastIndexOf("+"), 0) || data[0].length)
+        let hp1 = +data[1].substring(1, Math.max(data[1].lastIndexOf("+"), 0) || data[1].length) 
+        if (data[1][0] == "e") {
+            if (hp0 > hp1) {
+                data.splice(1, 1)
+                data[0] = "p" + (hp0 + hp1)
+            } else {
+                data.shift()
+                data[0] = "e" + (hp0 + hp1)
+            }
+        } else if (data[1][0] == "*") {
+            data.splice(1, 1)
+            data[0] = "p" + Math.floor(hp0 / 100 * hp1)
+        } else if (data[1][0] == "+") {
+            data.splice(1, 1)
+            data[0] = "p" + Math.floor(hp0 + hp1)
+        }
+    }
+
+    if (isGiftHunterGameCompleted()) {
+        giftHunterGames[player.des.giftHunterGameData.id].complete()
+        player.des.giftHunterGameData = {}
+    } else {
+        giftHunterGameIncrement()
+    }
+}
+
+function giftHunterGameIncrement() {
+    let data = player.des.giftHunterGameData.data
+    for (let yData of data) {
+        for (let xData of yData) {
+            if (!xData) continue
+            let x = 0
+            for (let e of xData) {
+                if (!e) continue
+                let plus = Math.max(e.lastIndexOf("+"), 0)
+                if (plus) {
+                    let hp = +e.substring(1, plus)
+                    let inc = +e.substring(plus + 1)
+                    xData[x] = e[0] + (hp + inc) + "+" + inc
+                }
+            }
+            x++
+        }
+    }
+    return null
+}
+
+let giftHunterGames = {
+    "1": {
+        type: "tower",
+        height: 2,
+        data: [
+            [["p4"]],
+            [["e2"], ["e1"], ["e3"], ["e9"], ["e2"]],
+            [["e33"], ["e15"], ["e42"], ["e42"], ["e38"], ["e50"], ["e15"]],
+            [["e48"], ["e42"], ["e60"], ["e80"], ["e60"], ["e84"], ["e42"], ["e60"], ["e35"]],
+            [["e130"], ["e160"], ["e150"], ["e150"], ["e190"], ["e170"], ["e180"], ["e150"], ["e999"]],
+        ],
+        complete() {
+            player.des.giftHunterState = "1.7b2"
+            player.des.giftHunterStates.game1 = true
+            player.des.giftHunterInventory.smallBoost = (player.des.giftHunterInventory.smallBoost || 0) + 2
+            player.des.giftHunterInventory.mediumBoost = (player.des.giftHunterInventory.mediumBoost || 0) + 1
+        }
+    },
+    "2": {
+        type: "dungeon",
+        height: 2,
+        data: [
+            [null,      null,      null,      ["e150"],  ["e23"],   ["e12"],   ["e24"],   null,      null,      null,       null,      null,      null,       ],
+            [null,      null,      null,      ["e37"],   null,      null,      ["e32"],   null,      null,      ["e4000"],  null,      null,      ["e9999"],  ],
+            [null,      null,      null,      ["e12"],   null,      null,      ["e48"],   null,      null,      ["e1500"],  null,      null,      ["e5246"],  ],
+            [["p4"],    ["e3"],    ["e5"],    ["e6"],    ["e499"],  ["e999"],  ["e82"],   null,      null,      ["*10"],    null,      null,      ["e3621"],  ],
+            [null,      null,      null,      ["e16"],   null,      null,      ["e64"],   null,      null,      ["e1500"],  null,      null,      ["e1742"],  ],
+            [null,      null,      null,      ["e20"],   null,      null,      ["e18"],   ["e200"],  ["*50"],   ["e1000"],  null,      null,      ["e925"],   ],
+            [null,      null,      null,      ["e30"],   ["e20"],   null,      null,      null,      null,      ["*50"],    ["e1500"], ["e3000"], ["e425"],   ],
+        ],
+        complete() {
+            player.des.giftHunterState = "1.8b2"
+            player.des.giftHunterStates.game2 = true
+            player.des.giftHunterInventory.quintupler = (player.des.giftHunterInventory.quintupler || 0) + 1
+        }
+    },
+    "3": {
+        type: "dungeon",
+        height: 3,
+        data: [
+            [["p20"], [], ["+5"], ],
+            [null, ["e20+1"], ],
+            [["e20"], ["e16"], ["e40+6"], ["e34"], ],
+            [null, null, null, ["e199"] ],
+            [["e20", "e40"], ["e16", "e70"], ["e16", "e125"], ["*5"], ["e110+9"], ],
+            [null, null, null, ["e599"] ],
+            [["e20", "e30", "e640"], ["e16", "e50", "e199"], ["e10", "e100"], ["*1"], ["e30+5"], ],
+        ],
+        complete() {
+            player.des.giftHunterState = "1.10b2"
+            player.des.giftHunterStates.game3 = true
+            player.des.giftHunterInventory.quintupler = (player.des.giftHunterInventory.quintupler || 0) + 1
+            player.des.giftHunterInventory.tripler = (player.des.giftHunterInventory.tripler || 0) + 1
+            player.des.giftHunterInventory.doubler = (player.des.giftHunterInventory.doubler || 0) + 1
+            player.des.giftHunterInventory.smallBoost = (player.des.giftHunterInventory.smallBoost || 0) + 2
+            player.des.giftHunterInventory.mediumBoost = (player.des.giftHunterInventory.mediumBoost || 0) + 3
+        }
+    },
+    "4": {
+        type: "tower",
+        height: 2,
+        data: [
+            [["p4"], null, null, null, null,                null, null, null, null, null,                      ["e84"],  ],
+            [["e2"], ["e3"], ["e4"],   null, null,          ["e777"], ["e1444"], ["e2888"], ["e5895"], ["*1"], ["e116"], ["e9999"], ["e2888"], ],
+            [["e6"], ["e3"], ["e16"],  null, null,          ["e64"], ["e196"], ["e376"],    null, null,        ["e264"], ["e9999"], ["e2888"], ["e29999"], ["e59999"], ],
+            [["e9"], ["e32"], ["e64"], ["e112+2"], ["*10"], ["e27"], ["e32"], ["e64"],      null, null,        ["e273"], ["e999"],  ["e1987"], ],
+            [null, null, null, null, null,                  null, null, null, null,                 ["e8888"], ["e256"],  ],
+        ],
+        complete() {
+            player.des.giftHunterState = "1.11c"
+            player.des.giftHunterStates.game4 = true
+            player.des.giftHunterInventory.smallBoost = (player.des.giftHunterInventory.smallBoost || 0) + 3
+            player.des.giftHunterInventory.mediumBoost = (player.des.giftHunterInventory.mediumBoost || 0) + 2
+        }
+    },
+}

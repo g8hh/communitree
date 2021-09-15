@@ -4,6 +4,8 @@ let options = {}
 
 function getStartOptions() {
 	return {
+		optionTab: "saving",
+
 		autosave: true,
 		msDisplay: "always",
 		theme: null,
@@ -14,6 +16,7 @@ function getStartOptions() {
 		forceOneTab: false,
 		oldStyle: false,
 		antiEpilepsy: false,
+		notation: "default",
 	}
 }
 
@@ -75,4 +78,12 @@ function milestoneShown(layer, id) {
 			break;
 	}
 	return false;
+}
+
+const NT_DISPLAYS = ["FGH-J NOTATION", "HYPER-E", "CHAINED ARROWS", "FALLBACK NOTATION"];
+
+const NT_SETTINGS = ["default", "hypere", "chained", "fallback"];
+
+function adjustNotation() {
+	options.notation = NT_SETTINGS[(NT_SETTINGS.indexOf(options.notation) + 1) % NT_SETTINGS.length];
 }

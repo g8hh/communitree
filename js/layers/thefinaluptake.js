@@ -53,6 +53,12 @@ addLayer("tfu", {
     type: "none",
 
     effect() {
+        if (tmp[this.layer].deactivated) return {
+            compBonus: EN(1),
+            maxFlames: EN(0),
+            decaySpeed: EN(0),
+            coalBonus: EN(0),
+        }
         let eff = {
             compBonus: player.tfu.best.div(10).max(1).mul(player.tfu.best.max(10).log10()).pow(2),
             maxFlames: buyableEffect("tfu", 101).mul(buyableEffect("tfu", 102)),
@@ -789,6 +795,8 @@ addLayer("tfu", {
     },
 
     update(delta) {
+        if (tmp[this.layer].deactivated) return
+        
         if (tmp[this.layer].layerShown) {
             let data = calculateDerivative([0, player.tfu.flames, EN.neg(tmp.tfu.effect.decaySpeed)], 
                 player.tfu.flames.div(tmp.tfu.effect.decaySpeed).max(Number.MIN_VALUE).min(buyableEffect("tfu", 103).mul(delta))
