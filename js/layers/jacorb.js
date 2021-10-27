@@ -631,7 +631,7 @@ addLayer("jac", {
                 if (hasUpgrade("jac", 243)) time = time.mul(100)
                 time = softcap(time, EN(36000), .5)
                 if (hasUpgrade("jac", 264)) time = time.mul(100); if (hasUpgrade("jac", 265)) time = time.mul(100)
-                let eff = EN.pow(mul, x.add(bonus)).pow(time.div(x.add(6).mul(5)).add(1).log()).max(1);
+                let eff = EN.pow(mul, x.add(bonus)).pow(time.div(x.add(6).mul(5).min(1e10)).add(1).log()).max(1);
                 eff = eff.mul(buyableEffect("jac", 131));
                 return softcap(eff, EN("e1000000"), 0.1)
             },
