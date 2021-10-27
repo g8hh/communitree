@@ -1,5 +1,5 @@
 let modInfo = {
-	name: "The Communitree!",
+	name: "社区树 - The Communitree!",
 	id: "allofem",
 	author: "ducdat0507",
 	pointsName: "points",
