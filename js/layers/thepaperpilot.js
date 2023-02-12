@@ -173,7 +173,7 @@ addLayer("tpp", {
                 return true
             },
             canClick() {
-                return player.tpp.isDev ? tmp.tpp.effect.quality.gte(1) : true
+                return player.tpp.isDev ? tmp.tpp.effect.quality?.gte(1) : true
             },
             onClick() {
                 if (player.tpp.isDev) {
@@ -579,7 +579,7 @@ addLayer("tpp", {
                     ["row", [
                         ["column", () => player.tpp.isDev ? [
                             ["raw-html", "<h3>Logic</h3><hr style='margin-block: 10px'/>"],
-                            ["raw-html", "<h3>" + format(player.tpp.dev.loc, 0) + "</h3> lines of code<br/><h5>(" + format(tmp.tpp.effect.qualityMultis[0]) + " quality)</h5>"],
+                            ["raw-html", "<h3>" + format(player.tpp.dev.loc, 0) + "</h3> lines of code<br/><h5>(" + format(tmp.tpp.effect.qualityMultis?.[0]) + " quality)</h5>"],
                             ["blank", "5px"],
                             ["clickable", "c1"],
                             ["blank", "5px"],
@@ -596,7 +596,7 @@ addLayer("tpp", {
                         ], { width: "400px" }],
                         () => player.tpp.buyables[101].gte(1) ? ["column", (player.tpp.isDev ? [
                             ["raw-html", "<h3>Gameplay</h3><hr style='margin-block: 10px'/>"],
-                            ["raw-html", "<h3>" + format(player.tpp.dev.gameplay, 0) + "</h3> gameplay mechanics<br/><h5>(×" + format(tmp.tpp.effect.qualityMultis[1]) + " quality)</h5>"],
+                            ["raw-html", "<h3>" + format(player.tpp.dev.gameplay, 0) + "</h3> gameplay mechanics<br/><h5>(×" + format(tmp.tpp.effect.qualityMultis?.[1]) + " quality)</h5>"],
                             ["blank", "5px"],
                             ["clickable", "g1"],
                             ["blank", "5px"],
@@ -613,7 +613,7 @@ addLayer("tpp", {
                         ]), { width: "400px" }] : [],
                         () => player.tpp.buyables[101].gte(1) ? ["column", (player.tpp.isDev ? [
                             ["raw-html", "<h3>Graphics</h3><hr style='margin-block: 10px'/>"],
-                            ["raw-html", "<h3>" + format(player.tpp.dev.graphics[0], 0) + "</h3> pixels<br/><h5>(×" + format(tmp.tpp.effect.qualityMultis[2]) + " quality)</h5>"],
+                            ["raw-html", "<h3>" + format(player.tpp.dev.graphics[0], 0) + "</h3> pixels<br/><h5>(×" + format(tmp.tpp.effect.qualityMultis?.[2]) + " quality)</h5>"],
                             ["blank", "5px"],
                             ["clickable", "v1"],
                             ["blank", "5px"],
@@ -648,7 +648,7 @@ addLayer("tpp", {
                         ]), { width: "400px" }] : [],
                         () => player.tpp.buyables[101].gte(1) ? ["column", (player.tpp.isDev ? [
                             ["raw-html", "<h3>Audio</h3><hr style='margin-block: 10px'/>"],
-                            ["raw-html", "<h3>" + format(player.tpp.dev.audios[0], 0) + "</h3> sound effects<br/><h5>(×" + format(tmp.tpp.effect.qualityMultis[3]) + " quality)</h5>"],
+                            ["raw-html", "<h3>" + format(player.tpp.dev.audios[0], 0) + "</h3> sound effects<br/><h5>(×" + format(tmp.tpp.effect.qualityMultis?.[3]) + " quality)</h5>"],
                             ["blank", "5px"],
                             ["clickable", "a1"],
                             ["blank", "5px"],
