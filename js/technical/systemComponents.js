@@ -178,6 +178,8 @@ var systemComponents = {
 				</tr>
 				<tr>
 					<td><button class="opt" onclick="adjustNotation()">Large Number Format: {{ NT_DISPLAYS[NT_SETTINGS.indexOf(options.notation)]}}</button></td>
+					<td><button class="opt" onclick="adjustNotationLow()">Small Number Format: {{ NL_DISPLAYS[NL_SETTINGS.indexOf(options.notationLow)]}}</button></td>
+					<td><button class="opt" onclick="toggleOpt('newsTicker')">News Ticker: {{ options.newsTicker?"ON":"OFF" }}</button></td>
 				</tr> 
 			</table>
 		</div>`
@@ -215,6 +217,14 @@ var systemComponents = {
         <image id="img" v-bind:href="data.image" x="0" y="0" :height="data.width" :width="data.height" />
     	</mask>
     	</svg>
+		</div>
+		`
+	},
+
+	'news-ticker': {
+		props: ['data', 'index'],
+		template: `<div id="newsticker">
+			<div id="newsmessage" v-bind:style="{ left: newsTicker.pos + 'px' }" :class="{ new: newsTicker.new }" v-html="newsTicker.current"></div>
 		</div>
 		`
 	},

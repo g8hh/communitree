@@ -432,7 +432,7 @@ var interval = setInterval(function() {
 	if (needCanvasUpdate){ resizeCanvas();
 		needCanvasUpdate = false;
 	}
-	tmp.scrolled = document.getElementById('treeTab') && document.getElementById('treeTab').scrollTop > 30
+	tmp.scrolled = document.getElementById('treeTab') && document.getElementById('treeTab').scrollTop > 30;
 	updateTemp();
 	updateOomps(diff);
 	updateWidth()
@@ -441,6 +441,7 @@ var interval = setInterval(function() {
 	fixNaNs()
 	adjustPopupTime(trueDiff)
 	updateParticles(trueDiff)
+	updateNewsTicker(trueDiff);
 	ticking = false
 	frame += 1;
 }, 50)

@@ -26,23 +26,25 @@ addLayer("tfu", {
     layerShown() { return player.aca.modActive && player.aca.modLevel == 0 },
     deactivated() { return !this.layerShown() },
 
-    startData() { return {
-        points: EN(0),
-        ashes: EN(0),
-        flames: EN(1),
+    startData() {
+        return {
+            points: EN(0),
+            ashes: EN(0),
+            flames: EN(1),
 
-        elec: EN(0),
-        totalElec: EN(0),
-        elecDist: 0,
-        coal: EN(0),
-        totalCoal: EN(0),
-        coalTime: EN(0),
+            elec: EN(0),
+            totalElec: EN(0),
+            elecDist: 0,
+            coal: EN(0),
+            totalCoal: EN(0),
+            coalTime: EN(0),
 
-        autoUpgrades: false,
-        autoReplenish: false,
-        autoDistribute: false,
-        autoCoalUpgrades: false,
-    }},
+            autoUpgrades: false,
+            autoReplenish: false,
+            autoDistribute: false,
+            autoCoalUpgrades: false,
+        }
+    },
 
     resource: "thefinaluptake (α) points",
     color: "#c5cdef",
@@ -182,15 +184,16 @@ addLayer("tfu", {
             }
         },
         respecText() { return player.tfu.totalCoal.gte(1) ? "Respec coal upgrades" : "Respec bonus levels" },
-        respecMessage() { return player.tfu.totalCoal.gte(1) ? 
-            "Are you sure to respec coal upgrades? This will force a coal reset as well!" : 
-            "Are you sure to respec bonus levels? This will force an electricity reset as well!" 
+        respecMessage() {
+            return player.tfu.totalCoal.gte(1) ?
+                "Are you sure to respec coal upgrades? This will force a coal reset as well!" :
+                "Are you sure to respec bonus levels? This will force an electricity reset as well!"
         },
 
         101: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -216,8 +219,8 @@ addLayer("tfu", {
             canAfford() {
                 let data = tmp[this.layer].buyables[this.id]
                 return player.tfu.points.gte(data.cost)
-            }, 
-            buy() { 
+            },
+            buy() {
                 player.tfu.points = player.tfu.points.sub(this.cost())
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(hasMilestone("tfu", 7) ? player.tfu.totalCoal : 1)
             },
@@ -226,7 +229,7 @@ addLayer("tfu", {
         102: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -252,8 +255,8 @@ addLayer("tfu", {
             canAfford() {
                 let data = tmp[this.layer].buyables[this.id]
                 return player.tfu.points.gte(data.cost)
-            }, 
-            buy() { 
+            },
+            buy() {
                 player.tfu.points = player.tfu.points.sub(this.cost())
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(hasMilestone("tfu", 7) ? player.tfu.totalCoal : 1)
             },
@@ -262,7 +265,7 @@ addLayer("tfu", {
         103: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -288,8 +291,8 @@ addLayer("tfu", {
             canAfford() {
                 let data = tmp[this.layer].buyables[this.id]
                 return player.tfu.points.gte(data.cost)
-            }, 
-            buy() { 
+            },
+            buy() {
                 player.tfu.points = player.tfu.points.sub(this.cost())
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(hasMilestone("tfu", 7) ? player.tfu.totalCoal : 1)
             },
@@ -298,7 +301,7 @@ addLayer("tfu", {
         104: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -324,8 +327,8 @@ addLayer("tfu", {
             canAfford() {
                 let data = tmp[this.layer].buyables[this.id]
                 return player.tfu.points.gte(data.cost)
-            }, 
-            buy() { 
+            },
+            buy() {
                 player.tfu.points = player.tfu.points.sub(this.cost())
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(hasMilestone("tfu", 7) ? player.tfu.totalCoal : 1)
             },
@@ -334,7 +337,7 @@ addLayer("tfu", {
         105: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -360,8 +363,8 @@ addLayer("tfu", {
             canAfford() {
                 let data = tmp[this.layer].buyables[this.id]
                 return player.tfu.points.gte(data.cost)
-            }, 
-            buy() { 
+            },
+            buy() {
                 player.tfu.points = player.tfu.points.sub(this.cost())
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(hasMilestone("tfu", 7) ? player.tfu.totalCoal : 1)
             },
@@ -370,7 +373,7 @@ addLayer("tfu", {
         111: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -392,8 +395,8 @@ addLayer("tfu", {
             },
             canAfford() {
                 return player.tfu.elec.gte(1)
-            }, 
-            buy() { 
+            },
+            buy() {
                 let alloc = player.tfu.elec.pow(player.tfu.elecDist)
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(alloc)
                 player.tfu.elec = player.tfu.elec.sub(alloc)
@@ -403,7 +406,7 @@ addLayer("tfu", {
         112: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -425,8 +428,8 @@ addLayer("tfu", {
             },
             canAfford() {
                 return player.tfu.elec.gte(1)
-            }, 
-            buy() { 
+            },
+            buy() {
                 let alloc = player.tfu.elec.pow(player.tfu.elecDist)
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(alloc)
                 player.tfu.elec = player.tfu.elec.sub(alloc)
@@ -436,7 +439,7 @@ addLayer("tfu", {
         113: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -458,8 +461,8 @@ addLayer("tfu", {
             },
             canAfford() {
                 return player.tfu.elec.gte(1)
-            }, 
-            buy() { 
+            },
+            buy() {
                 let alloc = player.tfu.elec.pow(player.tfu.elecDist)
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(alloc)
                 player.tfu.elec = player.tfu.elec.sub(alloc)
@@ -469,7 +472,7 @@ addLayer("tfu", {
         114: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -491,8 +494,8 @@ addLayer("tfu", {
             },
             canAfford() {
                 return player.tfu.elec.gte(1)
-            }, 
-            buy() { 
+            },
+            buy() {
                 let alloc = player.tfu.elec.pow(player.tfu.elecDist)
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(alloc)
                 player.tfu.elec = player.tfu.elec.sub(alloc)
@@ -502,7 +505,7 @@ addLayer("tfu", {
         115: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -524,8 +527,8 @@ addLayer("tfu", {
             },
             canAfford() {
                 return player.tfu.elec.gte(1)
-            }, 
-            buy() { 
+            },
+            buy() {
                 let alloc = player.tfu.elec.pow(player.tfu.elecDist)
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(alloc)
                 player.tfu.elec = player.tfu.elec.sub(alloc)
@@ -535,7 +538,7 @@ addLayer("tfu", {
         121: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -561,8 +564,8 @@ addLayer("tfu", {
             canAfford() {
                 let data = tmp[this.layer].buyables[this.id]
                 return player.tfu.coal.gte(data.cost)
-            }, 
-            buy() { 
+            },
+            buy() {
                 player.tfu.coal = player.tfu.coal.sub(this.cost())
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(1)
             },
@@ -571,7 +574,7 @@ addLayer("tfu", {
         122: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -597,8 +600,8 @@ addLayer("tfu", {
             canAfford() {
                 let data = tmp[this.layer].buyables[this.id]
                 return player.tfu.coal.gte(data.cost)
-            }, 
-            buy() { 
+            },
+            buy() {
                 player.tfu.coal = player.tfu.coal.sub(this.cost())
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(1)
             },
@@ -607,7 +610,7 @@ addLayer("tfu", {
         123: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -633,8 +636,8 @@ addLayer("tfu", {
             canAfford() {
                 let data = tmp[this.layer].buyables[this.id]
                 return player.tfu.coal.gte(data.cost)
-            }, 
-            buy() { 
+            },
+            buy() {
                 player.tfu.coal = player.tfu.coal.sub(this.cost())
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(1)
             },
@@ -643,7 +646,7 @@ addLayer("tfu", {
         124: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -670,8 +673,8 @@ addLayer("tfu", {
             canAfford() {
                 let data = tmp[this.layer].buyables[this.id]
                 return player.tfu.coal.gte(data.cost)
-            }, 
-            buy() { 
+            },
+            buy() {
                 player.tfu.coal = player.tfu.coal.sub(this.cost())
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(1)
             },
@@ -680,7 +683,7 @@ addLayer("tfu", {
         125: {
             title() {
                 return ""
-            }, 
+            },
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
@@ -706,8 +709,8 @@ addLayer("tfu", {
             canAfford() {
                 let data = tmp[this.layer].buyables[this.id]
                 return player.tfu.coal.gte(data.cost)
-            }, 
-            buy() { 
+            },
+            buy() {
                 player.tfu.coal = player.tfu.coal.sub(this.cost())
                 player[this.layer].buyables[this.id] = player[this.layer].buyables[this.id].add(1)
             },
@@ -796,9 +799,9 @@ addLayer("tfu", {
 
     update(delta) {
         if (tmp[this.layer].deactivated) return
-        
+
         if (tmp[this.layer].layerShown) {
-            let data = calculateDerivative([0, player.tfu.flames, EN.neg(tmp.tfu.effect.decaySpeed)], 
+            let data = calculateDerivative([0, player.tfu.flames, EN.neg(tmp.tfu.effect.decaySpeed)],
                 player.tfu.flames.div(tmp.tfu.effect.decaySpeed).max(Number.MIN_VALUE).min(buyableEffect("tfu", 103).mul(delta))
             );
             player.tfu.ashes = player.tfu.ashes.add(data[0]).abs()
@@ -841,12 +844,11 @@ addLayer("tfu", {
                 title: "Main",
                 content: [
                     ["blank", "10px"],
-                    ["clickable", 100], 
+                    ["clickable", 100],
                     ["row", [["buyable", 101], ["buyable", 102], ["buyable", 103], ["buyable", 104], ["buyable", 105]]],
                     ["blank", "10px"],
-                    ["raw-html", () => player.tfu.totalElec.gte(1) ? `You have <h3>${formatWhole(player.tfu.elec)}</h3> electricity${
-                        hasMilestone("tfu", 3) ? `, which are giving ${format(player.tfu.elec.add(1).max(1).log())}% of your electricity gain on reset each second` : ""
-                    }.` : ``],
+                    ["raw-html", () => player.tfu.totalElec.gte(1) ? `You have <h3>${formatWhole(player.tfu.elec)}</h3> electricity${hasMilestone("tfu", 3) ? `, which are giving ${format(player.tfu.elec.add(1).max(1).log())}% of your electricity gain on reset each second` : ""
+                        }.` : ``],
                     ["blank", "10px"],
                     ["slider", ["elecDist", 0, 1, 0.01, (() => player.tfu.elec.gte(2)), (() => `Bulk electricity distribution:<br/>${formatWhole(player.tfu.elec.pow(player.tfu.elecDist).round())}`)]],
                     ["row", [["buyable", 111], ["buyable", 112], ["buyable", 113], ["buyable", 114], ["buyable", 115]]],

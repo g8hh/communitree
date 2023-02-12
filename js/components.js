@@ -620,6 +620,36 @@ function loadVue() {
 		`
 	})
 
+	Vue.component('tpp-mastery', {
+		props: ['layer', 'data'],
+		computed: {
+			level() { return player.tpp.masteries[this.data] },
+			max() {
+				return player.tpp.buyables[100].toNumber() 
+					- Object.values(player.tpp.masteries).reduce((a, b) => a + b) 
+					+ player.tpp.masteries[this.data];
+			},
+		},
+		template: `
+			<div class="tpp-mastery">
+				<div>{{level + 2 + ": " + (layers.tpp.masteries[data][level + 2] || "// NO DATA //")}}</div>
+				<div>{{level + 1 + ": " + (layers.tpp.masteries[data][level + 1] || "// NO DATA //")}}</div>
+				<div class="current">{{level + ": " + (layers.tpp.masteries[data][level] || "// NO DATA //")}}</div>
+				<div>{{level >= 1 ? level - 1 + ": " + (layers.tpp.masteries[data][level - 1] || "// NO DATA //") : ""}}</div>
+				<div>{{level >= 2 ? level - 2 + ": " + (layers.tpp.masteries[data][level - 2] || "// NO DATA //") : ""}}</div>
+				<button v-on:click="setTPPMastery(data, 0)" class="upg small">
+					0
+				</button><button v-on:click="setTPPMastery(data, Math.max(0, level - 1))" class="upg small">
+					-
+				</button><button v-on:click="setTPPMastery(data, Math.min(max, level + 1))" class="upg small">
+					+
+				</button><button v-on:click="setTPPMastery(data, max)" class="upg small">
+					{{format(max, 0)}}
+				</button>
+			</div>
+		`
+	})
+
 	// SYSTEM COMPONENTS
 	Vue.component('node-mark', systemComponents['node-mark'])
 	Vue.component('tab-buttons', systemComponents['tab-buttons'])
@@ -631,6 +661,7 @@ function loadVue() {
 	Vue.component('tooltip', systemComponents['tooltip'])
 	Vue.component('particle', systemComponents['particle'])
 	Vue.component('bg', systemComponents['bg'])
+	Vue.component('news-ticker', systemComponents['news-ticker'])
 
 
 	app = new Vue({
@@ -687,6 +718,8 @@ function loadVue() {
 			readData,
 			clickGachaMerge,
 			getMergeGachaStyle,
+			setTPPMastery,
+			newsTicker,
 		},
 	})
 }

@@ -66,6 +66,8 @@ function polarize(array, smallTop = false) {
 
 function format(decimal, precision = 2, small = false, verbose = false) {
     if (EN.isNaN(decimal)) return "NaN"
+    if (decimal == "Infinity") return "∞"
+    if (decimal == "-Infinity") return "-∞"
     small = small || modInfo.allowSmall
     let precision2 = Math.max(3, precision)
     decimal = new ExpantaNum(decimal)
@@ -74,10 +76,94 @@ function format(decimal, precision = 2, small = false, verbose = false) {
     if (decimal.abs().lt(1e-308)) return (0).toFixed(precision)
     if (decimal.sign < 0) return "-" + format(decimal.neg(), precision)
     if (decimal.lt("0.0001")) { return format(decimal.rec(), precision) + "⁻¹" }
-    else if (decimal.lt(1)) return regularFormat(decimal, precision + (small ? 2 : 0))
-    else if (decimal.lt(1000)) return regularFormat(decimal, precision)
-    else if (decimal.lt(1e9)) return commaFormat(decimal, 0)
-    else if (decimal.lt("10^^6")) {
+    if (decimal.lt(1)) return regularFormat(decimal, precision + (small ? 2 : 0))
+    if (decimal.lt(1000)) return regularFormat(decimal, precision)
+    if (decimal.lt(1e9)) return commaFormat(decimal, 0)
+
+    if (options.notationLow == "standard" && decimal.lt("eeee45")) {
+        let tiers = [
+            (tier, inh) => {
+                let ones = ["K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No"]
+                let tens = ["", "Dc", "Vg", "Tg", "Qr", "Qq", "Sg", "St", "Og", "Ng"]
+                let hundreds = ["", "Ce", "Dn", "Tc", "Qe", "Qu", "Sc", "Se", "Oe", "Ne"]
+
+                if (inh) ones = ["", "", "D", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No"]
+                if (inh == 2) ones = ["", "U", "D", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No"]
+
+                const o = tier % 10; t = Math.floor(tier / 10) % 10; h = Math.floor(tier / 100) % 10
+
+                if (t == 0 && h == 0) {
+                    return ones[o]
+                }
+
+                ones = ["", "U", "D", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No"]
+
+                return ones[o] + tens[t] + hundreds[h]
+            }, 
+            (tier, inh) => {
+                let ones = ["", "Mi", "Mc", "Na", "Pc", "Fe", "At", "Ze", "Yc", "Xn"]
+                let tens = ["", "C", "Ic", "Tic", "Trc", "Ptc", "Hxc", "Hpc", "Otc", "Enc"]
+                let hundreds = ["", "H", "Dh", "Tih", "Trh", "Pth", "Hxh", "Hph", "Oth", "Enh"]
+
+                const o = tier % 10; t = Math.floor(tier / 10) % 10; h = Math.floor(tier / 100) % 10
+
+                if (t == 0 && h == 0) {
+                    return ones[o]
+                }
+
+                ones = ["", "Me", "De", "Ti", "Tr", "Pt", "Hx", "Hp", "Ot", "En"]
+
+                if (t == 1) ones[0] = "V"
+
+                return ones[o] + tens[t] + hundreds[h]
+            }, 
+            (tier, inh) => {
+                let ones = ["", "Ki", "Me", "Gi", "Te", "Pe", "Ex", "Zt", "Yt", "Xe"]
+                let tens = ["", "Dk", "Ik", "Trk", "Tk", "Pk", "Ek", "Zk", "Yk", "Nk"]
+                let hundreds = ["", "Ht", "Bt", "Trt", "Tt", "Pot", "Et", "Zet", "Yot", "Nt"]
+
+                const o = tier % 10; t = Math.floor(tier / 10) % 10; h = Math.floor(tier / 100) % 10
+
+                if (t == 0 && h == 0) {
+                    return ones[o]
+                }
+
+                if (t == 1) ones = ["", "He", "Do", "Ta", "Te", "Pe", "Ex", "Ze", "Yo", "Ne"]
+                else ones = ["", "En", "Da", "Ta", "Te", "Pe", "Ec", "Ze", "Yo", "Xe"]
+
+                return ones[o] + tens[t] + hundreds[h]
+            },
+            (tier, inh) => {
+                return ["Al", "Ej", "Ij", "St", "Un", "Em", "Ov", "Ol", "Et", "Loc", "Ax", "Up", "Ers", "Ult"][tier]
+            },, 
+        ]
+
+        let prefix = decimal.log10().div(3).sub(1).floor()
+        let tier = 0
+
+        while (prefix.gt("e90")) {
+            prefix = prefix.log10().floor()
+            tier++
+        }
+        
+        let prefix2 = prefix.log10().div(3).floor()
+
+        if (verbose) console.log(prefix, tier)
+
+        let str = (tier == 0 && prefix < 1e6 ? commaFormat(decimal.div(EN.pow(1000, prefix.add(1))), precision) : "1") 
+            + " " + tiers[tier](prefix.div(EN.pow(1000, prefix2)).floor() % 1000, prefix2 >= 1) + tiers[tier+1](prefix2)
+
+        while (prefix.gt(0) && prefix2.gt(0) && str.length < 8) {
+            prefix = EN(prefix % EN.pow(1000, prefix2))
+            prefix2 = prefix2.sub(1)
+            if (verbose) console.log(prefix.toString(), prefix2.toString())
+            if (prefix.gte(1)) str += "-" + tiers[tier](prefix.div(EN.pow(1000, prefix2)).floor() % 1000, 2) + tiers[tier+1](prefix2)
+        }
+
+        return str
+    }
+
+    if (decimal.lt("10^^6")) {
         let rep = (array[1]||0)-1
         if (array[0] >= 1000000000) {
             array[0] = Math.log10(array[0])

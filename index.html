@@ -17,7 +17,8 @@
 
 	<link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
 
-	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+	<script src="https://cdn.jsdelivr.net/npm/mathjs"></script>
 	<script src="js/technical/break_eternity.js"></script>
 	<script src="js/technical/layerSupport.js"></script>
 	<script src="js/tree.js"></script>
@@ -30,10 +31,12 @@
 	<script src="js/layers/acamaeda.js"></script>
 	<script src="js/layers/thefinaluptake.js"></script>
 	<script src="js/layers/despacit.js"></script>
+	<script src="js/layers/thepaperpilot.js"></script>
 
 	<script src="js/mod.js"></script>
 	<script src="js/technical/temp.js"></script>
 	<script src="js/technical/displays.js"></script>
+	<script src="js/technical/newsTicker.js"></script>
 	
 	<script src="js/game.js"></script>
 	<script src="js/utils/easyAccess.js"></script>
@@ -53,8 +56,14 @@
 		<canvas id="treeCanvas" class="canvas" v-if="!(gameEnded && !player.keepGoing)"></canvas>
 
 		<div v-if="false" id="loadingSection" class="fullWidth">
-			<h1>Loading... (If this takes too long it means there was a serious error!)←</h1>
+			<div>
+			<i><h1>The Communitree!</h1></i><br/>
+			<h2>by ducdat0507</h2><br/><br/><br/>
+			<b>Now Loading...</b><br/>
+			<h5>(if the site stopped loading and you still see this message something bad must've happened!)</h5>
+			</div>
 		</div>
+		
 		<div class="vl" v-if="player.navTab !== 'none' && tmp.other.splitScreen && player.tab!='none' && !(gameEnded && !player.keepGoing)"></div>
 		<div v-if="(gameEnded && !player.keepGoing)" class="fullWidth">
 			<br>
@@ -74,6 +83,8 @@
 				Prestige Tree server</a><br>
 			<br><br>
 		</div>
+
+		<news-ticker v-if="options.newsTicker"></news-ticker>
 
 		<div id="treeOverlay" v-if="!(gameEnded && !player.keepGoing) && (player.tab === 'none' || tmp.other.splitScreen || !readData(layoutInfo.showTree))" class="treeOverlay" onscroll="resizeCanvas()"
 			v-bind:class="{ 
@@ -144,4 +155,5 @@
 
 		</div>
 	</div>
+	
 </body>

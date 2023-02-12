@@ -13,10 +13,12 @@ function getStartOptions() {
 		offlineProd: true,
 		hideChallenges: false,
 		showStory: true,
-		forceOneTab: false,
+		forceOneTab: true,
 		oldStyle: false,
 		antiEpilepsy: false,
 		notation: "default",
+		notationLow: "default",
+		newsTicker: false,
 	}
 }
 
@@ -29,6 +31,12 @@ function toggleOpt(name) {
 		changeTreeQuality();
 	if (name == "oldStyle")
 		updateStyle();
+	if (name == "newsTicker") {
+		newsTicker.current = newsEntries[Math.floor(Math.random() * newsEntries.length)];
+        while (!run(newsTicker.current[0])) newsTicker.current = newsEntries[Math.floor(Math.random() * newsEntries.length)];
+        newsTicker.current = run(newsTicker.current[1]);
+		newsTicker.pos = window.innerWidth;
+	}
 }
 var styleCooldown = 0;
 function updateStyle() {
@@ -86,4 +94,12 @@ const NT_SETTINGS = ["default", "hypere", "chained", "fallback"];
 
 function adjustNotation() {
 	options.notation = NT_SETTINGS[(NT_SETTINGS.indexOf(options.notation) + 1) % NT_SETTINGS.length];
+}
+
+const NL_DISPLAYS = ["SCIENTIFIC", "STANDARD (BETA)"];
+
+const NL_SETTINGS = ["default", "standard"];
+
+function adjustNotationLow() {
+	options.notationLow = NL_SETTINGS[(NL_SETTINGS.indexOf(options.notationLow) + 1) % NL_SETTINGS.length];
 }
