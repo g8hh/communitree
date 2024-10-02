@@ -48,7 +48,7 @@ let newsEntries = [
     // Jacorb (always on)
     [true, "What if you want to enjoy your currently playing incremental game, but the game says (softcapped), (scaled), or any text in parentheses in general"],
     [true, "If you remember what the old Prestige Tree theme looks like, you deserve a veteran boost to your point gain."],
-    [true, "If you remember this image --&gt; <img src='remove.png'>, you deserve a veteran boost to your point gain."],
+    [true, "If you remember this image --&gt; <img src='remove.png' width='12' height='12'>, you deserve a veteran boost to your point gain."],
     [true, "Distance Incremental - Metascore: 713/100. Critics' Review: \"Beautiful game with lots of unlockable mechanics, very large numbers and funny gags. Also (softcapped)\""],
     [true, "The Prestige Tree - Gamerscore: 350/100. Critics' Review: \"I mean, the game is so good it even has a modding community\""],
     [true, "The four High Gods of Jacorbian community: (softcapped), J, gwa, and Homestuck."],
