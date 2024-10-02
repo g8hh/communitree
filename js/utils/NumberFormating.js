@@ -3,10 +3,11 @@ function exponentialFormat(num, precision, mantissa = true) {
     return num.toStringWithDecimalPlaces(precision)
 }
 
-function commaFormat(num, precision) {
+function commaFormat(num, precision, sig = false) {
     if (num === null || num === undefined) return "NaN"
     let zeroCheck = num.array == undefined ? num : num.array[0]
     if (zeroCheck < 0.001) return (0).toFixed(precision)
+    if (sig) precision = Math.max(precision - Math.floor(Math.log10(Math.max(num, 1))), 0);
     let init = num.toFixed(precision)
     let portions = init.split(".")
     portions[0] = portions[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,")
@@ -65,6 +66,7 @@ function polarize(array, smallTop = false) {
 }
 
 function format(decimal, precision = 2, small = false, verbose = false) {
+    if (options.notationLow == "standard" && EN.eq(decimal, "e3e24") && decimal.includes?.("3000000000000000000000306")) return "1 YUC'e";
     if (EN.isNaN(decimal)) return "NaN"
     if (decimal == "Infinity") return "∞"
     if (decimal == "-Infinity") return "-∞"
@@ -72,7 +74,6 @@ function format(decimal, precision = 2, small = false, verbose = false) {
     let precision2 = Math.max(3, precision)
     decimal = new ExpantaNum(decimal)
     let array = decimal.array
-    let fmt = decimal.toString()
     if (decimal.abs().lt(1e-308)) return (0).toFixed(precision)
     if (decimal.sign < 0) return "-" + format(decimal.neg(), precision)
     if (decimal.lt("0.0001")) { return format(decimal.rec(), precision) + "⁻¹" }
@@ -101,9 +102,9 @@ function format(decimal, precision = 2, small = false, verbose = false) {
                 return ones[o] + tens[t] + hundreds[h]
             }, 
             (tier, inh) => {
-                let ones = ["", "Mi", "Mc", "Na", "Pc", "Fe", "At", "Ze", "Yc", "Xn"]
-                let tens = ["", "C", "Ic", "Tic", "Trc", "Ptc", "Hxc", "Hpc", "Otc", "Enc"]
-                let hundreds = ["", "H", "Dh", "Tih", "Trh", "Pth", "Hxh", "Hph", "Oth", "Enh"]
+                let ones = ["", "Mi", "Mc", "Na", "Pc", "Fe", "At", "Z", "Y", "X"]
+                let tens = ["", "C", "Ic", "Ti", "Tr", "Pt", "Hx", "Hp", "Ot", "En"]
+                let hundreds = ["", "H", "Dh", "Th", "Trh", "Ph", "Hxh", "Hph", "Oh", "Eh"]
 
                 const o = tier % 10; t = Math.floor(tier / 10) % 10; h = Math.floor(tier / 100) % 10
 
@@ -120,7 +121,7 @@ function format(decimal, precision = 2, small = false, verbose = false) {
             (tier, inh) => {
                 let ones = ["", "Ki", "Me", "Gi", "Te", "Pe", "Ex", "Zt", "Yt", "Xe"]
                 let tens = ["", "Dk", "Ik", "Trk", "Tk", "Pk", "Ek", "Zk", "Yk", "Nk"]
-                let hundreds = ["", "Ht", "Bt", "Trt", "Tt", "Pot", "Et", "Zet", "Yot", "Nt"]
+                let hundreds = ["", "Ht", "Bt", "Trt", "Tt", "Pot", "Et", "Ze", "Yo", "Nt"]
 
                 const o = tier % 10; t = Math.floor(tier / 10) % 10; h = Math.floor(tier / 100) % 10
 
@@ -134,7 +135,7 @@ function format(decimal, precision = 2, small = false, verbose = false) {
                 return ones[o] + tens[t] + hundreds[h]
             },
             (tier, inh) => {
-                return ["Al", "Ej", "Ij", "St", "Un", "Em", "Ov", "Ol", "Et", "Loc", "Ax", "Up", "Ers", "Ult"][tier]
+                return ["Al", "Ej", "Ij", "St", "Un", "Em", "Ov", "Ol", "Et", "Lc", "Ax", "Up", "Es", "Ut"][tier]
             },, 
         ]
 
@@ -150,7 +151,7 @@ function format(decimal, precision = 2, small = false, verbose = false) {
 
         if (verbose) console.log(prefix, tier)
 
-        let str = (tier == 0 && prefix < 1e6 ? commaFormat(decimal.div(EN.pow(1000, prefix.add(1))), precision) : "1") 
+        let str = (tier == 0 && prefix < 1e6 ? commaFormat(decimal.div(EN.pow(1000, prefix.add(1))), precision2, true) : "1") 
             + " " + tiers[tier](prefix.div(EN.pow(1000, prefix2)).floor() % 1000, prefix2 >= 1) + tiers[tier+1](prefix2)
 
         while (prefix.gt(0) && prefix2.gt(0) && str.length < 8) {
@@ -176,10 +177,10 @@ function format(decimal, precision = 2, small = false, verbose = false) {
     }
 
     let layers = "FGH"
-    let pol = polarize(array)
+    let pol = polarize([...array])
 
     if (typeof options == "undefined" || options.notation == "hypere") {
-        let e = EN(fmt).toHyperE()
+        let e = decimal.toHyperE()
         let sp = e.split("#")
         sp[0] = "E" + format(sp[0].substring(1), precision2)
         return sp.join("#")
@@ -205,7 +206,13 @@ function format(decimal, precision = 2, small = false, verbose = false) {
         return `(10→${commaFormat(pol[0], precision2)}→${pol[2]})→${regularFormat(pol[1])}→${pol[2]+1}`
     }
 
-    return `(10${formatArrow(pol[2])}${commaFormat(pol[0], precision2)})${formatArrow(pol[2]+1)}${regularFormat(pol[1])}`
+    let s = "";
+    for (let i = array.length-1; i>=1; --i){
+      let q = i >= 5 ? "{"+i+"}" : "↑".repeat(i);
+      if (array[i] > 1) s+= "(10" + q + ")^" + array[i] + " ";
+      else if (array[i] == 1) s += " 10" + q;
+    }
+    return s + format(array[0]);
 } // w- what 
 
 function formatWhole(decimal) {

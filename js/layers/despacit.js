@@ -4156,7 +4156,7 @@ addLayer("des", {
             borderStyle: { "margin-top": "2px" },
             fillStyle: { "background": "#59bd77" },
             baseStyle: { "background": "#3a704b" },
-            textStyle: { color: "#1a3d25", "mix-blend-mode": "difference", "font-size": "14px" },
+            textStyle: { color: "#1a3d25", "font-size": "13px" },
         },
         dispBar: {
             direction: DOWN,
@@ -4174,7 +4174,7 @@ addLayer("des", {
             },
             baseStyle: { "background": "#3a704b" },
             borderStyle: { "margin-top": "-2px" },
-            textStyle: { color: "#1a3d25", "mix-blend-mode": "difference", "font-size": "14px" },
+            textStyle: { color: "#1a3d25", "font-size": "13px" },
         },
         gachaMergeBar: {
             direction: UP,

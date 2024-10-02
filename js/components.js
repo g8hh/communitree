@@ -272,7 +272,7 @@ function loadVue() {
 		template: `
 		<div v-if="tmp[layer].buyables && tmp[layer].buyables[data]!== undefined && tmp[layer].buyables[data].unlocked" style="display: grid">
 			<button v-bind:class="{ buyable: true, tooltipBox: true, can: tmp[layer].buyables[data].canBuy, locked: !tmp[layer].buyables[data].canAfford, bought: player[layer].buyables[data].gte(tmp[layer].buyables[data].purchaseLimit)}"
-			v-bind:style="[tmp[layer].buyables[data].canBuy ? {'background-color': tmp[layer].color} : {}, size ? {'height': size, 'width': size} : {}, tmp[layer].componentStyles.buyable, tmp[layer].buyables[data].style]"
+			v-bind:style="[tmp[layer].buyables[data].canBuy ? {'background-color': tmp[layer].color} : {}, size ? {'height': size, 'width': size} : {}, tmp[layer].componentStyles.buyable, tmp[layer].buyables[data].style]" :id='"buyable-" + layer + "-" + data'
 			v-on:click="buyBuyable(layer, data)" @mousedown="start" @mouseleave="stop" @mouseup="stop" @touchstart="start" @touchend="stop" @touchcancel="stop">
 				<span v-if= "tmp[layer].buyables[data].title"><h2 v-html="tmp[layer].buyables[data].title"></h2><br></span>
 				<span v-bind:style="{'white-space': 'pre-line'}" v-html="run(layers[layer].buyables[data].display, layers[layer].buyables[data])"></span>
@@ -446,7 +446,7 @@ function loadVue() {
 		},
 		template: `
 		<div v-if="tmp[layer].bars && tmp[layer].bars[data].unlocked" v-bind:style="{'position': 'relative'}"><div v-bind:style="[tmp[layer].bars[data].style, style.dims, {'display': 'table'}]">
-			<div class = "overlayTextContainer barBorder" v-bind:style="[tmp[layer].bars[data].borderStyle, style.dims]">
+			<div class = "overlayTextContainer barBorder" v-bind:style="[tmp[layer].bars[data].borderStyle, tmp[layer].bars[data].textContainerStyle, style.dims]">
 				<span class = "overlayText" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].textStyle]" v-html="run(layers[layer].bars[data].display, layers[layer].bars[data])"></span>
 			</div>
 			<div class ="barBG barBorder" v-bind:style="[tmp[layer].bars[data].style, tmp[layer].bars[data].baseStyle, tmp[layer].bars[data].borderStyle,  style.dims]">
@@ -646,6 +646,57 @@ function loadVue() {
 				</button><button v-on:click="setTPPMastery(data, max)" class="upg small">
 					{{format(max, 0)}}
 				</button>
+			</div>
+		`
+	})
+
+	Vue.component('restart-tree', {
+		props: ['layer', 'data'],
+		computed: {
+			level() { return player.tpp.masteries[this.data] },
+			max() {
+				return player.tpp.buyables[100].toNumber() 
+					- Object.values(player.tpp.masteries).reduce((a, b) => a + b) 
+					+ player.tpp.masteries[this.data];
+			},
+		},
+		data() { return { xOfs: 0, yOfs: 0 }},
+		methods: {
+			moveLeft() {
+				this.xOfs--;
+				window.requestAnimationFrame(drawTree);
+			},
+			moveRight() {
+				this.xOfs++;
+				window.requestAnimationFrame(drawTree);
+			},
+			moveUp() {
+				this.yOfs--;
+				window.requestAnimationFrame(drawTree);
+			},
+			moveDown() {
+				this.yOfs++;
+				window.requestAnimationFrame(drawTree);
+			},
+		},
+		template: `
+			<div class="restart-tree-holder">
+				<button @click="moveUp()" class="upg up">Up</button>
+				<div style="display:flex;flex-direction:row;">
+					<button @click="moveLeft()" class="upg left">Left</button>
+					<div class="restart-tree">
+						<table>
+							<tr v-for="y, _ in [-3, -2, -1, 0, 1, 2, 3]">
+								<td v-for="x, _ in [-3, -2, -1, 0, 1, 2, 3]">
+									<buyable v-if="data[x + xOfs + ':' + (y + yOfs)] != undefined" :layer="layer" :data="data[x + xOfs + ':' + (y + yOfs)]"></buyable>
+									<div v-else></div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<button @click="moveRight()" class="upg right">Right</button>
+				</div>
+				<button @click="moveDown()" class="upg down">Down</button>
 			</div>
 		`
 	})
