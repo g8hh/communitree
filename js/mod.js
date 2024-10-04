@@ -163,7 +163,7 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
-	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format([800, 2, 0, 1])} points)`,
+	() => `<h5 style="opacity:.5"><br/><i>(Current endgame: ${format([30000, 2, 0, 1])} points)`,
 	() => !player.isWarned ? `
 		<div style="border:2px solid var(--color);margin-top:10px;padding:5px;display:inline-block">
 		Important notice: Some parts of the game may contain flashing lights.<br/>
@@ -175,7 +175,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte([800, 2, 0, 1])
+	return player.points.gte([30000, 2, 0, 1])
 }
 
 

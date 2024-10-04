@@ -8,6 +8,10 @@ function getTPPPointGain(release) {
 }
 
 function claimTPPRelease(id, force = false) {
+    if (!player.tpp.releases[id]) {
+        player.tpp.releases.splice(id, 1);
+        return;
+    }
     let gain = getTPPPointGain(player.tpp.releases[id]);
     addPoints("tpp", gain);
     if (player.tpp.releases[id].exposure <= 0 || force) player.tpp.releases.splice(id, 1);
