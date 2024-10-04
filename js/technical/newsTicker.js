@@ -9,18 +9,20 @@ let newsEntries = [
     [true, "Hi, I'm a news ticker! My job is to give news to everyone! Let's hope that nothing ever goes terribly wrong while I'm ticking!"],
     [true, "What it feels like to get the same news ticker twice<div style='display:inline-block;width:calc(100vw + 100px)'></div>What it feels like to get the same news ticker twice"],
     [true, "One does not simply escape from the news ticker... unless you turn it off, of course. But are you truely safe from it even if you do that?"],
-    [true, "Wait, a news ticker? In a Prestige Tree mod? Unacceptable! How could they do this? Don't they know that news tickers are already a thing of the past? Why did they do this in $CURRENT_YEAR? That's it, I can't take it anymore, I'll turn off the news ticker myself. <i>(turns off the news ticker) (imagine the news ticker is turned off)</i>"],
+    [true, "Wait, a news ticker? In a Prestige Tree mod? Unacceptable! How could they do this? Don't they know that news tickers are already a thing of the past? Why did they do this in $CURRENT_YEAR? That's it, I can't take it anymore, I'll turn off the news ticker myself. <i>(turns off the news ticker) (please imagine that the news ticker is turned off)</i>"],
     [true, "Quote me <i>-literally everyone</i>"],
-    [true, "<a href='https://youtu.be/dQw4w9WgXcQ' target='_blank'>It is not a news ticker until one of the possible messages links to Rick Astley's Never Gonna Give You Up</a>"],
+    [true, "<a href='https://youtu.be/dQw4w9WgXcQ' target='_blank'>It is not a news ticker until one of the possible messages links to Rick Astley's <i>Never Gonna Give You Up</i></a>"],
     [true, "The Communitree - not to be confused with the numerous tree planting programs with the same name."],
     [true, "BREAKING NEWS: <r>Error: Script error.</r>"],
     [true, "Don't go to the Prestreestuck server, go the the Modding Tree server instead."],
     [true, "There are no \"challenges\" in this game. Thank me later."],
     [true, "If you see The Communitree in an update hiatus, that means the developer's computer wiped his save again and he has to replay the game all over again."],
     [true, "TMT players when I tell them that tn-shi was in the Incremental Game Jam Discord server"],
-    [true, "BREAKING NEWS: Game on hiatus finally got updated in three years, so many people is trying to play the game that the web portal the game was hosted on got broken."],
-    [true, "BEWARE OF THE PIPELINE: TMT player -> The Communitree! player -> Phigros player -> Rhythm game player -> Otoge music composer/VTuber"],
+    [true, "BREAKING NEWS: Game on hiatus finally got updated after three years, resulted in so many people trying to play the game that the web portal the game was hosted on got overloaded."],
+    [true, "BEWARE OF THE PIPELINE: TMT player -> The Communitree! player -> The Camellia Tree (duducat rewrite) player -> Phigros player -> Eastern rhythm game player -> Otoge music composer/VTuber"],
+    [true, "Most people don't know this, but me and the Phigros' tip box are friends! <i>*wink wink*</i>"],
     [true, "I just went to this news ticker code after two years of inactivity and found out that some of the news messages I wrote no longer reflects me as a person. If you, by chance, get offended by some of the news messages let me know and I'll consider removing it."],
+    [true, "Wow, some of these news messages did not age well. I guess you can say that those news message are - get this - \"old news\" amirite <i>*ba-dum-tss*</i>"],
     
     [true, "<a onclick='newsTicker.pos=-1/0'>Click here to reroll your news ticker.</a>"],
     [true, "<a onclick='navigator.clipboard.writeText(this.innerText);doPopup(`none`, `Copied contents to clipboard.`)'>Click here to copy this news message's contents into your clipboard.</a>"],
@@ -52,7 +54,7 @@ let newsEntries = [
     [true, "Distance Incremental - Metascore: 713/100. Critics' Review: \"Beautiful game with lots of unlockable mechanics, very large numbers and funny gags. Also (softcapped)\""],
     [true, "The Prestige Tree - Gamerscore: 350/100. Critics' Review: \"I mean, the game is so good it even has a modding community\""],
     [true, "The four High Gods of Jacorbian community: (softcapped), J, gwa, and Homestuck."],
-    [true, "Hot take: Buyables shouldn't be called \"buyables\", considering upgrades are also \"buyable\" in the sense that - you know - you can actually buy them."],
+    [true, "Calling buyables \"buyables\" assumes that one-time-purchasable upgrades aren't \"buyable\""],
     [true, "Did you know that the game <i>Derivative Clicker</i> describe its one time purchasable upgrades bought using prestige currencies as \"buyables\" and the repeatable upgrades bought using money as \"upgrades\"? Next time if you see someone refer to repeatable upgrades as \"buyables\" tell them this fact."],
     
     [true, "This news message is (hardca"],
@@ -60,6 +62,12 @@ let newsEntries = [
         let str = "This news message is (softcapped).";
         let news = "";
         for (let chr = 0; chr < str.length; chr++) news += `<span style='display:inline-block;padding-left:${1.2**chr}px'>${str[chr]}</span>`;
+        return news;
+    }],
+    [true, () => {
+        let str = "This news message is (scaled).";
+        let news = "";
+        for (let chr = 0; chr < str.length; chr++) news += `<span style='display:inline-block;transform:scaleX(${1.2**chr/20+1});width:${1.2**chr/20+1}ch'>${str[chr]}</span>`;
         return news;
     }],
     
@@ -92,6 +100,7 @@ let newsEntries = [
     [() => player.aca.modLevel + player.aca.modActive >= 3, "Help I'm trapped inside a video game's news ticker factory"],
     [() => player.aca.modLevel + player.aca.modActive >= 3, "Bonus points? What is that?"],
     [() => player.aca.modLevel + player.aca.modActive >= 3, "Made in Profectus <i>-thepaperpilot</i> <i style='display:inline-block;transform:skewX(-20deg)'>-thepaperpilot</i>"],
+    [() => player.aca.modLevel + player.aca.modActive >= 3, "<a href='https://mastodon.gamedev.place/@ducdat0507'>Follow me on the Fediverse!</a>"],
 
 ];
 
