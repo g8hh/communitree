@@ -3,6 +3,7 @@
 "use strict";
 
 function getTPPPointGain(release) {
+    if (!release) return 0;
     return EN.floor(release.views).mul(EN.floor(release.likes).add(1)).mul(EN.floor(release.shares).add(1)).add(1).mul(tmp.tpp.effect.tppMulti).sub(release.points)
 }
 

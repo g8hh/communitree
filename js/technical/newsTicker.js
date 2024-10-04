@@ -23,7 +23,7 @@ let newsEntries = [
     [true, "Most people don't know this, but me and the Phigros' tip box are friends! <i>*wink wink*</i>"],
     [true, "I just went to this news ticker code after two years of inactivity and found out that some of the news messages I wrote no longer reflects me as a person. If you, by chance, get offended by some of the news messages let me know and I'll consider removing it."],
     [true, "Wow, some of these news messages did not age well. I guess you can say that those news messages are - get this - \"old news\" amirite <i>*ba-dum-tss*</i>"],
-    [true, "Copyright Disclaimer: Copyright Disclaimer Under Section 107 of the Copyright Act 1976, allowance is made for \"fair use\" for purposes such as criticism, comment, news reporting, teaching, scholarship, and research. Fair use is a use permitted by copyright statute that might otherwise be infringing. Non-profit, educational or personal use tips the balance in favor of fair use."]
+    [true, "Copyright Disclaimer: Copyright Disclaimer Under Section 107 of the Copyright Act 1976, allowance is made for \"fair use\" for purposes such as criticism, comment, news reporting, teaching, scholarship, and research. Fair use is a use permitted by copyright statute that might otherwise be infringing. Non-profit, educational or personal use tips the balance in favor of fair use."],
 
     [true, "<a onclick='newsTicker.pos=-1/0'>Click here to reroll your news ticker.</a>"],
     [true, "<a onclick='navigator.clipboard.writeText(this.innerText);doPopup(`none`, `Copied contents to clipboard.`)'>Click here to copy this news message's contents into your clipboard.</a>"],
