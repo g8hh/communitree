@@ -38,6 +38,10 @@ var colors_theme
 function drawTree() {
 	if (!retrieveCanvasData()) return;
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	if (player.tab == "tpp") {
+		ctx.fillStyle = "#2a323d";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+	}
 	for (layer in layers){
 		if (tmp[layer].layerShown == true && tmp[layer].branches){
 			for (branch in tmp[layer].branches)
@@ -45,13 +49,15 @@ function drawTree() {
 					drawTreeBranch(layer, tmp[layer].branches[branch])
 				}
 		}
-		for(id in layers[layer].upgrades) {
-			if (tmp[layer].upgrades[id].branches) {
-				for (branch in tmp[layer].upgrades[id].branches)
-				{
-					drawTreeBranch(id, tmp[layer].upgrades[id].branches[branch], "upgrade-" + layer + "-")
-				}
+		for (feat of ["upgrade", "buyable"]) {
+			for (id in layers[layer][feat + "s"]) {
+				if (tmp[layer][feat + "s"][id].branches) {
+					for (branch in tmp[layer][feat + "s"][id].branches)
+					{
+						drawTreeBranch(id, tmp[layer][feat + "s"][id].branches[branch], feat + "-" + layer + "-")
+					}
 
+				}
 			}
 		}
 	}

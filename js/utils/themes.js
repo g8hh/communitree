@@ -1,30 +1,45 @@
 // ************ Themes ************
 const themes = {
-	1: "aqua"
-};
-const theme_names = {
-	aqua: "Aqua"
+	"default": {
+		name: "Default",
+		colors: { 1: "#ffffff", 2: "#bfbfbf", 3: "#7f7f7f" },
+		variables: {
+			"--background": "#0f0f0f",
+			"--background_tooltip": "rgba(0, 0, 0, 0.75)",
+			"--color": "#dfdfdf",
+			"--points": "#ffffff",
+			"--locked": "#bf8f8f",
+			"--bought": "#77bf5f",
+		}
+	},
+	"aqua": {
+		name: "Aqua",
+		colors: { 1: "#bfdfff", 2: "#8fa7bf", 3: "#5f6f7f" },
+		variables: {
+			"--background": "#001f3f",
+			"--background_tooltip": "rgba(0, 15, 31, 0.75)",
+			"--color": "#bfdfff",
+			"--points": "#dfefff",
+			"--locked": "#c4a7b3",
+			"--bought": "#77bf5f",
+		}
+	},
 };
 function changeTheme() {
-	let aqua = options.theme == "aqua";
-	colors_theme = colors[options.theme || "default"];
-	document.body.style.setProperty('--background', aqua ? "#001f3f" : "#0f0f0f");
-	document.body.style.setProperty('--background_tooltip', aqua ? "rgba(0, 15, 31, 0.75)" : "rgba(0, 0, 0, 0.75)");
-	document.body.style.setProperty('--color', aqua ? "#bfdfff" : "#dfdfdf");
-	document.body.style.setProperty('--points', aqua ? "#dfefff" : "#ffffff");
-	document.body.style.setProperty("--locked", aqua ? "#c4a7b3" : "#bf8f8f");
+	let theme = options.theme || "default";
+	colors_theme = themes[theme].colors;
+	for (let [key, value] of Object.entries(themes[theme].variables)) {
+		document.body.style.setProperty(key, value);
+	}
 }
 function getThemeName() {
-	return options.theme ? theme_names[options.theme] : "Default";
+	return options.theme ? themes[options.theme].name : "Default";
 }
+
 function switchTheme() {
-	if (options.theme === null)
-		options.theme = themes[1];
-	else {
-		options.theme = themes[Object.keys(themes)[options.theme] + 1];
-		if (!options.theme)
-			options.theme = null;
-	}
+	if (options.theme === null) options.theme = "default";
+	let keys = Object.keys(themes);
+	options.theme = keys[(keys.indexOf(options.theme) + 1) % keys.length];
 	changeTheme();
 	resizeCanvas();
 }

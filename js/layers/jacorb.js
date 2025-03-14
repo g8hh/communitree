@@ -580,7 +580,7 @@ addLayer("jac", {
                     }
 
                     Reset prestige points for +<h3>${format(data.prestigeGain, 0)}</h3> boosters
-                    ${data.prestigeGain.lt(100) ? "Next at " + format(data.prestigeNext, 0) + " prestige points" : ""}
+                    ${data.prestigeGain.lt(100) ? (hasUpgrade("jac", 213) ? "Next at " : "Requires ") + format(data.prestigeNext, 0) + " prestige points" : ""}
                 `
             },
             unlocked() { return hasUpgrade("jac", 202) }, 
@@ -642,7 +642,7 @@ addLayer("jac", {
                     which are giving a ×${format(data.effect)} boost to prestige point gain, slowly increases over this Jacorb reset.
 
                     Reset prestige points for +<h3>${format(data.prestigeGain, 0)}</h3> generators
-                    ${data.prestigeGain.lt(100) ? "Next at " + format(data.prestigeNext, 0) + " prestige points" : ""}
+                    ${data.prestigeGain.lt(100) ? (hasUpgrade("jac", 213) ? "Next at " : "Requires ") + format(data.prestigeNext, 0) + " prestige points" : ""}
                 `
             },
             unlocked() { return hasUpgrade("jac", 202) }, 
@@ -694,7 +694,7 @@ addLayer("jac", {
                     which are giving a ×${format(data.effect)} boost to point and prestige point gain, which increases at a diminishing rate over this Jacorb reset.
 
                     Reset previous progress for +<h3>${format(data.prestigeGain, 0)}</h3> time capsules
-                    ${data.prestigeGain.lt(100) ? "Next at " + format(data.prestigeNext, 0) + " Jacorb points" : ""}
+                    ${data.prestigeGain.lt(100) ? (hasUpgrade("jac", 241) ? "Next at " : "Requires ") + format(data.prestigeNext, 0) + " Jacorb points" : ""}
                 `
             },
             unlocked() { return hasUpgrade("jac", 203) }, 
@@ -801,7 +801,7 @@ addLayer("jac", {
                     which are giving a ×${format(data.effect.ppp)} bonus to point and prestige point gain, based on Generators' effect
 
                     Reset previous progress for +<h3>${format(data.prestigeGain, 0)}</h3> space energy
-                    ${data.prestigeGain.lt(100) ? "Next at " + format(data.prestigeNext, 0) + " Jacorb points" : ""}
+                    ${data.prestigeGain.lt(100) ? (hasUpgrade("jac", 241) ? "Next at " : "Requires ") + format(data.prestigeNext, 0) + " Jacorb points" : ""}
                 `
             },
             unlocked() { return hasUpgrade("jac", 203) }, 
@@ -854,7 +854,7 @@ addLayer("jac", {
                     which are giving a ×${format(data.effect)} bonus to base Booster effect.
 
                     Reset previous progress for +<h3>${format(data.prestigeGain, 0)}</h3> super boosters
-                    ${data.prestigeGain.lt(100) ? "Next at " + format(data.prestigeNext, 0) + " boosters" : ""}
+                    ${data.prestigeGain.lt(100) ? (hasUpgrade("jac", 244) ? "Next at " : "Requires ") + format(data.prestigeNext, 0) + " boosters" : ""}
                 `
             },
             unlocked() { return hasUpgrade("jac", 234) }, 
@@ -907,7 +907,7 @@ addLayer("jac", {
                     which are giving a ×${format(data.effect)} bonus to base Generator effect, slowly increases over this Jacorb reset.
 
                     Reset previous progress for +<h3>${format(data.prestigeGain, 0)}</h3> super generators
-                    ${data.prestigeGain.lt(100) ? "Next at " + format(data.prestigeNext, 0) + " generators" : ""}
+                    ${data.prestigeGain.lt(100) ? (hasUpgrade("jac", 225) ? "Next at " : "Requires ") + format(data.prestigeNext, 0) + " generators" : ""}
                 `
             },
             unlocked() { return hasUpgrade("jac", 204) }, 
@@ -1131,7 +1131,7 @@ addLayer("jac", {
                     which are giving a ×${format(data.effect)} bonus to Space Energy effect, slowly increases over this Jacorb reset.
 
                     Reset previous progress for +<h3>${format(data.prestigeGain, 0)}</h3> subspace energy
-                    ${data.prestigeGain.lt(100) ? "Next at " + format(data.prestigeNext, 0) + " space energy" : ""}
+                    ${data.prestigeGain.lt(100) ? (hasUpgrade("jac", 206) ? "Next at " : "Requires ")+ format(data.prestigeNext, 0) + " space energy" : ""}
                 `
             },
             unlocked() { return hasUpgrade("jac", 255) }, 
@@ -1183,7 +1183,7 @@ addLayer("jac", {
                     which are giving a ×${format(data.effect)} bonus to base Super Booster effect.
 
                     Reset previous progress for +<h3>${format(data.prestigeGain, 0)}</h3> hyper boosters
-                    ${data.prestigeGain.lt(100) ? "Next at " + format(data.prestigeNext, 0) + " super boosters" : ""}
+                    ${data.prestigeGain.lt(100) ? (hasUpgrade("jac", 246) ? "Next at " : "Requires ") + format(data.prestigeNext, 0) + " super boosters" : ""}
                 `
             },
             unlocked() { return hasUpgrade("jac", 236) }, 
@@ -1443,6 +1443,12 @@ addLayer("jac", {
         }
     },
     tabFormat: [
+        () => tmp.other.splitScreen ? "" : ["raw-html", `
+            <span v-if="player.points.lt('1e1000')">You have </span>
+            <h2 id="points">${format(player.points)}</h2>
+            <span v-if="player.points.lt('1e1e6')"> ${modInfo.pointsName}</span>
+            <div style="height:10px"></div>
+        `],
         "main-display",
         "prestige-button",
         ["blank", "10px"],

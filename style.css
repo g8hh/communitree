@@ -17,9 +17,11 @@
 body {
 	color: var(--color);
 	overflow: hidden;
+
 	--background: #0f0f0f;
 	--color: #dfdfdf;
 	--points: #ffffff;
+
 	background: var(--background)
 }
 
@@ -34,6 +36,50 @@ td {
 
 r {
 	color: red;
+}
+
+spoiler {
+	display: inline-block;
+	background: var(--color);
+	color: transparent;
+	border-radius: 4px;
+}
+spoiler:hover {
+	background: transparent;
+	color: var(--color);
+}
+
+#newsticker {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	left: 5px;
+	height: 28px;
+	line-height: 18px;
+	padding: 0;
+	display: block;
+	background: var(--background);
+	border: 3px solid var(--color);
+	border-radius: 5px;
+	overflow: hidden;
+	user-select: none;
+}
+
+#newsticker > div {
+	position: absolute;
+	height: 18px;
+	top: 0px;
+	margin: 5px 10px;
+	width: max-content;
+	transition: transform linear .2s;
+}
+
+#newsticker > .new {
+	transition: none;
+}
+
+#newsticker a {
+	color: #02f2f2;
 }
 
 .upgTable {
@@ -149,7 +195,7 @@ h1, h2, h3, b, input {
 }
 
 .bought {
-	background-color: #77bf5f;
+	background-color: var(--bought);
 	cursor: default;
 }
 
@@ -194,6 +240,25 @@ h1, h2, h3, b, input {
 	overflow: hidden;
 	-webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
 	margin:0
+}
+
+.tpp-mastery > div {
+	text-align: left;
+	height: 35px;
+	width: 350px;
+	padding: 5px 8px;
+}
+
+.tpp-mastery > div.current {
+	padding: 3px 6px;
+	border: 2px solid var(--color);
+}
+
+.tpp-mastery > .upg {
+    width: 25%; 
+    min-height: fit-content; 
+    font-size: 14px;
+    border-radius: 5px;
 }
 
 .overlayTextContainer {
@@ -471,7 +536,7 @@ a {
 	padding-right: 5px;
 
 	height: 75px;
-	background-color: #77bf5f;
+	background-color: var(--bought);
 	border: 4px solid;
 	border-radius: 4px;
 	border-color: rgba(0, 0, 0, 0.125);
@@ -560,7 +625,7 @@ ul {
 }
 
 .hChallenge.done {
-	background-color: #77bf5f;
+	background-color: var(--bought);
 }
 
 .hChallenge.canComplete {
@@ -569,12 +634,21 @@ ul {
 
 .fullWidth {
 	position: absolute;
-	height: 100%;
-	width: 100%;
+	top: 0%;
+	bottom: 0%;
+	left: 0%;
+	right: 0%;
 	min-width: 100%;
 	overflow-y: auto;
 	overflow-x: auto;
 	transition-duration: 0s
+}
+
+#newsticker ~ .col, #newsticker ~ .fullWidth {
+	top: 45px;
+	height: calc(100% - 45px);
+	min-height: calc(100% - 45px);
+	margin-top: 0px;
 }
 
 .tooltipBox { 
@@ -640,6 +714,10 @@ ul {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	transform: translate(0, 0);
+
+	background-color: var(--background);
+	z-index: 2147483647;
 }
 
 .treeOverlay {
@@ -780,4 +858,41 @@ button > * {
 	background: transparent !important;
 	background-image: none !important;
 	--background: transparent !important;
+}
+
+.restart-tree {
+	background: var(--background);
+	border: 4px solid var(--color);
+	overflow: hidden;
+}
+.restart-tree table {
+	margin: -60px -50px -50px -60px;
+}
+
+.restart-tree td > div {
+	width: 128px;
+	height: 128px;
+}
+
+.restart-tree-holder .upg {
+	width: 80px;
+	height: 80px;
+	min-height: 80px;
+}
+
+.restart-tree-holder .up {
+	border-radius: 25% 25% 0 0;
+}
+
+.restart-tree-holder .down {
+	border-radius: 0 0 25% 25%;
+}
+
+.restart-tree-holder .left {
+    position: initial;
+	border-radius: 25% 0 0 25%;
+}
+
+.restart-tree-holder .right {
+	border-radius: 0 25% 25% 0;
 }

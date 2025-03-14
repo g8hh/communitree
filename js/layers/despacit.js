@@ -171,7 +171,7 @@ function generateCode() {
         "gacha", "merge", "life", "power", "summer", "winter", "cm", "tree", "prestige", "despacit",
         "number", "idle", "comm", "mod", "communitree", "large", "christmas", "easter", "father", "mother",
         "patrick", "luck", "code", "game", "incremental", "newyear", "community", "lgbt", "pride", "candy",
-        "lollipop", "dimension", "prestige", "something"
+        "lollipop", "dimension", "prestige", "something", "happy", "lucky", "treasure",
     ]
     let chars = "abcdefghijklmnopqrstuvwxyz0123456789"
     let num = Math.random() > .5 ? Math.randomFloor(10000) : (Math.randomFloor(4) + 6).toString().repeat(Math.floor(Math.random() * 3 + 2))
@@ -184,10 +184,11 @@ function generateCode() {
             while (str.length < len) str += chars[Math.randomFloor(chars.length)]
             return str
         case 2:
-            chars = Math.random() > .5 ? "abcdefghijklmnopqrstuvwxyz" : "aeiou"
-            str += chars[Math.randomFloor(chars.length)]
-            chars = Math.random() > .5 ? "abcdefghijklmnopqrstuvwxyz" : "aeiou"
-            str += chars[Math.randomFloor(chars.length)]
+            len = Math.randomFloor(2) + 2
+            while (str.length < len) {
+                chars = Math.random() > .5 ? "abcdefghijklmnopqrstuvwxyz" : "aeiou"
+                str += chars[Math.randomFloor(chars.length)]
+            }
             return str + num
     }
 }
@@ -3316,7 +3317,7 @@ addLayer("des", {
             buy() { 
                 if (!this.canAfford()) return
                 let grid = player.des.grid
-                let slots = Object.keys(grid).filter(x => !grid[x].type && layers[layer].grid.getUnlocked(x))
+                let slots = Object.keys(grid).filter(x => !grid[x].type && layers.des.grid.getUnlocked(x))
                 if (slots.length) {
                     let slot = slots[Math.floor(Math.random() * slots.length)]
                     let pool = player.des.mergePool
@@ -3373,7 +3374,7 @@ addLayer("des", {
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
-                return `<h3>Scrapyard Expansion X</h3><br/>(${format(x, 0)} / 6)
+                return `<h3>Mergeyard Expansion X</h3><br/>(${format(x, 0)} / 6)
                     Adds 1 more column to the merge field.
 
                     Cost: ${format(data.cost, 0)} mergents`
@@ -3402,7 +3403,7 @@ addLayer("des", {
             display() {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
-                return `<h3>Scrapyard Expansion Y</h3><br/>(${format(x, 0)} / 6)
+                return `<h3>Mergeyard Expansion Y</h3><br/>(${format(x, 0)} / 6)
                     Adds 1 more row to the merge field.
 
                     Cost: ${format(data.cost, 0)} mergents`
@@ -3664,7 +3665,7 @@ addLayer("des", {
                 let x = player[this.layer].buyables[this.id]
                 let data = tmp[this.layer].buyables[this.id]
                 return `<h2>Life Mergeyard</h2><br/>(${format(x.div(10).floor(), 0)})
-                    Spend mergents to increase power token gain!
+                    Spend mergents to increase life token gain!
                     Currently: ×${format(data.effect)}
 
                     Cost: ${format(data.cost)} mergents
@@ -4155,7 +4156,7 @@ addLayer("des", {
             borderStyle: { "margin-top": "2px" },
             fillStyle: { "background": "#59bd77" },
             baseStyle: { "background": "#3a704b" },
-            textStyle: { color: "#1a3d25", "mix-blend-mode": "difference", "font-size": "14px" },
+            textStyle: { color: "#1a3d25", "font-size": "13px" },
         },
         dispBar: {
             direction: DOWN,
@@ -4173,7 +4174,7 @@ addLayer("des", {
             },
             baseStyle: { "background": "#3a704b" },
             borderStyle: { "margin-top": "-2px" },
-            textStyle: { color: "#1a3d25", "mix-blend-mode": "difference", "font-size": "14px" },
+            textStyle: { color: "#1a3d25", "font-size": "13px" },
         },
         gachaMergeBar: {
             direction: UP,
@@ -4224,7 +4225,7 @@ addLayer("des", {
             if (getBuyableAmount("des", 205).gte(1)) player.des.autoTime += delta / 15 * Math.pow(hasUpgrade("des", 275) ? 1.12 : 1.1, getBuyableAmount("des", 205).toNumber())
             if (player.des.mergeTime >= 1) {
                 let grid = player.des.grid
-                let slots = Object.keys(grid).filter(x => !grid[x].type && layers[layer].grid.getUnlocked(x))
+                let slots = Object.keys(grid).filter(x => !grid[x].type && layers.des.grid.getUnlocked(x))
                 let bonus = 0
                 if (hasUpgrade("des", 201)) bonus += Math.round(Math.random())
                 if (hasUpgrade("des", 238)) bonus += Math.random() < .2 ? 1 : 0
@@ -5415,7 +5416,7 @@ let giftHunter = {
     "2.1": {
         message: [
             // -----------------------------------------------------------------------
-            "You decided to find some giftcodes in-game. You open your trust-worthy",
+            "You decided to find some giftcodes online. You open your trust-worthy",
             "Aireagle Browser(tm) and soon realized a problem. The Internet is just",
             "impossibly vast. Finding giftcodes here is like finding diamond in the",
             "middle of the ocean. Is that even possible? Where should you even start?",

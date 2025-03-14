@@ -151,6 +151,7 @@ addLayer("aca", {
         if (player.aca.modActive) switch (player.aca.modLevel) {
             case 0: eff.compBonus = eff.compBonus.mul(tmp.tfu.effect.compBonus || 1); break;
             case 1: eff.modSpeed[0] = eff.modSpeed[0].mul(tmp.des.effect.compBonus || 1); break;
+            case 2: eff.modSpeed[1] = eff.modSpeed[1].mul(tmp.tpp.effect.compBonus || 1); break;
         }
 
         if (hasUpgrade("aca", 351)) eff.modSpeed[0] = eff.modSpeed[0].mul(upgradeEffect("aca", 351))
@@ -2608,6 +2609,7 @@ addLayer("aca", {
             startReqs: [
                 [1000000, 5, 35],
                 [1500000, 1, 0, 1],
+                [800, 2, 0, 1],
                 [1, 1, 1, 1, 1, 1],
             ],
             endReqs: [
