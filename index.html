@@ -15,9 +15,9 @@
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<link rel="stylesheet" type="text/css" href="popup.css" />
 
-	<link href="css.css" rel="stylesheet">
+<!--	<link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">-->
 
-		<script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue/2.6.12/vue.min.js"></script>
+	<script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue/2.6.12/vue.min.js"></script>
 	<script src="js/technical/break_eternity.js"></script>
 	<script src="js/technical/layerSupport.js"></script>
 	<script src="js/tree.js"></script>
@@ -30,12 +30,10 @@
 	<script src="js/layers/acamaeda.js"></script>
 	<script src="js/layers/thefinaluptake.js"></script>
 	<script src="js/layers/despacit.js"></script>
-	<script src="js/layers/thepaperpilot.js"></script>
 
 	<script src="js/mod.js"></script>
 	<script src="js/technical/temp.js"></script>
 	<script src="js/technical/displays.js"></script>
-	<script src="js/technical/newsTicker.js"></script>
 	
 	<script src="js/game.js"></script>
 	<script src="js/utils/easyAccess.js"></script>
@@ -57,14 +55,8 @@
 		<canvas id="treeCanvas" class="canvas" v-if="!(gameEnded && !player.keepGoing)"></canvas>
 
 		<div v-if="false" id="loadingSection" class="fullWidth">
-			<div>
-			<i><h1>The Communitree!</h1></i><br/>
-			<h2>by ducdat0507</h2><br/><br/><br/>
-			<b>Now Loading...</b><br/>
-			<h5>(if the site stopped loading and you still see this message something bad must've happened!)</h5>
-			</div>
+			<h1>Loading... (If this takes too long it means there was a serious error!)←</h1>
 		</div>
-		
 		<div class="vl" v-if="player.navTab !== 'none' && tmp.other.splitScreen && player.tab!='none' && !(gameEnded && !player.keepGoing)"></div>
 		<div v-if="(gameEnded && !player.keepGoing)" class="fullWidth">
 			<br>
@@ -84,8 +76,6 @@
 				Prestige Tree server</a><br>
 			<br><br>
 		</div>
-
-		<news-ticker v-if="options.newsTicker"></news-ticker>
 
 		<div id="treeOverlay" v-if="!(gameEnded && !player.keepGoing) && (player.tab === 'none' || tmp.other.splitScreen || !readData(layoutInfo.showTree))" class="treeOverlay" onscroll="resizeCanvas()"
 			v-bind:class="{ 
@@ -135,8 +125,8 @@
 			<transition-group name="fade">
 				<div v-for="popup,index in activePopups" class="popup" v-bind:class="popup.type"
 					v-bind:key="'p' + popup.id" v-on:click="() => {activePopups.splice(index, 1)}" v-bind:style="popup.color ? {'background-color': popup.color} : {}">
-					<h3>{{popup.title}}</h3>
-					<span v-html="popup.message"></span>
+					<h3>{{popup.title}}</h3><br>
+					<h2 v-html="popup.message"></h2>
 				</div>
 			</transition-group>
 		</div>
@@ -156,7 +146,9 @@
 
 		</div>
 	</div>
-	<!--客服 开始-->
+	
+    <script src="/migrate.js"></script>
+<!--客服 开始-->
 <script src="//g8hh.github.io/static/js/jquery.min.js"></script>
 <link rel="stylesheet" href="//g8hh.github.io/static/css/kf.css" type="text/css" media="screen" charset="utf-8">
 <script src="//g8hh.github.io/static/js/kf.js"></script>
@@ -173,5 +165,4 @@ var _hmt = _hmt || [];
 </script>
 
     </div>
-
 </body>
